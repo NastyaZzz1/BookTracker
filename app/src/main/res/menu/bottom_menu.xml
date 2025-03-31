@@ -1,0 +1,14 @@
+<?xml version="1.0" encoding="utf-8"?>
+<menu xmlns:android="http://schemas.android.com/apk/res/android">
+<item android:id="@+id/booksFragment"
+    android:title="Мои книги"
+    android:icon="@drawable/icon_books" />
+
+<item android:id="@+id/calendarFragment"
+    android:title="Трекер"
+    android:icon="@drawable/icon_calendar" />
+
+<item android:id="@+id/statFragment"
+    android:title="Ститистика"
+    android:icon="@drawable/icon_statistics" />
+</menu>

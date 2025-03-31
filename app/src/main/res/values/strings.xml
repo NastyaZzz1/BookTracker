@@ -1,0 +1,8 @@
+<resources>
+    <string name="app_name">BookTracker</string>
+    <string name="hello_blank_fragment">Hello blank fragment</string>
+    <string name="all_books">Все книги</string>
+    <string name="reading_books">Читаю сейчас</string>
+    <string name="past_books">Прочитано</string>
+    <string name="want_books">Хочу прочитать</string>
+</resources>

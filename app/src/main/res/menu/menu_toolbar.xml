@@ -1,0 +1,13 @@
+<?xml version="1.0" encoding="utf-8"?>
+<menu xmlns:app="http://schemas.android.com/apk/res-auto"
+    xmlns:android="http://schemas.android.com/apk/res/android">
+    <item android:id="@+id/addBooksFragment"
+        android:title="add_book"
+        android:icon="@drawable/icon_plus"
+        app:showAsAction="always" />
+
+    <item android:id="@+id/favoriteBooksFragment"
+        android:title="favorite"
+        android:icon="@drawable/icon_heart"
+        app:showAsAction="always" />
+</menu>
