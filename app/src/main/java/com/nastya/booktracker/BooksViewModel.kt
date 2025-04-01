@@ -1,9 +1,21 @@
 package com.nastya.booktracker
 
+import androidx.lifecycle.LiveData
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.MutableLiveData
 
 class BooksViewModel : ViewModel() {
+    private val _navigateToBook = MutableLiveData<Long?>()
+    val navigateToBook: LiveData<Long?>
+        get() = _navigateToBook
+
+    fun onBookClicked(bookId: Long) {
+        _navigateToBook.value = bookId
+    }
+
+    fun onBookNavigated() {
+        _navigateToBook.value = null
+    }
 
     val initialBooks = listOf(
         Book(1, "Мастер и Маргарита", "М.А. Булгаков", "«Мастер и Маргарита» — это смесь мистики, сатиры и вечной истории любви, одно из самых загадочных и захватывающих произведений русской литературы. В Москву 1930-х годов прибывает сам Воланд, дьявол, в сопровождении своей свиты, чтобы внести хаос и справедливость в жизнь советского общества. Параллельно разворачивается трагическая история Мастера, писателя, чей роман о Понтии Пилате отвергли, и его возлюбленной Маргариты, готовой на всё, чтобы спасти его. Готовы ли вы отправиться в путешествие по миру, где стираются границы между реальностью и фантазией, добром и злом?"),
@@ -18,6 +30,10 @@ class BooksViewModel : ViewModel() {
         Book(10, "Три мушкетера", "Александр Дюма", ""),
     )
 
-    var books: MutableLiveData<List<Book>> = MutableLiveData(initialBooks)
+    private var _books: MutableLiveData<List<Book>> = MutableLiveData(initialBooks)
+    val books: LiveData<List<Book>> = _books
 
+    fun getBook(bookId: Long) : Book? {
+        return _books.value?.find { it.bookId == bookId }
+    }
 }

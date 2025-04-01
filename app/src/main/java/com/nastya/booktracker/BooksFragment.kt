@@ -7,6 +7,7 @@ import android.view.View
 import android.view.ViewGroup
 import androidx.lifecycle.Observer
 import androidx.lifecycle.ViewModelProvider
+import androidx.navigation.fragment.findNavController
 import com.nastya.booktracker.databinding.FragmentBooksBinding
 
 class BooksFragment : Fragment() {
@@ -25,14 +26,27 @@ class BooksFragment : Fragment() {
         binding.viewModel = viewModel
         binding.lifecycleOwner = viewLifecycleOwner
 
-        val adapter = BookItemAdapter()
+        val adapter = BookItemAdapter { bookId ->
+            viewModel.onBookClicked(bookId)
+        }
         binding.booksList.adapter = adapter
 
         viewModel.books.observe(viewLifecycleOwner, Observer {
             it?.let {
-                adapter.data = it
+                adapter.submitList(it)
             }
         })
+
+        viewModel.navigateToBook.observe(viewLifecycleOwner, Observer { bookId ->
+            bookId?.let {
+                val action = BooksFragmentDirections.
+                    actionBooksFragmentToEditBookFragment(bookId)
+                this.findNavController().navigate(action)
+                viewModel.onBookNavigated()
+            }
+        }
+
+        )
 
         return view
     }
