@@ -13,12 +13,12 @@ import com.nastya.booktracker.databinding.FragmentBooksBinding
 class BooksFragment : Fragment() {
     private var _binding: FragmentBooksBinding? = null
     private val binding get() = _binding!!
-    lateinit var viewModel: BooksViewModel
+    private lateinit var viewModel: BooksViewModel
 
     override fun onCreateView(
         inflater: LayoutInflater, container: ViewGroup?,
         savedInstanceState: Bundle?
-    ): View? {
+    ): View {
         _binding = FragmentBooksBinding.inflate(inflater, container, false)
         val view = binding.root
 
@@ -31,10 +31,8 @@ class BooksFragment : Fragment() {
         }
         binding.booksList.adapter = adapter
 
-        viewModel.books.observe(viewLifecycleOwner, Observer {
-            it?.let {
-                adapter.submitList(it)
-            }
+        viewModel.filteredProducts.observe(viewLifecycleOwner, Observer {
+            it?.let { adapter.submitList(it) }
         })
 
         viewModel.navigateToBook.observe(viewLifecycleOwner, Observer { bookId ->
@@ -44,11 +42,32 @@ class BooksFragment : Fragment() {
                 this.findNavController().navigate(action)
                 viewModel.onBookNavigated()
             }
-        }
+        })
 
-        )
+        viewModel.filterByCategory("all");
+        binding.allBooksBtn.isSelected = true
+        setupFilterButtons();
 
         return view
+    }
+
+    private fun setupFilterButtons() {
+        binding.allBooksBtn.setOnClickListener { filterProducts("all") }
+        binding.wantBooksBtn.setOnClickListener { filterProducts("reading") }
+        binding.readingBooksBtn.setOnClickListener { filterProducts("past") }
+        binding.pastBooksBtn.setOnClickListener { filterProducts("want") }
+    }
+
+    private fun filterProducts(category: String) {
+        viewModel.filterByCategory(category)
+        updateButtonStates(category)
+    }
+
+    private fun updateButtonStates(selectedCategory: String) {
+        binding.allBooksBtn.isSelected = selectedCategory == "all"
+        binding.wantBooksBtn.isSelected = selectedCategory == "reading"
+        binding.readingBooksBtn.isSelected = selectedCategory == "past"
+        binding.pastBooksBtn.isSelected = selectedCategory == "want"
     }
 
     override fun onDestroyView() {

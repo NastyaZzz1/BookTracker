@@ -42,6 +42,7 @@ android {
 }
 
 dependencies {
+    implementation(libs.io.coil.kt)
     implementation(libs.androidx.cardview)
     implementation(libs.androidx.lifecycle.livedata.ktx)
     implementation(libs.androidx.lifecycle.viewmodel.ktx)

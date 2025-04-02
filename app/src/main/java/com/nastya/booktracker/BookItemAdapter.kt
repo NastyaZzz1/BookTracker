@@ -4,6 +4,8 @@ import android.view.LayoutInflater
 import android.view.ViewGroup
 import androidx.recyclerview.widget.ListAdapter
 import androidx.recyclerview.widget.RecyclerView
+import coil.load
+import coil.transform.RoundedCornersTransformation
 import com.nastya.booktracker.databinding.BookItemBinding
 
 class BookItemAdapter(val clickListener: (bookId: Long) -> Unit) :
@@ -28,9 +30,21 @@ class BookItemAdapter(val clickListener: (bookId: Long) -> Unit) :
                 return BookItemViewHolder(binding)
             }
         }
-        fun bind(item: Book, clickListener: (bookId: Long) -> Unit) {
-            binding.book = item
-            binding.root.setOnClickListener { clickListener(item.bookId) }
+
+        fun bind(item: Book?, clickListener: (bookId: Long) -> Unit) {
+            item?.let { book ->
+                binding.book = book
+                binding.root.setOnClickListener { clickListener(book.bookId) }
+
+                binding.bookImage.load(book.imageUrl) {
+                    crossfade(true)
+//                    placeholder(R.drawable.placeholder)
+//                      error(R.drawable.ic_error)
+                }
+            } ?: run {
+                binding.bookName.text = "No data"
+//                binding.bookImage.setImageResource(R.drawable.placeholder)
+            }
         }
     }
 }
