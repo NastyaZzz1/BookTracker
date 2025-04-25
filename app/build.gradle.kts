@@ -21,6 +21,7 @@ android {
 
     buildFeatures{
         dataBinding = true
+        viewBinding = true
     }
 
     buildTypes {
@@ -42,6 +43,8 @@ android {
 }
 
 dependencies {
+    implementation (libs.calendarview)
+    implementation (libs.mpandroidchart)
     implementation(libs.io.coil.kt)
     implementation(libs.androidx.cardview)
     implementation(libs.androidx.lifecycle.livedata.ktx)

@@ -5,7 +5,6 @@ import androidx.lifecycle.MutableLiveData
 import androidx.lifecycle.ViewModel
 
 class EditBookViewModel(bookId: Long) : ViewModel() {
-
     val book: Book? = BooksViewModel().getBook(bookId)
 
     private val _navigateToList = MutableLiveData<Boolean>(false)

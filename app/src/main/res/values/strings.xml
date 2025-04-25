@@ -5,4 +5,9 @@
     <string name="reading_books">Читаю сейчас</string>
     <string name="past_books">Прочитано</string>
     <string name="want_books">Хочу прочитать</string>
+    <string name="content_description_img">Изображение книги</string>
+    <string name="my_goals">Мои цели</string>
+    <string name="for_day">На день</string>
+    <string name="for_month">На месяц</string>
+    <string name="for_year">На год</string>
 </resources>
