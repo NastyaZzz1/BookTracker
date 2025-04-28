@@ -48,14 +48,16 @@ class BooksFragment : Fragment() {
         binding.allBooksBtn.isSelected = true
         setupFilterButtons();
 
+//        binding.
+
         return view
     }
 
     private fun setupFilterButtons() {
         binding.allBooksBtn.setOnClickListener { filterProducts("all") }
-        binding.wantBooksBtn.setOnClickListener { filterProducts("reading") }
-        binding.readingBooksBtn.setOnClickListener { filterProducts("past") }
-        binding.pastBooksBtn.setOnClickListener { filterProducts("want") }
+        binding.wantBooksBtn.setOnClickListener { filterProducts("want") }
+        binding.readingBooksBtn.setOnClickListener { filterProducts("reading") }
+        binding.pastBooksBtn.setOnClickListener { filterProducts("past") }
     }
 
     private fun filterProducts(category: String) {
@@ -65,9 +67,9 @@ class BooksFragment : Fragment() {
 
     private fun updateButtonStates(selectedCategory: String) {
         binding.allBooksBtn.isSelected = selectedCategory == "all"
-        binding.wantBooksBtn.isSelected = selectedCategory == "reading"
-        binding.readingBooksBtn.isSelected = selectedCategory == "past"
-        binding.pastBooksBtn.isSelected = selectedCategory == "want"
+        binding.wantBooksBtn.isSelected = selectedCategory == "want"
+        binding.readingBooksBtn.isSelected = selectedCategory == "reading"
+        binding.pastBooksBtn.isSelected = selectedCategory == "past"
     }
 
     override fun onDestroyView() {

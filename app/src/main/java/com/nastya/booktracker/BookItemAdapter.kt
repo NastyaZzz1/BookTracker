@@ -1,5 +1,6 @@
 package com.nastya.booktracker
 
+import android.annotation.SuppressLint
 import android.view.LayoutInflater
 import android.view.ViewGroup
 import androidx.recyclerview.widget.ListAdapter
@@ -31,10 +32,15 @@ class BookItemAdapter(val clickListener: (bookId: Long) -> Unit) :
             }
         }
 
+        @SuppressLint("SetTextI18n")
         fun bind(item: Book?, clickListener: (bookId: Long) -> Unit) {
             item?.let { book ->
+                val progress = (book.readPagesCount * 100 ) / book.allPagesCount;
                 binding.book = book
                 binding.root.setOnClickListener { clickListener(book.bookId) }
+                binding.linProgressBar.progress = progress;
+                binding.linProgressText.text = "$progress%";
+                binding.linProgressBar.isIndeterminate = false;
 
                 binding.bookImage.load(book.imageUrl) {
                     crossfade(true)

@@ -1,13 +1,44 @@
 <?xml version="1.0" encoding="utf-8"?>
-<FrameLayout xmlns:android="http://schemas.android.com/apk/res/android"
+<LinearLayout
+    xmlns:android="http://schemas.android.com/apk/res/android"
     xmlns:tools="http://schemas.android.com/tools"
     android:layout_width="match_parent"
     android:layout_height="match_parent"
-    tools:context=".AddBooksFragment">
+    tools:context=".AddBooksFragment"
+    android:orientation="vertical">
 
-    <TextView
+    <EditText
+        android:id="@+id/book_name_add"
         android:layout_width="match_parent"
-        android:layout_height="match_parent"
-        android:text="Add_books" />
+        android:layout_height="wrap_content"
+        android:minHeight="48dp"
+        android:hint="Название" />
 
-</FrameLayout>
+    <EditText
+        android:id="@+id/book_author_add"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:minHeight="48dp"
+        android:hint="Автор" />
+
+    <EditText
+        android:id="@+id/book_desc_add"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:minHeight="48dp"
+        android:hint="Описание" />
+
+    <EditText
+        android:id="@+id/book_page_add"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:minHeight="48dp"
+        android:hint="Количество страниц" />
+
+    <Button
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:text="Добавить"
+        android:layout_gravity="center"/>
+
+</LinearLayout>

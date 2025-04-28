@@ -7,4 +7,6 @@ data class Book (
     var category: String,
     var description: String,
     var imageUrl: String,
+    var allPagesCount: Int,
+    var readPagesCount: Int,
 )

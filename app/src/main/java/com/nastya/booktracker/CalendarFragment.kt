@@ -34,7 +34,6 @@ import java.util.*
 
 @RequiresApi(Build.VERSION_CODES.O)
 class CalendarFragment : Fragment() {
-
     private var _binding: FragmentCalendarBinding? = null
     private val binding get() = _binding!!
     private val progressData: MutableMap<String, Float> = mutableMapOf()
@@ -42,7 +41,6 @@ class CalendarFragment : Fragment() {
     private val monthCalendarView: CalendarView get() = binding.calendarView
     private val selectedDates = mutableSetOf<LocalDate>()
     private val today = LocalDate.now()
-
 
     override fun onCreateView(
         inflater: LayoutInflater, container: ViewGroup?,
@@ -147,8 +145,6 @@ class CalendarFragment : Fragment() {
         _binding = null
     }
 }
-
-
 
 @RequiresApi(Build.VERSION_CODES.O)
 fun Month.displayText(short: Boolean = true): String {

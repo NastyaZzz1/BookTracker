@@ -1,5 +1,11 @@
 <?xml version="1.0" encoding="utf-8"?>
 <resources>
-    <style name="CustomDateText" parent="TextAppearance.AppCompat">
+    <style name="BottomNavigationTheme" parent="Widget.MaterialComponents.BottomNavigationView">
+        <item name="itemTextColor">@color/bottom_nav_text_color</item>
+        <item name="itemIconTint">@color/white</item>
+    </style>
+    <style name="CustomProgressIndicator" parent="Widget.MaterialComponents.LinearProgressIndicator">
+        <item name="indicatorTrackGapSize">0dp</item>
+        <item name="trackCornerRadius">6dp</item>
     </style>
 </resources>
