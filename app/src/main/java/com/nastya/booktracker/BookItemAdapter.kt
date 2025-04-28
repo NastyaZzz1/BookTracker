@@ -6,7 +6,6 @@ import android.view.ViewGroup
 import androidx.recyclerview.widget.ListAdapter
 import androidx.recyclerview.widget.RecyclerView
 import coil.load
-import coil.transform.RoundedCornersTransformation
 import com.nastya.booktracker.databinding.BookItemBinding
 
 class BookItemAdapter(val clickListener: (bookId: Long) -> Unit) :
@@ -17,7 +16,7 @@ class BookItemAdapter(val clickListener: (bookId: Long) -> Unit) :
     }
 
     override fun onBindViewHolder(holder: BookItemViewHolder, position: Int) {
-        val item = getItem(position)
+        val item  = getItem(position)
         holder.bind(item, clickListener)
     }
 
@@ -36,6 +35,7 @@ class BookItemAdapter(val clickListener: (bookId: Long) -> Unit) :
         fun bind(item: Book?, clickListener: (bookId: Long) -> Unit) {
             item?.let { book ->
                 val progress = (book.readPagesCount * 100 ) / book.allPagesCount;
+                binding.linProgressBar.setProgressCompat(0, false)
                 binding.book = book
                 binding.root.setOnClickListener { clickListener(book.bookId) }
                 binding.linProgressBar.progress = progress;
