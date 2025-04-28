@@ -1,13 +1,60 @@
 <?xml version="1.0" encoding="utf-8"?>
-<FrameLayout xmlns:android="http://schemas.android.com/apk/res/android"
+<layout
+    xmlns:android="http://schemas.android.com/apk/res/android"
     xmlns:tools="http://schemas.android.com/tools"
-    android:layout_width="match_parent"
-    android:layout_height="match_parent"
     tools:context=".AddBooksFragment">
 
-    <TextView
+    <data>
+        <variable
+            name="viewModel"
+            type="com.nastya.booktracker.AddBookViewModel" />
+    </data>
+
+    <LinearLayout
         android:layout_width="match_parent"
         android:layout_height="match_parent"
-        android:text="Add_books" />
+        android:orientation="vertical">
 
-</FrameLayout>
+        <EditText
+            android:id="@+id/book_name_add"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:minHeight="48dp"
+            android:text="@={viewModel.newTaskName}"
+            android:hint="Название" />
+
+        <EditText
+            android:id="@+id/book_author_add"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:minHeight="48dp"
+            android:hint="Автор" />
+
+        <EditText
+            android:id="@+id/book_desc_add"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:minHeight="48dp"
+            android:hint="Описание" />
+
+        <EditText
+            android:id="@+id/book_page_add"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:minHeight="48dp"
+            android:hint="Количество страниц" />
+
+        <Button
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:text="Добавить"
+            android:layout_gravity="center"
+            android:onClick="@{() -> viewModel.addTask()}"/>
+
+        <TextView
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:text="@{viewModel.booksString}" />
+
+    </LinearLayout>
+</layout>

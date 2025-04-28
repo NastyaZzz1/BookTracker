@@ -1,46 +1,56 @@
 package com.nastya.booktracker
 
+import android.annotation.SuppressLint
 import android.view.LayoutInflater
 import android.view.ViewGroup
-import android.widget.TextView
-import androidx.cardview.widget.CardView
+import androidx.recyclerview.widget.ListAdapter
 import androidx.recyclerview.widget.RecyclerView
+import coil.load
+import com.nastya.booktracker.databinding.BookItemBinding
 
-class BookItemAdapter : RecyclerView.Adapter<BookItemAdapter.BookItemViewHolder>() {
-
-    var data = listOf<Book>()
-        set(value) {
-            field = value
-            notifyDataSetChanged()
-        }
-
-    override fun getItemCount() = data.size
+class BookItemAdapter(val clickListener: (bookId: Long) -> Unit) :
+    ListAdapter<Book, BookItemAdapter.BookItemViewHolder>(BookDiffItemCallback()) {
 
     override fun onCreateViewHolder(parent: ViewGroup, viewType: Int): BookItemViewHolder {
         return BookItemViewHolder.inflateFrom(parent)
     }
 
     override fun onBindViewHolder(holder: BookItemViewHolder, position: Int) {
-        val item = data[position]
-        holder.bind(item)
+        val item  = getItem(position)
+        holder.bind(item, clickListener)
     }
 
-    class BookItemViewHolder(val rootView: CardView)
-        : RecyclerView.ViewHolder(rootView) {
-
-        val bookName = rootView.findViewById<TextView>(R.id.book_name)
-        val bookAuthor = rootView.findViewById<TextView>(R.id.book_author)
+    class BookItemViewHolder(val binding: BookItemBinding)
+        : RecyclerView.ViewHolder(binding.root) {
 
         companion object {
             fun inflateFrom(parent: ViewGroup): BookItemViewHolder {
                 val layoutInflater = LayoutInflater.from(parent.context)
-                val view = layoutInflater.inflate(R.layout.book_item, parent, false) as CardView
-                return BookItemViewHolder(view)
+                val binding = BookItemBinding.inflate(layoutInflater, parent, false)
+                return BookItemViewHolder(binding)
             }
         }
-        fun bind(item: Book) {
-            bookName.text = item.bookName
-            bookAuthor.text = item.bookAuthor
+
+        @SuppressLint("SetTextI18n")
+        fun bind(item: Book?, clickListener: (bookId: Long) -> Unit) {
+            item?.let { book ->
+                val progress = (book.readPagesCount * 100 ) / book.allPagesCount;
+                binding.linProgressBar.setProgressCompat(0, false)
+                binding.book = book
+                binding.root.setOnClickListener { clickListener(book.bookId) }
+                binding.linProgressBar.progress = progress;
+                binding.linProgressText.text = "$progress%";
+                binding.linProgressBar.isIndeterminate = false;
+
+                binding.bookImage.load(book.imageUrl) {
+                    crossfade(true)
+//                    placeholder(R.drawable.placeholder)
+//                      error(R.drawable.ic_error)
+                }
+            } ?: run {
+                binding.bookName.text = "No data"
+//                binding.bookImage.setImageResource(R.drawable.placeholder)
+            }
         }
     }
 }

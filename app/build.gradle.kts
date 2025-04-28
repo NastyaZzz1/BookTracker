@@ -2,6 +2,7 @@ plugins {
     alias(libs.plugins.android.application)
     alias(libs.plugins.kotlin.android)
     alias(libs.plugins.org.jetbrains.kotlin.kapt)
+    alias(libs.plugins.androidx.navigation.safeargs)
 }
 
 android {
@@ -20,6 +21,7 @@ android {
 
     buildFeatures{
         dataBinding = true
+        viewBinding = true
     }
 
     buildTypes {
@@ -41,6 +43,9 @@ android {
 }
 
 dependencies {
+    implementation (libs.calendarview)
+    implementation (libs.mpandroidchart)
+    implementation(libs.io.coil.kt)
     implementation(libs.androidx.cardview)
     implementation(libs.androidx.lifecycle.livedata.ktx)
     implementation(libs.androidx.lifecycle.viewmodel.ktx)

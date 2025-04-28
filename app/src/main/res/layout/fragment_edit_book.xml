@@ -1,0 +1,85 @@
+<?xml version="1.0" encoding="utf-8"?>
+<layout
+    xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:tools="http://schemas.android.com/tools"
+    tools:context=".EditBookFragment">
+
+    <data>
+        <variable
+            name="viewModel"
+            type="com.nastya.booktracker.EditBookViewModel" />
+    </data>
+
+    <LinearLayout
+        android:layout_width="match_parent"
+        android:layout_height="match_parent"
+        android:orientation="vertical">
+
+        <EditText
+            android:id="@+id/book_name"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:textSize="16sp"
+            android:inputType="text"
+            android:text="@{viewModel.book.bookName}"
+            android:hint="Название" />
+
+        <EditText
+            android:id="@+id/book_author"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:textSize="16sp"
+            android:inputType="text"
+            android:minHeight="48dp"
+            android:text="@{viewModel.book.bookAuthor}"
+            android:hint="Автор" />
+
+        <EditText
+            android:id="@+id/book_desc"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:textSize="16sp"
+            android:inputType="text"
+            android:minHeight="48dp"
+            android:text="@{viewModel.book.description}"
+            android:hint="Описание" />
+
+        <EditText
+            android:id="@+id/book_all_pages"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:textSize="16sp"
+            android:inputType="text"
+            android:minHeight="48dp"
+            android:text="@{String.valueOf(viewModel.book.allPagesCount)}"
+            android:hint="Общее количество страниц" />
+
+        <EditText
+            android:id="@+id/book_read_pages"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:textSize="16sp"
+            android:inputType="text"
+            android:minHeight="48dp"
+            android:text="@{String.valueOf(viewModel.book.readPagesCount)}"
+            android:hint="Количество прочитанных страниц" />
+
+
+        <Button
+            android:id="@+id/update_button"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_gravity="center"
+            android:text="Изменить"
+            android:onClick="@{() -> viewModel.updateTask()}" />
+
+        <Button
+            android:id="@+id/delete_button"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_gravity="center"
+            android:text="Удалить"
+            android:onClick="@{() -> viewModel.deleteTask()}" />
+
+    </LinearLayout>
+</layout>
