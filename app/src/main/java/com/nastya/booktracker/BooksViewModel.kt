@@ -1,6 +1,8 @@
 package com.nastya.booktracker
 
+import android.util.Log
 import androidx.lifecycle.LiveData
+import androidx.lifecycle.MediatorLiveData
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.MutableLiveData
 import androidx.lifecycle.viewModelScope
@@ -11,20 +13,52 @@ class BooksViewModel(val dao: BookDao) : ViewModel() {
     val navigateToBook: LiveData<Long?>
         get() = _navigateToBook
 
-    val books = dao.getAll()
+    private val _books = dao.getAll()
+    val books: LiveData<List<Book>> = _books
 
-//    private var _filteredProducts: MutableLiveData<List<Book>> = MutableLiveData()
-//    var filteredProducts: LiveData<List<Book>> = _filteredProducts
-//
-//
-//    fun filterByCategory(category: String) {
-//        val currentList = books.value ?: return
-//        _filteredProducts.value = if (category == "all") {
-//            currentList
-//        } else {
-//            currentList.filter { it.category == category }
-//        }
-//    }
+    private val _filteredProducts = MediatorLiveData<List<Book>>()
+    val filteredProducts: LiveData<List<Book>> = _filteredProducts
+
+    init {
+        _filteredProducts.addSource(_books) { allBooks ->
+            _filteredProducts.value = allBooks ?: emptyList()
+        }
+    }
+
+    fun filterByCategory(category: String) {
+        books.value?.let { currentList ->
+            _filteredProducts.value = if (category == "all") {
+                currentList
+            } else {
+                currentList.filter { it.category == category }
+            }
+        }
+    }
+
+    fun updateAllCategories() {
+        viewModelScope.launch {
+            val booksList = dao.getAllOnce()
+
+            val updatedBooks = booksList.map { book ->
+                val newCategory = when {
+                    book.readPagesCount == 0 -> "want"
+                    book.readPagesCount == book.allPagesCount -> "past"
+                    else -> "reading"
+                }
+
+                if (book.category != newCategory) {
+                    book.copy(category = newCategory)
+                } else {
+                    book
+                }
+            }
+
+            updatedBooks.forEach { updatedBook ->
+                dao.update(updatedBook)
+            }
+        }
+    }
+
 
     fun onBookClicked(bookId: Long) {
         _navigateToBook.value = bookId
@@ -32,6 +66,17 @@ class BooksViewModel(val dao: BookDao) : ViewModel() {
 
     fun onBookNavigated() {
         _navigateToBook.value = null
+    }
+
+    fun toggleBookIsFavorite(bookId: Long) {
+        viewModelScope.launch {
+            val book = dao.getNotLive(bookId)
+            if(book != null) {
+                dao.update(book)
+            } else {
+                Log.e("BooksViewModel", "Книга с bookId=$bookId не найдена.")
+            }
+        }
     }
 
 //    val initialBooks = listOf(

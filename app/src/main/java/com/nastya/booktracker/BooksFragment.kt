@@ -22,64 +22,69 @@ class BooksFragment : Fragment() {
         _binding = FragmentBooksBinding.inflate(inflater, container, false)
         val view = binding.root
 
+        return view
+    }
+
+    override fun onViewCreated(view: View, savedInstanceState: Bundle?) {
         val application = requireNotNull(this.activity).application
         val dao = BookDatabase.getInstance(application).bookDao
         val viewModelFactory = BookViewModelFactory(dao)
         viewModel = ViewModelProvider(
             this, viewModelFactory).get(BooksViewModel::class.java)
-        binding.viewModel = viewModel
-        binding.lifecycleOwner = viewLifecycleOwner
+        this.viewModel = viewModel
 
-        val adapter = BookItemAdapter { bookId ->
-            viewModel.onBookClicked(bookId)
-        }
+        val adapter = BookItemAdapter (
+            onItemClick = { bookId ->
+                viewModel.onBookClicked(bookId)
+            },
+            onFavoriteClick = { bookId ->
+                viewModel.toggleBookIsFavorite(bookId)
+            }
+        )
         binding.booksList.adapter = adapter
 
-//        viewModel.filteredProducts.observe(viewLifecycleOwner, Observer {
-//            it?.let { adapter.submitList(it) }
-//        })
-//
-        viewModel.books.observe(viewLifecycleOwner, Observer {
+        viewModel.filteredProducts.observe(viewLifecycleOwner, Observer {
             it?.let {
                 adapter.submitList(it)
             }
         })
 
+        viewModel.updateAllCategories()
+
+        viewModel.filterByCategory("all");
+        binding.allBooksBtn.isSelected = true
+        setupFilterButtons();
+
 
         viewModel.navigateToBook.observe(viewLifecycleOwner, Observer { bookId ->
             bookId?.let {
                 val action = BooksFragmentDirections.
-                    actionBooksFragmentToEditBookFragment(bookId)
+                actionBooksFragmentToEditBookFragment(bookId)
                 this.findNavController().navigate(action)
                 viewModel.onBookNavigated()
             }
         })
 
-//        viewModel.filterByCategory("all");
-        binding.allBooksBtn.isSelected = true
-//        setupFilterButtons();
-
-        return view
     }
-//
-//    private fun setupFilterButtons() {
-//        binding.allBooksBtn.setOnClickListener { filterProducts("all") }
-//        binding.wantBooksBtn.setOnClickListener { filterProducts("want") }
-//        binding.readingBooksBtn.setOnClickListener { filterProducts("reading") }
-//        binding.pastBooksBtn.setOnClickListener { filterProducts("past") }
-//    }
-//
-//    private fun filterProducts(category: String) {
-//        viewModel.filterByCategory(category)
-//        updateButtonStates(category)
-//    }
-//
-//    private fun updateButtonStates(selectedCategory: String) {
-//        binding.allBooksBtn.isSelected = selectedCategory == "all"
-//        binding.wantBooksBtn.isSelected = selectedCategory == "want"
-//        binding.readingBooksBtn.isSelected = selectedCategory == "reading"
-//        binding.pastBooksBtn.isSelected = selectedCategory == "past"
-//    }
+
+    private fun setupFilterButtons() {
+        binding.allBooksBtn.setOnClickListener { filterProducts("all") }
+        binding.wantBooksBtn.setOnClickListener { filterProducts("want") }
+        binding.readingBooksBtn.setOnClickListener { filterProducts("reading") }
+        binding.pastBooksBtn.setOnClickListener { filterProducts("past") }
+    }
+
+    private fun filterProducts(category: String) {
+        viewModel.filterByCategory(category)
+        updateButtonStates(category)
+    }
+
+    private fun updateButtonStates(selectedCategory: String) {
+        binding.allBooksBtn.isSelected = selectedCategory == "all"
+        binding.wantBooksBtn.isSelected = selectedCategory == "want"
+        binding.readingBooksBtn.isSelected = selectedCategory == "reading"
+        binding.pastBooksBtn.isSelected = selectedCategory == "past"
+    }
 
     override fun onDestroyView() {
         super.onDestroyView()

@@ -18,6 +18,12 @@ interface BookDao {
     @Delete
     suspend fun delete(book: Book)
 
+    @Query("SELECT * FROM book_table")
+    suspend fun getAllOnce(): List<Book>
+
+    @Query("SELECT * FROM book_table WHERE bookId = :bookId")
+    suspend fun getNotLive(bookId: Long): Book?
+
     @Query("SELECT * FROM book_table WHERE bookId = :bookId")
     fun get(bookId: Long) : LiveData<Book>
 

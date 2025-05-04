@@ -29,4 +29,7 @@ data class Book (
 
     @ColumnInfo(name = "read_pages_count")
     var readPagesCount: Int = 0,
+
+    @ColumnInfo(name = "is_favorite_book")
+    var isFavorite: Boolean = false,
 )

@@ -1,60 +1,59 @@
 <?xml version="1.0" encoding="utf-8"?>
-<layout
-    xmlns:android="http://schemas.android.com/apk/res/android"
+<LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:app="http://schemas.android.com/apk/res-auto"
     xmlns:tools="http://schemas.android.com/tools"
+    android:layout_width="match_parent"
+    android:layout_height="match_parent"
+    android:orientation="vertical"
     tools:context=".AddBooksFragment">
 
-    <data>
-        <variable
-            name="viewModel"
-            type="com.nastya.booktracker.AddBookViewModel" />
-    </data>
-
-    <LinearLayout
+    <EditText
+        android:id="@+id/book_name_add"
         android:layout_width="match_parent"
-        android:layout_height="match_parent"
-        android:orientation="vertical">
+        android:layout_height="wrap_content"
+        android:inputType="text"
+        android:hint="Название"
+        android:minHeight="48dp" />
 
-        <EditText
-            android:id="@+id/book_name_add"
-            android:layout_width="match_parent"
-            android:layout_height="wrap_content"
-            android:minHeight="48dp"
-            android:text="@={viewModel.newTaskName}"
-            android:hint="Название" />
+    <EditText
+        android:id="@+id/book_author_add"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:inputType="text"
+        android:hint="Автор"
+        android:minHeight="48dp" />
 
-        <EditText
-            android:id="@+id/book_author_add"
-            android:layout_width="match_parent"
-            android:layout_height="wrap_content"
-            android:minHeight="48dp"
-            android:hint="Автор" />
+    <EditText
+        android:id="@+id/book_desc_add"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:inputType="text"
+        android:hint="Описание"
+        android:minHeight="48dp" />
 
-        <EditText
-            android:id="@+id/book_desc_add"
-            android:layout_width="match_parent"
-            android:layout_height="wrap_content"
-            android:minHeight="48dp"
-            android:hint="Описание" />
+    <EditText
+        android:id="@+id/book_page_add"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:hint="Количество страниц"
+        android:inputType="number"
+        android:minHeight="48dp" />
 
-        <EditText
-            android:id="@+id/book_page_add"
-            android:layout_width="match_parent"
-            android:layout_height="wrap_content"
-            android:minHeight="48dp"
-            android:hint="Количество страниц" />
+    <EditText
+        android:id="@+id/book_img_add"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:inputType="text"
+        android:hint="Ссылка на бложку"
+        android:minHeight="48dp" />
 
-        <Button
-            android:layout_width="wrap_content"
-            android:layout_height="wrap_content"
-            android:text="Добавить"
-            android:layout_gravity="center"
-            android:onClick="@{() -> viewModel.addTask()}"/>
+    <com.google.android.material.button.MaterialButton
+        android:id="@+id/btnAction"
+        android:layout_width="wrap_content"
+        android:layout_height="38dp"
+        android:layout_gravity="center"
+        android:background="@drawable/button_drawble"
+        app:backgroundTint="@null"
+        android:text="@string/add" />
 
-        <TextView
-            android:layout_width="match_parent"
-            android:layout_height="wrap_content"
-            android:text="@{viewModel.booksString}" />
-
-    </LinearLayout>
-</layout>
+</LinearLayout>
