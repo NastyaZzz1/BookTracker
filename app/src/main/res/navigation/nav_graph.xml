@@ -31,7 +31,11 @@ app:startDestination="@id/booksFragment">
         android:id="@+id/favoriteBooksFragment"
         android:name="com.nastya.booktracker.FavoriteBooksFragment"
         android:label="Любимые книги"
-        tools:layout="@layout/fragment_favorite_books" />
+        tools:layout="@layout/fragment_favorite_books" >
+        <action
+            android:id="@+id/action_favoriteBooksFragment_to_editBookFragment"
+            app:destination="@id/editBookFragment" />
+    </fragment>
 
     <fragment
         android:id="@+id/addBooksFragment"
@@ -50,6 +54,9 @@ app:startDestination="@id/booksFragment">
         <action
             android:id="@+id/action_editBookFragment_to_booksFragment"
             app:destination="@id/booksFragment" />
+        <action
+            android:id="@+id/action_editBookFragment_to_favoriteBooksFragment"
+            app:destination="@id/favoriteBooksFragment" />
     </fragment>
 
 </navigation>

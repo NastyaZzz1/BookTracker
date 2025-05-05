@@ -64,7 +64,6 @@ class BooksFragment : Fragment() {
                 viewModel.onBookNavigated()
             }
         })
-
     }
 
     private fun setupFilterButtons() {

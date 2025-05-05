@@ -68,6 +68,11 @@ class AddBooksFragment : Fragment() {
                 binding.bookAuthorAdd.requestFocus()
             } else {
                 viewModel.addTask()
+                binding.bookNameAdd.text.clear()
+                binding.bookAuthorAdd.text.clear()
+                binding.bookDescAdd.text.clear()
+                binding.bookPageAdd.text.clear()
+                binding.bookImgAdd.text.clear()
             }
         }
     }

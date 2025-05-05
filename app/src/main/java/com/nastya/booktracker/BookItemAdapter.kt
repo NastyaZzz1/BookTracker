@@ -1,6 +1,7 @@
 package com.nastya.booktracker
 
 import android.annotation.SuppressLint
+import android.util.Log
 import android.view.LayoutInflater
 import android.view.ViewGroup
 import androidx.recyclerview.widget.ListAdapter
@@ -54,6 +55,7 @@ class BookItemAdapter(
                     onFavoriteClick(book.bookId)
                 }
 
+                Log.d("fav", book.isFavorite.toString())
                 binding.favBtn.setImageResource(
                     if (book.isFavorite) R.drawable.icon_heart
                     else R.drawable.icon_heart_empty

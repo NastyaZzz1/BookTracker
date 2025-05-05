@@ -5,11 +5,15 @@ import androidx.fragment.app.Fragment
 import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
+import androidx.lifecycle.Observer
+import androidx.lifecycle.ViewModelProvider
+import androidx.navigation.fragment.findNavController
 import com.nastya.booktracker.databinding.FragmentFavoriteBooksBinding
 
 class FavoriteBooksFragment : Fragment() {
     private var _binding: FragmentFavoriteBooksBinding? = null
     private val binding get() = _binding!!
+    private lateinit var viewModel: FavoriteBooksViewModel
 
     override fun onCreateView(
         inflater: LayoutInflater, container: ViewGroup?,
@@ -19,6 +23,43 @@ class FavoriteBooksFragment : Fragment() {
         val view = binding.root
 
         return view
+    }
+
+    override fun onViewCreated(view: View, savedInstanceState: Bundle?) {
+        val application = requireNotNull(this.activity).application
+        val dao = BookDatabase.getInstance(application).bookDao
+        val viewModelFactory = FavoriteBooksViewModelFactory(dao)
+        viewModel = ViewModelProvider(
+            this, viewModelFactory).get(FavoriteBooksViewModel::class.java)
+        this.viewModel = viewModel
+
+        val adapter = BookItemAdapter (
+            onItemClick = { bookId ->
+                viewModel.onBookClicked(bookId)
+            },
+            onFavoriteClick = { bookId ->
+                viewModel.toggleBookIsFavorite(bookId)
+            }
+        )
+        binding.favBooksList.adapter = adapter
+
+        viewModel.filterByFavorite()
+
+        viewModel.favoriteProducts.observe(viewLifecycleOwner, Observer {
+            it?.let {
+                adapter.submitList(it)
+            }
+        })
+
+
+        viewModel.navigateToBook.observe(viewLifecycleOwner, Observer { bookId ->
+            bookId?.let {
+                val action = FavoriteBooksFragmentDirections.
+                actionFavoriteBooksFragmentToEditBookFragment(bookId)
+                this.findNavController().navigate(action)
+                viewModel.onBookNavigated()
+            }
+        })
     }
 
     override fun onDestroyView() {
