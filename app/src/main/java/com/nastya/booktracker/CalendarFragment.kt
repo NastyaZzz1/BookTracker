@@ -11,35 +11,37 @@ import com.kizitonwose.calendar.view.MonthDayBinder
 import com.kizitonwose.calendar.view.ViewContainer
 import java.time.LocalDate
 import java.time.YearMonth
-import android.content.Context
-import android.graphics.Canvas
 import android.graphics.Color
-import android.graphics.Paint
-import android.graphics.RectF
 import android.os.Build
-import android.util.AttributeSet
+import android.util.Log
 import android.view.LayoutInflater
 import android.view.ViewGroup
 import androidx.annotation.RequiresApi
 import androidx.core.content.ContextCompat
+import androidx.core.widget.addTextChangedListener
 import androidx.fragment.app.Fragment
 import androidx.lifecycle.ViewModelProvider
+import androidx.lifecycle.viewModelScope
 import com.kizitonwose.calendar.view.CalendarView
 import com.nastya.booktracker.databinding.CalendarDayLayoutBinding
 import com.nastya.booktracker.databinding.FragmentCalendarBinding
+import kotlinx.coroutines.launch
 import java.time.DayOfWeek
 import java.time.Month
 import java.time.format.TextStyle
 import java.util.*
+import androidx.lifecycle.viewModelScope
+import kotlinx.coroutines.async
+import kotlinx.coroutines.coroutineScope
+
 
 @RequiresApi(Build.VERSION_CODES.O)
 class CalendarFragment : Fragment() {
     private var _binding: FragmentCalendarBinding? = null
     private val binding get() = _binding!!
-    private val progressData: MutableMap<String, Float> = mutableMapOf()
     private lateinit var viewModel: CalendarViewModel
     private val monthCalendarView: CalendarView get() = binding.calendarView
-    private val selectedDates = mutableSetOf<LocalDate>()
+    private var selectedDate: LocalDate? = null
     private val today = LocalDate.now()
 
     override fun onCreateView(
@@ -49,10 +51,18 @@ class CalendarFragment : Fragment() {
         _binding = FragmentCalendarBinding.inflate(inflater, container, false)
         val view = binding.root
 
-        viewModel = ViewModelProvider(this).get(CalendarViewModel::class.java)
+        val application = requireNotNull(this.activity).application
+        val dailyReadingDao = BookDatabase.getInstance(application).dailyReadingDao
 
-        binding.viewModel = viewModel
-        binding.lifecycleOwner = viewLifecycleOwner
+        val viewModelFactory = CalendarViewModelFactory(dailyReadingDao, requireActivity().application)
+        viewModel = ViewModelProvider(this, viewModelFactory)
+            .get(CalendarViewModel::class.java)
+
+        this.viewModel = viewModel
+
+        binding.dayGoal.setText(viewModel.dailyGoal.value.toString())
+        binding.monthGoal.setText(viewModel.monthlyGoal.value.toString())
+        binding.yearGoal.setText(viewModel.yearlyGoal.value.toString())
 
         return view
     }
@@ -65,6 +75,25 @@ class CalendarFragment : Fragment() {
         val endMonth = currentMonth.plusMonths(10)
         val daysOfWeek = daysOfWeek(firstDayOfWeek = DayOfWeek.MONDAY)
 
+        binding.dayGoal.addTextChangedListener { str ->
+            str.toString().toIntOrNull()?.let { goalPage ->
+                viewModel.onDayGoalChanged(goalPage)
+            }
+            setupWeekCalendar(startMonth, endMonth, currentMonth, daysOfWeek)
+        }
+
+        binding.monthGoal.addTextChangedListener { str ->
+            str.toString().toIntOrNull()?.let { goalPage ->
+                viewModel.onMonthGoalChanged(goalPage)
+            }
+        }
+
+        binding.yearGoal.addTextChangedListener { str ->
+            str.toString().toIntOrNull()?.let { goalPage ->
+                viewModel.onYearGoalChanged(goalPage)
+            }
+        }
+
         setupWeekCalendar(startMonth, endMonth, currentMonth, daysOfWeek)
     }
 
@@ -72,20 +101,29 @@ class CalendarFragment : Fragment() {
         startMonth: YearMonth,
         endMonth: YearMonth,
         currentMonth: YearMonth,
-        daysOfWeek: List<DayOfWeek>,
+        daysOfWeek: List<DayOfWeek>
     ) {
         class DayViewContainer(view: View) : ViewContainer(view) {
             val textView = CalendarDayLayoutBinding.bind(view).calendarDayText
             val progressView = CalendarDayLayoutBinding.bind(view).circularProgress
             val vBG = CalendarDayLayoutBinding.bind(view).vBG
-
             lateinit var day: CalendarDay
 
             init {
                 view.setOnClickListener {
                     if (day.position == DayPosition.MonthDate) {
-                        if (selectedDates.contains(day.date)) selectedDates.remove(day.date)
-                        else selectedDates.add(day.date)
+                        val currentSelection = selectedDate
+                        if (currentSelection == day.date) {
+                            selectedDate = null
+                            binding.calendarView.notifyDateChanged(currentSelection)
+                        }
+                        else {
+                            selectedDate = day.date
+                            binding.calendarView.notifyDateChanged(day.date)
+                            if (currentSelection != null) {
+                                binding.calendarView.notifyDateChanged(currentSelection)
+                            }
+                        }
                     }
                 }
             }
@@ -93,15 +131,19 @@ class CalendarFragment : Fragment() {
         binding.calendarView.dayBinder = object : MonthDayBinder<DayViewContainer> {
             override fun create(view: View) = DayViewContainer(view)
             override fun bind(container: DayViewContainer, data: CalendarDay) {
+                container.day = data
                 container.textView.text = data.date.dayOfMonth.toString()
-                container.progressView.progress = 75
+
+                viewModel.viewModelScope.launch {
+                    container.progressView.progress = viewModel.dailyProgressGet(data.date).toInt()
+                }
 
                 if (data.position == DayPosition.MonthDate) {
                     when {
-                        selectedDates.contains(data.date) -> {
+                        selectedDate == data.date -> {
                             container.textView.setTextColor(ContextCompat.getColor(
-                                    requireContext(),
-                                    R.color.dark_green)
+                                requireContext(),
+                                R.color.dark_green)
                             )
                             container.textView.setBackgroundResource(R.drawable.selected_bg)
                         }
@@ -113,7 +155,7 @@ class CalendarFragment : Fragment() {
 
                         else -> {
                             container.textView.setTextColor(Color.BLACK)
-                            container.textView.setBackgroundResource(R.drawable.selected_bg)
+                            container.textView.setBackgroundResource(R.drawable.not_selected_bg)
                         }
                     }
                 } else {

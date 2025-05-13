@@ -55,7 +55,6 @@ class BookItemAdapter(
                     onFavoriteClick(book.bookId)
                 }
 
-                Log.d("fav", book.isFavorite.toString())
                 binding.favBtn.setImageResource(
                     if (book.isFavorite) R.drawable.icon_heart
                     else R.drawable.icon_heart_empty

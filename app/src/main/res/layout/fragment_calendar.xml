@@ -1,14 +1,12 @@
 <?xml version="1.0" encoding="utf-8"?>
-<layout xmlns:android="http://schemas.android.com/apk/res/android"
-    xmlns:tools="http://schemas.android.com/tools"
+<ScrollView xmlns:android="http://schemas.android.com/apk/res/android"
     xmlns:app="http://schemas.android.com/apk/res-auto"
+    xmlns:tools="http://schemas.android.com/tools"
+    android:id="@+id/horizontalScrollView"
+    android:layout_width="match_parent"
+    android:layout_height="wrap_content"
+    android:scrollbars="none"
     tools:context=".CalendarFragment">
-
-    <data>
-        <variable
-            name="viewModel"
-            type="com.nastya.booktracker.CalendarViewModel" />
-    </data>
 
     <LinearLayout
         android:layout_width="match_parent"
@@ -16,33 +14,106 @@
         android:orientation="vertical">
 
         <LinearLayout
-            android:layout_width="wrap_content"
+            android:layout_width="match_parent"
             android:layout_height="wrap_content"
             android:orientation="vertical">
 
             <TextView
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
-                android:textSize="22sp"
-                android:text="@string/my_goals" />
+                android:text="@string/my_goals"
+                android:textSize="22sp" />
 
-            <TextView
+            <LinearLayout
                 android:layout_width="match_parent"
-                android:layout_height="wrap_content"
-                android:textSize="18sp"
-                android:text="@string/for_day" />
+                android:layout_height="match_parent"
+                android:orientation="horizontal">
 
-            <TextView
-                android:layout_width="match_parent"
-                android:layout_height="wrap_content"
-                android:textSize="18sp"
-                android:text="@string/for_month" />
+                <TextView
+                    android:id="@+id/day_goal_label"
+                    android:layout_width="0dp"
+                    android:layout_height="wrap_content"
+                    android:layout_weight="1"
+                    android:labelFor="@id/day_goal"
+                    android:text="@string/for_day"
+                    android:textSize="18sp" />
 
-            <TextView
+                <EditText
+                    android:id="@+id/day_goal"
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:inputType="number"
+                    android:labelFor="@id/day_goal_label"
+                    android:minWidth="48dp"
+                    android:minHeight="48dp" />
+
+                <TextView
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:text="@string/pages"
+                    android:textSize="16sp" />
+            </LinearLayout>
+
+
+            <LinearLayout
                 android:layout_width="match_parent"
-                android:layout_height="wrap_content"
-                android:textSize="18sp"
-                android:text="@string/for_year" />
+                android:layout_height="match_parent"
+                android:orientation="horizontal">
+
+                <TextView
+                    android:id="@+id/month_goal_label"
+                    android:layout_width="0dp"
+                    android:layout_height="wrap_content"
+                    android:layout_weight="1"
+                    android:labelFor="@id/month_goal"
+                    android:text="@string/for_month"
+                    android:textSize="18sp" />
+
+                <EditText
+                    android:id="@+id/month_goal"
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:inputType="number"
+                    android:labelFor="@id/month_goal_label"
+                    android:minWidth="48dp"
+                    android:minHeight="48dp" />
+
+                <TextView
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:text="@string/pages"
+                    android:textSize="16sp" />
+            </LinearLayout>
+
+            <LinearLayout
+                android:layout_width="match_parent"
+                android:layout_height="match_parent"
+                android:orientation="horizontal">
+
+                <TextView
+                    android:id="@+id/year_goal_label"
+                    android:layout_width="0dp"
+                    android:layout_height="wrap_content"
+                    android:layout_weight="1"
+                    android:labelFor="@id/year_goal"
+                    android:text="@string/for_year"
+                    android:textSize="18sp" />
+
+                <EditText
+                    android:id="@+id/year_goal"
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:inputType="number"
+                    android:labelFor="@id/year_goal_label"
+                    android:minWidth="48dp"
+                    android:minHeight="48dp" />
+
+                <TextView
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:text="@string/pages"
+                    android:textSize="16sp" />
+            </LinearLayout>
         </LinearLayout>
 
         <LinearLayout
@@ -53,7 +124,7 @@
             <LinearLayout
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
-                android:orientation="horizontal" >
+                android:orientation="horizontal">
 
                 <TextView
                     android:id="@+id/oneMonthText"
@@ -75,16 +146,15 @@
 
             <include
                 android:id="@+id/titlesContainer"
+                layout="@layout/calendar_day_titles_container"
                 android:layout_width="match_parent"
-                android:layout_height="wrap_content"
-                layout="@layout/calendar_day_titles_container" />
+                android:layout_height="wrap_content" />
 
             <com.kizitonwose.calendar.view.CalendarView
                 android:id="@+id/calendarView"
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
                 app:cv_dayViewResource="@layout/calendar_day_layout" />
-
         </LinearLayout>
     </LinearLayout>
-</layout>
+</ScrollView>

@@ -4,10 +4,17 @@ import android.content.Context
 import androidx.room.Database
 import androidx.room.Room
 import androidx.room.RoomDatabase
+import androidx.room.TypeConverters
 
-@Database(entities = [Book::class], version = 1, exportSchema = false)
+@Database(
+    entities = [Book::class, DailyReading::class],
+    version = 1,
+    exportSchema = false
+)
+@TypeConverters(TypeConverter::class)
 abstract class BookDatabase : RoomDatabase()  {
     abstract val bookDao: BookDao
+    abstract val dailyReadingDao: DailyReadingDao
 
     companion object {
         @Volatile
