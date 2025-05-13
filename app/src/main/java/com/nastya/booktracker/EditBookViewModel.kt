@@ -1,7 +1,6 @@
 package com.nastya.booktracker
 
 import android.os.Build
-import android.util.Log
 import androidx.annotation.RequiresApi
 import androidx.lifecycle.LiveData
 import androidx.lifecycle.MutableLiveData
@@ -10,9 +9,9 @@ import androidx.lifecycle.viewModelScope
 import kotlinx.coroutines.launch
 import java.time.LocalDate
 
-class EditBookViewModel(bookId: Long, val bookDao: BookDao, val dailyReadingDao: DailyReadingDao) : ViewModel() {
+class EditBookViewModel(bookId: Long, private val bookDao: BookDao, private val dailyReadingDao: DailyReadingDao) : ViewModel() {
     val book = bookDao.get(bookId)
-    private val _navigateToList = MutableLiveData<Boolean>(false)
+    private val _navigateToList: MutableLiveData<Boolean> = MutableLiveData<Boolean>(false)
     val navigateToList: LiveData<Boolean>
         get() = _navigateToList
 
@@ -53,18 +52,15 @@ class EditBookViewModel(bookId: Long, val bookDao: BookDao, val dailyReadingDao:
                 val progressItem = dailyReadingDao.get(LocalDate.now())
 
                 if (progressItem != null) {
-                    Log.d("DailyReading", "Запись найдена " + progressItem.countPage.toString() + " " + progressItem.readDate)
                     progressItem.countPage += newReadPages - currentReadPages
                     progressItem.readDate = LocalDate.now()
                     dailyReadingDao.update(progressItem)
-                    Log.d("DailyReading", "Запись обновлена " + progressItem.countPage.toString() + " " + progressItem.readDate)
                 }
                 else {
                     val progressItemNew = DailyReading(
                         countPage = newReadPages - currentReadPages,
                         readDate = LocalDate.now())
                     dailyReadingDao.insert(progressItemNew)
-                    Log.d("DailyReading", "Запись создана " + progressItemNew.countPage.toString() + " " + progressItemNew.readDate)
                 }
             }
         }

@@ -13,16 +13,12 @@ import com.github.mikephil.charting.data.BarData
 import com.github.mikephil.charting.data.BarDataSet
 import com.github.mikephil.charting.data.BarEntry
 import com.github.mikephil.charting.formatter.ValueFormatter
-import com.kizitonwose.calendar.core.daysOfWeek
-import com.kizitonwose.calendar.view.CalendarView
-import com.nastya.booktracker.databinding.FragmentCalendarBinding
 import com.nastya.booktracker.databinding.FragmentStatBinding
 import java.text.SimpleDateFormat
-import java.time.DayOfWeek
-import java.time.YearMonth
 import java.util.Date
 import java.util.Locale
 
+@Suppress("DEPRECATION")
 @RequiresApi(Build.VERSION_CODES.O)
 class StatFragment : Fragment() {
     private var _binding: FragmentStatBinding? = null
@@ -34,7 +30,7 @@ class StatFragment : Fragment() {
     override fun onCreateView(
         inflater: LayoutInflater, container: ViewGroup?,
         savedInstanceState: Bundle?
-    ): View? {
+    ): View {
         _binding = FragmentStatBinding.inflate(inflater, container, false)
         val view = binding.root
 

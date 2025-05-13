@@ -10,10 +10,10 @@ import java.time.LocalDate
 @Dao
 interface DailyReadingDao {
     @Insert
-    suspend fun insert(daily_reading: DailyReading)
+    suspend fun insert(dailyReading: DailyReading)
 
     @Update
-    suspend fun update(daily_reading: DailyReading)
+    suspend fun update(dailyReading: DailyReading)
 
     @Query("SELECT * FROM daily_reading_table WHERE read_date = :readDate")
     suspend fun get(readDate: LocalDate) : DailyReading?

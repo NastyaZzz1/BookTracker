@@ -1,6 +1,5 @@
 package com.nastya.booktracker
 
-import android.util.Log
 import androidx.lifecycle.LiveData
 import androidx.lifecycle.MediatorLiveData
 import androidx.lifecycle.ViewModel
@@ -14,7 +13,7 @@ class BooksViewModel(val dao: BookDao) : ViewModel() {
         get() = _navigateToBook
 
     private val _books = dao.getAll()
-    val books: LiveData<List<Book>> = _books
+    private val books: LiveData<List<Book>> = _books
 
     private val _filteredProducts = MediatorLiveData<List<Book>>()
     val filteredProducts: LiveData<List<Book>> = _filteredProducts
@@ -40,9 +39,9 @@ class BooksViewModel(val dao: BookDao) : ViewModel() {
             val booksList = dao.getAllOnce()
 
             val updatedBooks = booksList.map { book ->
-                val newCategory = when {
-                    book.readPagesCount == 0 -> "want"
-                    book.readPagesCount == book.allPagesCount -> "past"
+                val newCategory = when (book.readPagesCount) {
+                    0 -> "want"
+                    book.allPagesCount -> "past"
                     else -> "reading"
                 }
 
@@ -72,11 +71,7 @@ class BooksViewModel(val dao: BookDao) : ViewModel() {
         viewModelScope.launch {
             val book = dao.getNotLive(bookId)
             book!!.isFavorite = !book.isFavorite
-            if(book != null) {
-                dao.update(book)
-            } else {
-                Log.e("BooksViewModel", "Книга с bookId=$bookId не найдена.")
-            }
+            dao.update(book)
         }
     }
 

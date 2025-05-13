@@ -1,7 +1,6 @@
 package com.nastya.booktracker
 
 import android.annotation.SuppressLint
-import android.util.Log
 import android.view.LayoutInflater
 import android.view.ViewGroup
 import androidx.recyclerview.widget.ListAdapter
@@ -43,8 +42,8 @@ class BookItemAdapter(
                 val progress = (book.readPagesCount * 100 ) / allPagesCount
                 binding.book = book
                 binding.root.setOnClickListener { onItemClick(book.bookId) }
-                binding.linProgressBar.progress = progress;
-                binding.linProgressText.text = "$progress%";
+                binding.linProgressBar.progress = progress
+                binding.linProgressText.text = "$progress%"
 
                 binding.favBtn.setOnClickListener{
                     book.isFavorite = !book.isFavorite

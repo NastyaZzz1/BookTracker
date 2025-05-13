@@ -21,7 +21,7 @@ class FavoriteBooksViewModel(val dao: BookDao) : ViewModel() {
     }
 
     private val _books = dao.getAll()
-    val books: LiveData<List<Book>> = _books
+    private val books: LiveData<List<Book>> = _books
 
     private var _favoriteProducts = MutableLiveData<List<Book>>(emptyList())
     var favoriteProducts: LiveData<List<Book>> = _favoriteProducts

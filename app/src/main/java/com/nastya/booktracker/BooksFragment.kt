@@ -30,8 +30,7 @@ class BooksFragment : Fragment() {
         val dao = BookDatabase.getInstance(application).bookDao
         val viewModelFactory = BookViewModelFactory(dao)
         viewModel = ViewModelProvider(
-            this, viewModelFactory).get(BooksViewModel::class.java)
-        this.viewModel = viewModel
+            this, viewModelFactory)[BooksViewModel::class.java]
 
         val adapter = BookItemAdapter (
             onItemClick = { bookId ->
@@ -43,7 +42,7 @@ class BooksFragment : Fragment() {
         )
         binding.booksList.adapter = adapter
 
-        viewModel.filteredProducts.observe(viewLifecycleOwner, Observer {
+        viewModel.filteredProducts.observe(this.viewLifecycleOwner, Observer {
             it?.let {
                 adapter.submitList(it)
             }
@@ -51,9 +50,9 @@ class BooksFragment : Fragment() {
 
         viewModel.updateAllCategories()
 
-        viewModel.filterByCategory("all");
+        viewModel.filterByCategory("all")
         binding.allBooksBtn.isSelected = true
-        setupFilterButtons();
+        setupFilterButtons()
 
 
         viewModel.navigateToBook.observe(viewLifecycleOwner, Observer { bookId ->

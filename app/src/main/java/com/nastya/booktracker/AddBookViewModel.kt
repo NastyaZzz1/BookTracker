@@ -5,11 +5,11 @@ import androidx.lifecycle.viewModelScope
 import kotlinx.coroutines.launch
 
 class AddBookViewModel(val dao: BookDao): ViewModel() {
-    var newBookName = ""
-    var newBookAuthor = ""
-    var newBookDesc = ""
-    var newImageUrl = ""
-    var newAllPagesCount = 1
+    private var newBookName = ""
+    private var newBookAuthor = ""
+    private var newBookDesc = ""
+    private var newImageUrl = ""
+    private var newAllPagesCount = 1
 
     fun onNewAllPagesCountChanged(bookPage: Int){
         newAllPagesCount = bookPage

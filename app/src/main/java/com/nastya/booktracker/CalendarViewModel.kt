@@ -2,16 +2,13 @@ package com.nastya.booktracker
 
 import android.content.Context
 import android.os.Build
-import android.util.Log
 import androidx.annotation.RequiresApi
 import androidx.lifecycle.LiveData
 import androidx.lifecycle.MutableLiveData
 import androidx.lifecycle.ViewModel
-import androidx.lifecycle.viewModelScope
-import kotlinx.coroutines.launch
 import java.time.LocalDate
 
-class CalendarViewModel(val dailyReadingDao: DailyReadingDao, val context: Context) : ViewModel() {
+class CalendarViewModel(private val dailyReadingDao: DailyReadingDao, val context: Context) : ViewModel() {
     private val _dailyGoal = MutableLiveData<Int>()
     val dailyGoal: LiveData<Int> = _dailyGoal
     private val _monthlyGoal = MutableLiveData<Int>()
@@ -19,15 +16,15 @@ class CalendarViewModel(val dailyReadingDao: DailyReadingDao, val context: Conte
     private val _yearlyGoal = MutableLiveData<Int>()
     val yearlyGoal: LiveData<Int> = _yearlyGoal
 
-    private val DAY_GOAL_KEY = "daily_goal"
-    private val MONTH_GOAL_KEY = "monthly_goal"
-    private val YEAR_GOAL_KEY = "yearly_goal"
+    private val dayGoalKey = "daily_goal"
+    private val monthGoalKey = "monthly_goal"
+    private val yearGoalKey = "yearly_goal"
 
     init {
         val sharedPref = context.getSharedPreferences("app_prefs", Context.MODE_PRIVATE)
-        val savedDayGoal = sharedPref.getInt(DAY_GOAL_KEY, 1)
-        val savedMonthGoal = sharedPref.getInt(MONTH_GOAL_KEY, 1)
-        val savedYearGoal = sharedPref.getInt(YEAR_GOAL_KEY, 1)
+        val savedDayGoal = sharedPref.getInt(dayGoalKey, 1)
+        val savedMonthGoal = sharedPref.getInt(monthGoalKey, 1)
+        val savedYearGoal = sharedPref.getInt(yearGoalKey, 1)
         _dailyGoal.value = savedDayGoal
         _monthlyGoal.value = savedMonthGoal
         _yearlyGoal.value = savedYearGoal
@@ -50,17 +47,17 @@ class CalendarViewModel(val dailyReadingDao: DailyReadingDao, val context: Conte
 
     private fun saveDayGoal(goalPageNew: Int) {
         val sharedPref = context.getSharedPreferences("app_prefs", Context.MODE_PRIVATE)
-        sharedPref.edit().putInt(DAY_GOAL_KEY, goalPageNew).apply()
+        sharedPref.edit().putInt(dayGoalKey, goalPageNew).apply()
     }
 
     private fun saveMonthGoal(goalPageNew: Int) {
         val sharedPref = context.getSharedPreferences("app_prefs", Context.MODE_PRIVATE)
-        sharedPref.edit().putInt(MONTH_GOAL_KEY, goalPageNew).apply()
+        sharedPref.edit().putInt(monthGoalKey, goalPageNew).apply()
     }
 
     private fun saveYearGoal(goalPageNew: Int) {
         val sharedPref = context.getSharedPreferences("app_prefs", Context.MODE_PRIVATE)
-        sharedPref.edit().putInt(YEAR_GOAL_KEY, goalPageNew).apply()
+        sharedPref.edit().putInt(yearGoalKey, goalPageNew).apply()
     }
 
     @RequiresApi(Build.VERSION_CODES.O)
@@ -69,7 +66,6 @@ class CalendarViewModel(val dailyReadingDao: DailyReadingDao, val context: Conte
         val currentGoal = _dailyGoal.value ?: 1
         val countPage = progressItem?.countPage ?: 0
         val newProgress = (countPage * 100f).div(currentGoal)
-//        Log.d("Cal", "newProgress: " + newProgress)
         return newProgress
     }
 }

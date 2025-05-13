@@ -22,7 +22,7 @@ class EditBookFragment : Fragment() {
     override fun onCreateView(
         inflater: LayoutInflater, container: ViewGroup?,
         savedInstanceState: Bundle?
-    ): View? {
+    ): View {
         _binding = FragmentEditBookBinding.inflate(inflater, container, false)
         val view = binding.root
 
@@ -33,8 +33,7 @@ class EditBookFragment : Fragment() {
         val dailyReadingDao = BookDatabase.getInstance(application).dailyReadingDao
 
         val viewModelFactory = EditBookViewModelFactory(bookId, bookDao, dailyReadingDao)
-        val viewModel = ViewModelProvider(this, viewModelFactory)
-                            .get(EditBookViewModel::class.java)
+        val viewModel = ViewModelProvider(this, viewModelFactory)[EditBookViewModel::class.java]
 
         this.viewModel = viewModel
 

@@ -13,7 +13,6 @@ import java.time.LocalDate
 import java.time.YearMonth
 import android.graphics.Color
 import android.os.Build
-import android.util.Log
 import android.view.LayoutInflater
 import android.view.ViewGroup
 import androidx.annotation.RequiresApi
@@ -30,10 +29,6 @@ import java.time.DayOfWeek
 import java.time.Month
 import java.time.format.TextStyle
 import java.util.*
-import androidx.lifecycle.viewModelScope
-import kotlinx.coroutines.async
-import kotlinx.coroutines.coroutineScope
-
 
 @RequiresApi(Build.VERSION_CODES.O)
 class CalendarFragment : Fragment() {
@@ -47,7 +42,7 @@ class CalendarFragment : Fragment() {
     override fun onCreateView(
         inflater: LayoutInflater, container: ViewGroup?,
         savedInstanceState: Bundle?
-    ): View? {
+    ): View {
         _binding = FragmentCalendarBinding.inflate(inflater, container, false)
         val view = binding.root
 
@@ -55,10 +50,7 @@ class CalendarFragment : Fragment() {
         val dailyReadingDao = BookDatabase.getInstance(application).dailyReadingDao
 
         val viewModelFactory = CalendarViewModelFactory(dailyReadingDao, requireActivity().application)
-        viewModel = ViewModelProvider(this, viewModelFactory)
-            .get(CalendarViewModel::class.java)
-
-        this.viewModel = viewModel
+        viewModel = ViewModelProvider(this, viewModelFactory)[CalendarViewModel::class.java]
 
         binding.dayGoal.setText(viewModel.dailyGoal.value.toString())
         binding.monthGoal.setText(viewModel.monthlyGoal.value.toString())

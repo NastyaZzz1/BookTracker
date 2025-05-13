@@ -5,7 +5,7 @@ import androidx.lifecycle.ViewModelProvider
 
 class EditBookViewModelFactory(private val bookId: Long,
                                private val bookDao: BookDao,
-                               val dailyReadingDao: DailyReadingDao
+                               private val dailyReadingDao: DailyReadingDao
     )
         : ViewModelProvider.Factory {
     override fun <T : ViewModel> create(modelClass: Class<T>): T {

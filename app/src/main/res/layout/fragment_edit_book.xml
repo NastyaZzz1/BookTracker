@@ -11,59 +11,71 @@
         android:id="@+id/book_name"
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
-        android:hint="Название"
+        android:autofillHints=""
+        android:hint="@string/book_name_hint"
         android:inputType="text"
-        android:textSize="16sp" />
+        android:textSize="16sp"
+        tools:ignore="VisualLintTextFieldSize" />
 
     <EditText
         android:id="@+id/book_author"
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
-        android:hint="Автор"
+        android:hint="@string/book_author_hint"
+        android:autofillHints=""
         android:inputType="text"
         android:minHeight="48dp"
-        android:textSize="16sp" />
+        android:textSize="16sp"
+        tools:ignore="VisualLintTextFieldSize" />
 
     <EditText
         android:id="@+id/book_desc"
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
-        android:hint="Описание"
+        android:hint="@string/book_desc_hint"
+        android:autofillHints=""
         android:inputType="text"
         android:minHeight="48dp"
-        android:textSize="16sp" />
+        android:textSize="16sp"
+        tools:ignore="VisualLintTextFieldSize" />
 
     <EditText
         android:id="@+id/book_all_pages"
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
-        android:hint="Общее количество страниц"
+        android:hint="@string/book_all_pages_hint"
+        android:autofillHints=""
         android:inputType="number"
         android:minHeight="48dp"
-        android:textSize="16sp" />
+        android:textSize="16sp"
+        tools:ignore="VisualLintTextFieldSize" />
 
     <EditText
         android:id="@+id/book_read_pages"
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
-        android:hint="Количество прочитанных страниц"
+        android:hint="@string/book_read_pages_hint"
+        android:autofillHints=""
         android:inputType="number"
         android:minHeight="48dp"
-        android:textSize="16sp" />
+        android:textSize="16sp"
+        tools:ignore="VisualLintTextFieldSize" />
 
     <EditText
         android:id="@+id/book_img"
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
-        android:hint="Ссылка на обложку"
+        android:hint="@string/book_img_hint"
+        android:autofillHints=""
         android:inputType="text"
         android:minHeight="48dp"
-        android:textSize="16sp" />
+        android:textSize="16sp"
+        tools:ignore="VisualLintTextFieldSize" />
 
     <com.google.android.material.button.MaterialButton
         android:id="@+id/update_button"
         android:layout_width="wrap_content"
-        android:layout_height="38dp"
+        android:layout_height="48dp"
         android:layout_gravity="center"
         android:background="@drawable/button_drawble"
         app:backgroundTint="@null"
@@ -72,12 +84,13 @@
     <com.google.android.material.button.MaterialButton
         android:id="@+id/delete_button"
         android:layout_width="wrap_content"
-        android:layout_height="36dp"
+        android:layout_height="48dp"
+        android:layout_marginStart="10dp"
         android:layout_marginTop="20dp"
-        android:layout_marginLeft="10dp"
-        android:textColor="@color/dark_gray"
         android:background="@drawable/button_drawble_del"
-        app:backgroundTint="@null"
-        android:text="@string/del" />
+        android:minWidth="48dp"
+        android:text="@string/del"
+        android:textColor="@color/dark_gray"
+        app:backgroundTint="@null" />
 
 </LinearLayout>

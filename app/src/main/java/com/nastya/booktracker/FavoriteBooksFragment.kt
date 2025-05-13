@@ -18,7 +18,7 @@ class FavoriteBooksFragment : Fragment() {
     override fun onCreateView(
         inflater: LayoutInflater, container: ViewGroup?,
         savedInstanceState: Bundle?
-    ): View? {
+    ): View {
         _binding = FragmentFavoriteBooksBinding.inflate(inflater, container, false)
         val view = binding.root
 
@@ -30,8 +30,7 @@ class FavoriteBooksFragment : Fragment() {
         val dao = BookDatabase.getInstance(application).bookDao
         val viewModelFactory = FavoriteBooksViewModelFactory(dao)
         viewModel = ViewModelProvider(
-            this, viewModelFactory).get(FavoriteBooksViewModel::class.java)
-        this.viewModel = viewModel
+            this, viewModelFactory)[FavoriteBooksViewModel::class.java]
 
         val adapter = BookItemAdapter (
             onItemClick = { bookId ->
