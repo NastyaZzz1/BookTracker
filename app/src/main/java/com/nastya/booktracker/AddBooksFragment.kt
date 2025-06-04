@@ -5,9 +5,12 @@ import androidx.fragment.app.Fragment
 import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
+import android.widget.Toast
 import androidx.core.widget.addTextChangedListener
 import androidx.lifecycle.ViewModelProvider
+import androidx.lifecycle.viewModelScope
 import com.nastya.booktracker.databinding.FragmentAddBooksBinding
+import kotlinx.coroutines.launch
 
 class AddBooksFragment : Fragment() {
     private var _binding: FragmentAddBooksBinding? = null
@@ -60,19 +63,24 @@ class AddBooksFragment : Fragment() {
             val name = binding.bookNameAdd.text.toString().trim()
             val author = binding.bookAuthorAdd.text.toString().trim()
 
-            if (name.isEmpty() && author.isEmpty()) {
-                binding.bookNameAdd.error = "Введите название"
-                binding.bookNameAdd.requestFocus()
+            viewModel.viewModelScope.launch {
+                if (name.isEmpty() && author.isEmpty()) {
+                    binding.bookNameAdd.error = "Введите название"
+                    binding.bookNameAdd.requestFocus()
 
-                binding.bookAuthorAdd.error = "Введите автора"
-                binding.bookAuthorAdd.requestFocus()
-            } else {
-                viewModel.addTask()
-                binding.bookNameAdd.text.clear()
-                binding.bookAuthorAdd.text.clear()
-                binding.bookDescAdd.text.clear()
-                binding.bookPageAdd.text.clear()
-                binding.bookImgAdd.text.clear()
+                    binding.bookAuthorAdd.error = "Введите автора"
+                    binding.bookAuthorAdd.requestFocus()
+                } else if (!viewModel.isAvailableBook(name, author)) {
+                    Toast.makeText(context, "Такая книга уже существует", Toast.LENGTH_SHORT).show()
+                } else {
+                    viewModel.addTask()
+                    Toast.makeText(context, "Книга добавлена", Toast.LENGTH_SHORT).show()
+                    binding.bookNameAdd.text.clear()
+                    binding.bookAuthorAdd.text.clear()
+                    binding.bookDescAdd.text.clear()
+                    binding.bookPageAdd.text.clear()
+                    binding.bookImgAdd.text.clear()
+                }
             }
         }
     }

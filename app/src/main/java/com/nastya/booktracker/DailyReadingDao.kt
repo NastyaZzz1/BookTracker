@@ -19,5 +19,8 @@ interface DailyReadingDao {
     suspend fun get(readDate: LocalDate) : DailyReading?
 
     @Query("SELECT * FROM daily_reading_table ORDER BY dataId DESC")
-    fun getAll() : LiveData<List<DailyReading>>
+    suspend fun getAll() : List<DailyReading>
+
+    @Query("SELECT SUM(count_page) FROM daily_reading_table WHERE strftime('%Y', read_date) = :year AND strftime('%m', read_date) = :month")
+    suspend fun getTotalPagesReadInMonth(year: String, month: String): Int?
 }

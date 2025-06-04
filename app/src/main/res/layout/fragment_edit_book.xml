@@ -1,96 +1,103 @@
 <?xml version="1.0" encoding="utf-8"?>
-<LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
+<ScrollView xmlns:android="http://schemas.android.com/apk/res/android"
     xmlns:app="http://schemas.android.com/apk/res-auto"
     xmlns:tools="http://schemas.android.com/tools"
+    android:id="@+id/horizontalScrollView"
     android:layout_width="match_parent"
-    android:layout_height="match_parent"
-    android:orientation="vertical"
+    android:layout_height="wrap_content"
+    android:scrollbars="none"
     tools:context=".EditBookFragment">
 
-    <EditText
-        android:id="@+id/book_name"
+    <LinearLayout
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
-        android:autofillHints=""
-        android:hint="@string/book_name_hint"
-        android:inputType="text"
-        android:textSize="16sp"
-        tools:ignore="VisualLintTextFieldSize" />
+        android:orientation="vertical"
+        tools:context=".EditBookFragment">
 
-    <EditText
-        android:id="@+id/book_author"
-        android:layout_width="match_parent"
-        android:layout_height="wrap_content"
-        android:hint="@string/book_author_hint"
-        android:autofillHints=""
-        android:inputType="text"
-        android:minHeight="48dp"
-        android:textSize="16sp"
-        tools:ignore="VisualLintTextFieldSize" />
+        <EditText
+            android:id="@+id/book_name"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:autofillHints=""
+            android:hint="@string/book_name_hint"
+            android:inputType="text"
+            android:textSize="16sp"
+            tools:ignore="VisualLintTextFieldSize" />
 
-    <EditText
-        android:id="@+id/book_desc"
-        android:layout_width="match_parent"
-        android:layout_height="wrap_content"
-        android:hint="@string/book_desc_hint"
-        android:autofillHints=""
-        android:inputType="text"
-        android:minHeight="48dp"
-        android:textSize="16sp"
-        tools:ignore="VisualLintTextFieldSize" />
+        <EditText
+            android:id="@+id/book_author"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:hint="@string/book_author_hint"
+            android:autofillHints=""
+            android:inputType="text"
+            android:minHeight="48dp"
+            android:textSize="16sp"
+            tools:ignore="VisualLintTextFieldSize" />
 
-    <EditText
-        android:id="@+id/book_all_pages"
-        android:layout_width="match_parent"
-        android:layout_height="wrap_content"
-        android:hint="@string/book_all_pages_hint"
-        android:autofillHints=""
-        android:inputType="number"
-        android:minHeight="48dp"
-        android:textSize="16sp"
-        tools:ignore="VisualLintTextFieldSize" />
+        <EditText
+            android:id="@+id/book_desc"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:hint="@string/book_desc_hint"
+            android:autofillHints=""
+            android:inputType="textMultiLine"
+            android:minHeight="48dp"
+            android:textSize="16sp"
+            tools:ignore="VisualLintTextFieldSize" />
 
-    <EditText
-        android:id="@+id/book_read_pages"
-        android:layout_width="match_parent"
-        android:layout_height="wrap_content"
-        android:hint="@string/book_read_pages_hint"
-        android:autofillHints=""
-        android:inputType="number"
-        android:minHeight="48dp"
-        android:textSize="16sp"
-        tools:ignore="VisualLintTextFieldSize" />
+        <EditText
+            android:id="@+id/book_all_pages"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:hint="@string/book_all_pages_hint"
+            android:autofillHints=""
+            android:inputType="number"
+            android:minHeight="48dp"
+            android:textSize="16sp"
+            tools:ignore="VisualLintTextFieldSize" />
 
-    <EditText
-        android:id="@+id/book_img"
-        android:layout_width="match_parent"
-        android:layout_height="wrap_content"
-        android:hint="@string/book_img_hint"
-        android:autofillHints=""
-        android:inputType="text"
-        android:minHeight="48dp"
-        android:textSize="16sp"
-        tools:ignore="VisualLintTextFieldSize" />
+        <EditText
+            android:id="@+id/book_read_pages"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:hint="@string/book_read_pages_hint"
+            android:autofillHints=""
+            android:inputType="number"
+            android:minHeight="48dp"
+            android:textSize="16sp"
+            tools:ignore="VisualLintTextFieldSize" />
 
-    <com.google.android.material.button.MaterialButton
-        android:id="@+id/update_button"
-        android:layout_width="wrap_content"
-        android:layout_height="48dp"
-        android:layout_gravity="center"
-        android:background="@drawable/button_drawble"
-        app:backgroundTint="@null"
-        android:text="@string/save" />
+        <EditText
+            android:id="@+id/book_img"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:hint="@string/book_img_hint"
+            android:autofillHints=""
+            android:inputType="text"
+            android:minHeight="48dp"
+            android:textSize="16sp"
+            tools:ignore="VisualLintTextFieldSize" />
 
-    <com.google.android.material.button.MaterialButton
-        android:id="@+id/delete_button"
-        android:layout_width="wrap_content"
-        android:layout_height="48dp"
-        android:layout_marginStart="10dp"
-        android:layout_marginTop="20dp"
-        android:background="@drawable/button_drawble_del"
-        android:minWidth="48dp"
-        android:text="@string/del"
-        android:textColor="@color/dark_gray"
-        app:backgroundTint="@null" />
+        <com.google.android.material.button.MaterialButton
+            android:id="@+id/update_button"
+            android:layout_width="wrap_content"
+            android:layout_height="48dp"
+            android:layout_gravity="center"
+            android:background="@drawable/button_drawble"
+            app:backgroundTint="@null"
+            android:text="@string/save" />
 
-</LinearLayout>
+        <com.google.android.material.button.MaterialButton
+            android:id="@+id/delete_button"
+            android:layout_width="wrap_content"
+            android:layout_height="48dp"
+            android:layout_marginStart="10dp"
+            android:layout_marginTop="20dp"
+            android:background="@drawable/button_drawble_del"
+            android:minWidth="48dp"
+            android:text="@string/del"
+            android:textColor="@color/dark_gray"
+            app:backgroundTint="@null" />
+    </LinearLayout>
+</ScrollView>

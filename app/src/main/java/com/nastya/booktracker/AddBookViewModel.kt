@@ -42,4 +42,9 @@ class AddBookViewModel(val dao: BookDao): ViewModel() {
             dao.insert(book)
         }
     }
+
+    suspend fun isAvailableBook(bookName: String, bookAuthor: String): Boolean {
+        return if (dao.countBooksByTitleAndAuthor(bookName, bookAuthor) == 0) true
+        else false
+    }
 }

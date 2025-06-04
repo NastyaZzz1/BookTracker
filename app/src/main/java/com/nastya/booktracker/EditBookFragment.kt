@@ -63,7 +63,6 @@ class EditBookFragment : Fragment() {
     override fun onViewCreated(view: View, savedInstanceState: Bundle?) {
         super.onViewCreated(view, savedInstanceState)
 
-
         binding.bookName.addTextChangedListener { str ->
             viewModel.onBookNameChanged((str.takeIf { !it.isNullOrBlank() } ?: "").toString())
         }
@@ -100,7 +99,10 @@ class EditBookFragment : Fragment() {
         }
 
         binding.updateButton.setOnClickListener {
-            if (viewModel.errorMessage.value == null) viewModel.updateTask()
+            if (viewModel.errorMessage.value == null) {
+                viewModel.updateTask()
+                Toast.makeText(context, "Изменения сохранены", Toast.LENGTH_SHORT).show()
+            }
             else Toast.makeText(context, "Исправьте ошибки перед сохранением", Toast.LENGTH_SHORT).show()
         }
 

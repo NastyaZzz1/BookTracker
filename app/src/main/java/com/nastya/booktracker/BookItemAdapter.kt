@@ -61,12 +61,9 @@ class BookItemAdapter(
 
                 binding.bookImage.load(book.imageUrl) {
                     crossfade(true)
-//                    placeholder(R.drawable.placeholder)
-//                      error(R.drawable.ic_error)
                 }
             } ?: run {
                 binding.bookName.text = "No data"
-//                binding.bookImage.setImageResource(R.drawable.placeholder)
             }
         }
     }

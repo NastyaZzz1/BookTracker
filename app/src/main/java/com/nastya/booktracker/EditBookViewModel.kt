@@ -8,6 +8,7 @@ import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
 import kotlinx.coroutines.launch
 import java.time.LocalDate
+import java.time.format.DateTimeFormatter
 
 class EditBookViewModel(bookId: Long, private val bookDao: BookDao, private val dailyReadingDao: DailyReadingDao) : ViewModel() {
     val book = bookDao.get(bookId)
@@ -37,11 +38,13 @@ class EditBookViewModel(bookId: Long, private val bookDao: BookDao, private val 
     @RequiresApi(Build.VERSION_CODES.O)
     fun onReadPagesCountChanged(newReadPages: Int) {
         if (book.value?.readPagesCount?.let { it <= newReadPages } == true) {
-            dailyReadingInsert(book.value?.readPagesCount, newReadPages)
-            book.value?.readPagesCount = newReadPages
-            _errorMessage.value = null
+            if(book.value?.allPagesCount?.let {it >= newReadPages} == true) {
+                dailyReadingInsert(book.value?.readPagesCount, newReadPages)
+                book.value?.readPagesCount = newReadPages
+                _errorMessage.value = null
+            }
         } else {
-            _errorMessage.value = "Новое значение не может быть меньше предыдущего"
+            _errorMessage.value = "Новое значение не может быть меньше предыдущего и больше общего"
         }
     }
 
@@ -49,6 +52,10 @@ class EditBookViewModel(bookId: Long, private val bookDao: BookDao, private val 
     fun dailyReadingInsert(currentReadPages: Int?, newReadPages: Int) {
         if (currentReadPages != null && newReadPages - currentReadPages != 0) {
             viewModelScope.launch {
+//                val dateString = "18-05-2025"
+//                val formatter = DateTimeFormatter.ofPattern("dd-MM-yyyy")
+//                val localDate: LocalDate = LocalDate.parse(dateString, formatter)
+
                 val progressItem = dailyReadingDao.get(LocalDate.now())
 
                 if (progressItem != null) {

@@ -29,4 +29,7 @@ interface BookDao {
 
     @Query("SELECT * FROM book_table ORDER BY bookId DESC")
     fun getAll() : LiveData<List<Book>>
+
+    @Query("SELECT COUNT(*) FROM book_table WHERE book_name = :title AND book_author = :author")
+    suspend fun countBooksByTitleAndAuthor(title: String, author: String): Int
 }
