@@ -52,21 +52,21 @@ class EditBookViewModel(bookId: Long, private val bookDao: BookDao, private val 
     fun dailyReadingInsert(currentReadPages: Int?, newReadPages: Int) {
         if (currentReadPages != null && newReadPages - currentReadPages != 0) {
             viewModelScope.launch {
-//                val dateString = "18-05-2025"
-//                val formatter = DateTimeFormatter.ofPattern("dd-MM-yyyy")
-//                val localDate: LocalDate = LocalDate.parse(dateString, formatter)
+                val dateString = "09-06-2025"
+                val formatter = DateTimeFormatter.ofPattern("dd-MM-yyyy")
+                val localDate: LocalDate = LocalDate.parse(dateString, formatter)
 
-                val progressItem = dailyReadingDao.get(LocalDate.now())
+                val progressItem = dailyReadingDao.get(localDate)
 
                 if (progressItem != null) {
                     progressItem.countPage += newReadPages - currentReadPages
-                    progressItem.readDate = LocalDate.now()
+                    progressItem.readDate = localDate
                     dailyReadingDao.update(progressItem)
                 }
                 else {
                     val progressItemNew = DailyReading(
                         countPage = newReadPages - currentReadPages,
-                        readDate = LocalDate.now())
+                        readDate = localDate)
                     dailyReadingDao.insert(progressItemNew)
                 }
             }
