@@ -1,5 +1,8 @@
 package com.nastya.booktracker
 
+import android.util.Log
+import androidx.lifecycle.LiveData
+import androidx.lifecycle.MutableLiveData
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
 import kotlinx.coroutines.launch
@@ -10,6 +13,10 @@ class AddBookViewModel(val dao: BookDao): ViewModel() {
     private var newBookDesc = ""
     private var newImageUrl = ""
     private var newAllPagesCount = 1
+
+    private val _navigateToBack: MutableLiveData<Boolean> = MutableLiveData<Boolean>(false)
+    val navigateToBack: LiveData<Boolean>
+        get() = _navigateToBack
 
     fun onNewAllPagesCountChanged(bookPage: Int){
         newAllPagesCount = bookPage
@@ -40,6 +47,7 @@ class AddBookViewModel(val dao: BookDao): ViewModel() {
                 imageUrl = newImageUrl,
                 allPagesCount = newAllPagesCount)
             dao.insert(book)
+            _navigateToBack.value = true
         }
     }
 

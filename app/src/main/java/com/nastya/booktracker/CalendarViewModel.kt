@@ -6,7 +6,10 @@ import androidx.annotation.RequiresApi
 import androidx.lifecycle.LiveData
 import androidx.lifecycle.MutableLiveData
 import androidx.lifecycle.ViewModel
+import com.google.android.material.dialog.MaterialAlertDialogBuilder
 import java.time.LocalDate
+import java.time.format.DateTimeFormatter
+import java.util.Locale
 
 class CalendarViewModel(private val dailyReadingDao: DailyReadingDao, val context: Context) : ViewModel() {
     private val _dailyGoal = MutableLiveData<Int>()
@@ -62,10 +65,31 @@ class CalendarViewModel(private val dailyReadingDao: DailyReadingDao, val contex
 
     @RequiresApi(Build.VERSION_CODES.O)
     suspend fun dailyProgressGet (date: LocalDate) : Float {
-        val progressItem = dailyReadingDao.get(date)
         val currentGoal = _dailyGoal.value ?: 1
-        val countPage = progressItem?.countPage ?: 0
+        val countPage = dailyReadingDao.getAllPagesOfBook(date) ?: 0
         val newProgress = (countPage * 100f).div(currentGoal)
         return newProgress
+    }
+
+    @RequiresApi(Build.VERSION_CODES.O)
+    suspend fun showInfDialog(context: Context, date: LocalDate) {
+        val booksProgress = dailyReadingDao.getAllBookOnDate(date)
+        val countPage = dailyReadingDao.getAllPagesOfBook(date) ?: 0
+        val message = booksProgress.joinToString(separator = "\n") { reading ->
+            "${reading.bookTitle}: ${reading.countPage} стр.".trimIndent()
+        }
+        val dateFormat = formatLocalDate(date)
+        val alertDialog = MaterialAlertDialogBuilder(context)
+            .setTitle(dateFormat)
+            .setMessage("Всего страниц: $countPage\n$message")
+            .setNegativeButton("Окей", null)
+            .create()
+        alertDialog.show()
+    }
+
+    @RequiresApi(Build.VERSION_CODES.O)
+    fun formatLocalDate(date: LocalDate): String {
+        val formatter = DateTimeFormatter.ofPattern("d MMMM yyyy", Locale("ru"))
+        return date.format(formatter)
     }
 }

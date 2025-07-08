@@ -7,8 +7,10 @@ import android.view.View
 import android.view.ViewGroup
 import android.widget.Toast
 import androidx.core.widget.addTextChangedListener
+import androidx.lifecycle.Observer
 import androidx.lifecycle.ViewModelProvider
 import androidx.lifecycle.viewModelScope
+import androidx.navigation.findNavController
 import com.nastya.booktracker.databinding.FragmentAddBooksBinding
 import kotlinx.coroutines.launch
 
@@ -30,6 +32,12 @@ class AddBooksFragment : Fragment() {
         val viewModel = ViewModelProvider(this, viewModelFactory)
             .get(AddBookViewModel::class.java)
         this.viewModel = viewModel
+
+        viewModel.navigateToBack.observe(viewLifecycleOwner, Observer { navigate ->
+            if(navigate) {
+                view.findNavController().popBackStack()
+            }
+        })
 
         return view
     }
@@ -75,11 +83,6 @@ class AddBooksFragment : Fragment() {
                 } else {
                     viewModel.addTask()
                     Toast.makeText(context, "Книга добавлена", Toast.LENGTH_SHORT).show()
-                    binding.bookNameAdd.text.clear()
-                    binding.bookAuthorAdd.text.clear()
-                    binding.bookDescAdd.text.clear()
-                    binding.bookPageAdd.text.clear()
-                    binding.bookImgAdd.text.clear()
                 }
             }
         }

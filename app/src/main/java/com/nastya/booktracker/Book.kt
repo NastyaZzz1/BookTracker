@@ -7,6 +7,7 @@ import androidx.room.PrimaryKey
 @Entity(tableName = "book_table")
 data class Book (
     @PrimaryKey(autoGenerate = true)
+    @ColumnInfo(name = "book_id")
     var bookId: Long = 0L,
 
     @ColumnInfo(name = "book_name")

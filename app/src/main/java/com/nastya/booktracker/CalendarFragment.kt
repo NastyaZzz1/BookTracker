@@ -133,11 +133,11 @@ class CalendarFragment : Fragment() {
                 if (data.position == DayPosition.MonthDate) {
                     when {
                         selectedDate == data.date -> {
-                            container.textView.setTextColor(ContextCompat.getColor(
-                                requireContext(),
-                                R.color.dark_green)
-                            )
-                            container.textView.setBackgroundResource(R.drawable.selected_bg)
+                            container.textView.setTextColor(Color.BLACK)
+                            container.vBG.setBackgroundResource(R.drawable.selected_bg)
+                            viewModel.viewModelScope.launch {
+                                viewModel.showInfDialog(requireContext(), data.date)
+                            }
                         }
 
                         today == data.date -> {
@@ -147,7 +147,7 @@ class CalendarFragment : Fragment() {
 
                         else -> {
                             container.textView.setTextColor(Color.BLACK)
-                            container.textView.setBackgroundResource(R.drawable.not_selected_bg)
+                            container.vBG.setBackgroundResource(R.drawable.not_selected_bg)
                         }
                     }
                 } else {

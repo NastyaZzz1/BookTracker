@@ -12,77 +12,122 @@
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
         android:orientation="vertical"
+        android:paddingHorizontal="10dp"
+        android:paddingTop="10dp"
         tools:context=".EditBookFragment">
 
-        <EditText
-            android:id="@+id/book_name"
+        <com.google.android.material.textfield.TextInputLayout
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
-            android:autofillHints=""
-            android:hint="@string/book_name_hint"
-            android:inputType="text"
-            android:textSize="16sp"
-            tools:ignore="VisualLintTextFieldSize" />
+            app:hintEnabled="true"
+            app:hintTextColor="@color/dark_green"
+            app:hintAnimationEnabled="true"
+            app:boxStrokeColor="@color/dark_green">
 
-        <EditText
-            android:id="@+id/book_author"
-            android:layout_width="match_parent"
-            android:layout_height="wrap_content"
-            android:hint="@string/book_author_hint"
-            android:autofillHints=""
-            android:inputType="text"
-            android:minHeight="48dp"
-            android:textSize="16sp"
-            tools:ignore="VisualLintTextFieldSize" />
+            <com.google.android.material.textfield.TextInputEditText
+                android:id="@+id/book_name"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:inputType="text"
+                android:textSize="16sp"
+                android:hint="@string/book_name_hint"/>
+        </com.google.android.material.textfield.TextInputLayout>
 
-        <EditText
-            android:id="@+id/book_desc"
-            android:layout_width="match_parent"
-            android:layout_height="wrap_content"
-            android:hint="@string/book_desc_hint"
-            android:autofillHints=""
-            android:inputType="textMultiLine"
-            android:minHeight="48dp"
-            android:textSize="16sp"
-            tools:ignore="VisualLintTextFieldSize" />
 
-        <EditText
-            android:id="@+id/book_all_pages"
+        <com.google.android.material.textfield.TextInputLayout
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
-            android:hint="@string/book_all_pages_hint"
-            android:autofillHints=""
-            android:inputType="number"
-            android:minHeight="48dp"
-            android:textSize="16sp"
-            tools:ignore="VisualLintTextFieldSize" />
+            app:hintEnabled="true"
+            app:hintTextColor="@color/dark_green"
+            app:boxStrokeColor="@color/dark_green"
+            app:hintAnimationEnabled="true">
 
-        <EditText
-            android:id="@+id/book_read_pages"
-            android:layout_width="match_parent"
-            android:layout_height="wrap_content"
-            android:hint="@string/book_read_pages_hint"
-            android:autofillHints=""
-            android:inputType="number"
-            android:minHeight="48dp"
-            android:textSize="16sp"
-            tools:ignore="VisualLintTextFieldSize" />
+            <com.google.android.material.textfield.TextInputEditText
+                android:id="@+id/book_author"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:inputType="text"
+                android:textSize="16sp"
+                android:hint="@string/book_author_hint"/>
+        </com.google.android.material.textfield.TextInputLayout>
 
-        <EditText
-            android:id="@+id/book_img"
+
+        <com.google.android.material.textfield.TextInputLayout
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
-            android:hint="@string/book_img_hint"
-            android:autofillHints=""
-            android:inputType="text"
-            android:minHeight="48dp"
-            android:textSize="16sp"
-            tools:ignore="VisualLintTextFieldSize" />
+            app:hintEnabled="true"
+            app:hintTextColor="@color/dark_green"
+            app:boxStrokeColor="@color/dark_green"
+            app:hintAnimationEnabled="true">
+
+            <com.google.android.material.textfield.TextInputEditText
+                android:id="@+id/book_desc"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:inputType="text"
+                android:textSize="16sp"
+                android:hint="@string/book_desc_hint"/>
+        </com.google.android.material.textfield.TextInputLayout>
+
+
+        <com.google.android.material.textfield.TextInputLayout
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            app:hintEnabled="true"
+            app:hintTextColor="@color/dark_green"
+            app:boxStrokeColor="@color/dark_green"
+            app:hintAnimationEnabled="true">
+
+            <com.google.android.material.textfield.TextInputEditText
+                android:id="@+id/book_all_pages"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:inputType="text"
+                android:textSize="16sp"
+                android:hint="@string/book_all_pages_hint"/>
+        </com.google.android.material.textfield.TextInputLayout>
+
+
+        <com.google.android.material.textfield.TextInputLayout
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            app:hintEnabled="true"
+            app:hintTextColor="@color/dark_green"
+            app:boxStrokeColor="@color/dark_green"
+            app:hintAnimationEnabled="true">
+
+            <com.google.android.material.textfield.TextInputEditText
+                android:id="@+id/book_read_pages"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:inputType="text"
+                android:textSize="16sp"
+                android:hint="@string/book_read_pages_hint"/>
+        </com.google.android.material.textfield.TextInputLayout>
+
+
+        <com.google.android.material.textfield.TextInputLayout
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            app:hintEnabled="true"
+            app:hintAnimationEnabled="true"
+            app:boxStrokeColor="@color/dark_green"
+            app:hintTextColor="@color/dark_green">
+
+            <com.google.android.material.textfield.TextInputEditText
+                android:id="@+id/book_img"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:inputType="text"
+                android:textSize="16sp"
+                android:hint="@string/book_img_hint"/>
+        </com.google.android.material.textfield.TextInputLayout>
 
         <com.google.android.material.button.MaterialButton
             android:id="@+id/update_button"
             android:layout_width="wrap_content"
             android:layout_height="48dp"
+            android:layout_marginTop="10dp"
             android:layout_gravity="center"
             android:background="@drawable/button_drawble"
             app:backgroundTint="@null"
@@ -93,7 +138,7 @@
             android:layout_width="wrap_content"
             android:layout_height="48dp"
             android:layout_marginStart="10dp"
-            android:layout_marginTop="20dp"
+            android:layout_marginTop="18dp"
             android:background="@drawable/button_drawble_del"
             android:minWidth="48dp"
             android:text="@string/del"

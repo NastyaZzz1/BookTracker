@@ -21,13 +21,13 @@ interface BookDao {
     @Query("SELECT * FROM book_table")
     suspend fun getAllOnce(): List<Book>
 
-    @Query("SELECT * FROM book_table WHERE bookId = :bookId")
+    @Query("SELECT * FROM book_table WHERE book_id = :bookId")
     suspend fun getNotLive(bookId: Long): Book?
 
-    @Query("SELECT * FROM book_table WHERE bookId = :bookId")
+    @Query("SELECT * FROM book_table WHERE book_id = :bookId")
     fun get(bookId: Long) : LiveData<Book>
 
-    @Query("SELECT * FROM book_table ORDER BY bookId DESC")
+    @Query("SELECT * FROM book_table ORDER BY book_id DESC")
     fun getAll() : LiveData<List<Book>>
 
     @Query("SELECT COUNT(*) FROM book_table WHERE book_name = :title AND book_author = :author")

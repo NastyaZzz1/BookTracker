@@ -1,14 +1,15 @@
 package com.nastya.booktracker
 
+import android.content.Context
 import android.os.Build
 import androidx.annotation.RequiresApi
 import androidx.lifecycle.LiveData
 import androidx.lifecycle.MutableLiveData
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
+import com.google.android.material.dialog.MaterialAlertDialogBuilder
 import kotlinx.coroutines.launch
 import java.time.LocalDate
-import java.time.format.DateTimeFormatter
 
 class EditBookViewModel(bookId: Long, private val bookDao: BookDao, private val dailyReadingDao: DailyReadingDao) : ViewModel() {
     val book = bookDao.get(bookId)
@@ -19,20 +20,33 @@ class EditBookViewModel(bookId: Long, private val bookDao: BookDao, private val 
     private val _errorMessage = MutableLiveData<String?>()
     val errorMessage: LiveData<String?> get() = _errorMessage
 
-    fun onAllPagesCountChanged(bookPage: Int){
+    fun onAllPagesCountChanged(bookPage: Int) {
         book.value?.allPagesCount = bookPage
     }
 
-    fun onBookNameChanged(bookName: String){
+    fun onBookNameChanged(bookName: String) {
         book.value?.bookName = bookName
     }
 
-    fun onBookAuthorChanged(bookAuthor: String){
+    fun onBookAuthorChanged(bookAuthor: String) {
         book.value?.bookAuthor = bookAuthor
     }
 
-    fun onBookDescChanged(bookDesc: String){
+    fun onBookDescChanged(bookDesc: String) {
         book.value?.description = bookDesc
+    }
+
+    fun showDeleteConfirmationDialog(context: Context) {
+        val alertDialog = MaterialAlertDialogBuilder(context)
+            .setTitle("Удаление книги")
+            .setMessage("Вы точно хотите удалить книгу?")
+            .setPositiveButton("Да") { _, _ ->
+                deleteTask()
+            }
+            .setNegativeButton("Отмена", null)
+            .create()
+
+        alertDialog.show()
     }
 
     @RequiresApi(Build.VERSION_CODES.O)
@@ -50,23 +64,29 @@ class EditBookViewModel(bookId: Long, private val bookDao: BookDao, private val 
 
     @RequiresApi(Build.VERSION_CODES.O)
     fun dailyReadingInsert(currentReadPages: Int?, newReadPages: Int) {
+
         if (currentReadPages != null && newReadPages - currentReadPages != 0) {
             viewModelScope.launch {
-                val dateString = "09-06-2025"
-                val formatter = DateTimeFormatter.ofPattern("dd-MM-yyyy")
-                val localDate: LocalDate = LocalDate.parse(dateString, formatter)
+//                val dateString = "09-06-2025"
+//                val formatter = DateTimeFormatter.ofPattern("dd-MM-yyyy")
+//                val localDate: LocalDate = LocalDate.parse(dateString, formatter)
 
-                val progressItem = dailyReadingDao.get(localDate)
+                var progressItem = dailyReadingDao.getPagesReadForBookOnDate(LocalDate.now(), book.value?.bookId)
 
                 if (progressItem != null) {
-                    progressItem.countPage += newReadPages - currentReadPages
-                    progressItem.readDate = localDate
-                    dailyReadingDao.update(progressItem)
+                    val updatedReading = DailyReading(
+                        dataId = progressItem.dataId,
+                        readDate = progressItem.readDate,
+                        bookId = book.value?.bookId ?: 0L,
+                        countPage = progressItem.countPage + (newReadPages - currentReadPages)
+                    )
+                    dailyReadingDao.update(updatedReading)
                 }
                 else {
                     val progressItemNew = DailyReading(
                         countPage = newReadPages - currentReadPages,
-                        readDate = localDate)
+                        bookId = book.value!!.bookId,
+                        readDate = LocalDate.now())
                     dailyReadingDao.insert(progressItemNew)
                 }
             }
@@ -94,5 +114,4 @@ class EditBookViewModel(bookId: Long, private val bookDao: BookDao, private val 
     fun onNavigatedToList() {
         _navigateToList.value = false
     }
-
 }

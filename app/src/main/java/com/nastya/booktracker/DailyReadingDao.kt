@@ -15,11 +15,24 @@ interface DailyReadingDao {
     @Update
     suspend fun update(dailyReading: DailyReading)
 
-    @Query("SELECT * FROM daily_reading_table WHERE read_date = :readDate")
-    suspend fun get(readDate: LocalDate) : DailyReading?
+    @Query("""
+       SELECT dr.dataId, dr.read_date as readDate, dr.count_page as countPage, b.book_name as bookTitle
+       FROM daily_reading_table dr 
+       JOIN book_table b ON dr.book_id = b.book_id
+       WHERE dr.read_date = :readDate
+    """)
+    suspend fun getAllBookOnDate(readDate: LocalDate) : List<DailyReadingWithTitle>
 
-    @Query("SELECT * FROM daily_reading_table ORDER BY dataId DESC")
-    suspend fun getAll() : List<DailyReading>
+    @Query("""
+       SELECT dr.dataId, dr.read_date as readDate, dr.count_page as countPage, b.book_name as bookTitle
+       FROM daily_reading_table dr 
+       JOIN book_table b ON dr.book_id = b.book_id
+       WHERE dr.read_date = :readDate and dr.book_id = :bookId
+    """)
+    suspend fun getPagesReadForBookOnDate(readDate: LocalDate, bookId: Long?) : DailyReadingWithTitle?
+
+    @Query("SELECT SUM(count_page) FROM daily_reading_table WHERE read_date = :readDate")
+    suspend fun getAllPagesOfBook(readDate: LocalDate) : Int?
 
     @Query("SELECT SUM(count_page) FROM daily_reading_table WHERE strftime('%Y', read_date) = :year AND strftime('%m', read_date) = :month")
     suspend fun getTotalPagesReadInMonth(year: String, month: String): Int?

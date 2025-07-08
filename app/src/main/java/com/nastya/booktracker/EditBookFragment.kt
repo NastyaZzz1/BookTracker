@@ -107,7 +107,7 @@ class EditBookFragment : Fragment() {
         }
 
         binding.deleteButton.setOnClickListener {
-            viewModel.deleteTask()
+            viewModel.showDeleteConfirmationDialog(requireContext())
         }
     }
 
