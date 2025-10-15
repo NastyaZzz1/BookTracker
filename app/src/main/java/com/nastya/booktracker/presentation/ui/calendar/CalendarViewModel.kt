@@ -2,6 +2,9 @@ package com.nastya.booktracker.presentation.ui.calendar
 
 import android.content.Context
 import android.os.Build
+import android.view.LayoutInflater
+import android.widget.EditText
+import com.nastya.booktracker.R
 import androidx.annotation.RequiresApi
 import androidx.lifecycle.LiveData
 import androidx.lifecycle.MutableLiveData
@@ -11,6 +14,8 @@ import com.nastya.booktracker.data.local.dao.DailyReadingDao
 import java.time.LocalDate
 import java.time.format.DateTimeFormatter
 import java.util.Locale
+import androidx.core.content.edit
+import androidx.core.widget.addTextChangedListener
 
 class CalendarViewModel(private val dailyReadingDao: DailyReadingDao, val context: Context) : ViewModel() {
     private val _dailyGoal = MutableLiveData<Int>()
@@ -51,17 +56,17 @@ class CalendarViewModel(private val dailyReadingDao: DailyReadingDao, val contex
 
     private fun saveDayGoal(goalPageNew: Int) {
         val sharedPref = context.getSharedPreferences("app_prefs", Context.MODE_PRIVATE)
-        sharedPref.edit().putInt(dayGoalKey, goalPageNew).apply()
+        sharedPref.edit { putInt(dayGoalKey, goalPageNew) }
     }
 
     private fun saveMonthGoal(goalPageNew: Int) {
         val sharedPref = context.getSharedPreferences("app_prefs", Context.MODE_PRIVATE)
-        sharedPref.edit().putInt(monthGoalKey, goalPageNew).apply()
+        sharedPref.edit { putInt(monthGoalKey, goalPageNew) }
     }
 
     private fun saveYearGoal(goalPageNew: Int) {
         val sharedPref = context.getSharedPreferences("app_prefs", Context.MODE_PRIVATE)
-        sharedPref.edit().putInt(yearGoalKey, goalPageNew).apply()
+        sharedPref.edit { putInt(yearGoalKey, goalPageNew) }
     }
 
     @RequiresApi(Build.VERSION_CODES.O)
@@ -73,7 +78,7 @@ class CalendarViewModel(private val dailyReadingDao: DailyReadingDao, val contex
     }
 
     @RequiresApi(Build.VERSION_CODES.O)
-    suspend fun showInfDialog(context: Context, date: LocalDate) {
+    suspend fun showInfDialogDetailData(context: Context, date: LocalDate) {
         val booksProgress = dailyReadingDao.getAllBookOnDate(date)
         val countPage = dailyReadingDao.getAllPagesOfBook(date) ?: 0
         val message = booksProgress.joinToString(separator = "\n") { reading ->
@@ -85,6 +90,44 @@ class CalendarViewModel(private val dailyReadingDao: DailyReadingDao, val contex
             .setMessage("Всего страниц: $countPage\n$message")
             .setNegativeButton("Окей", null)
             .create()
+        alertDialog.show()
+    }
+
+    @RequiresApi(Build.VERSION_CODES.O)
+    fun showInfDialogChangeGoal(context: Context) {
+        val dialogView = LayoutInflater.from(context).inflate(R.layout.dialog_change_goal, null)
+        val alertDialog = MaterialAlertDialogBuilder(context)
+            .setTitle("Изменить цели")
+            .setView(dialogView)
+            .setPositiveButton("Окей", null)
+            .create()
+
+        val dayGoal = dialogView.findViewById<EditText>(R.id.day_goal)
+        val monthGoal = dialogView.findViewById<EditText>(R.id.month_goal)
+        val yearGoal = dialogView.findViewById<EditText>(R.id.year_goal)
+
+        dayGoal.setText(_dailyGoal.value.toString())
+        monthGoal.setText(_monthlyGoal.value.toString())
+        yearGoal.setText(_yearlyGoal.value.toString())
+
+        dayGoal.addTextChangedListener { str ->
+            str.toString().toIntOrNull()?.let { goalPage ->
+                onDayGoalChanged(goalPage)
+            }
+        }
+
+        monthGoal.addTextChangedListener { str ->
+            str.toString().toIntOrNull()?.let { goalPage ->
+                onMonthGoalChanged(goalPage)
+            }
+        }
+
+        yearGoal.addTextChangedListener { str ->
+            str.toString().toIntOrNull()?.let { goalPage ->
+                onYearGoalChanged(goalPage)
+            }
+        }
+
         alertDialog.show()
     }
 

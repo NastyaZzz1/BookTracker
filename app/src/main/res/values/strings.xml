@@ -23,4 +23,5 @@
     <string name="book_read_pages_hint">Количество прочитанных страниц</string>
     <string name="book_img_hint">Ссылка на обложку</string>
     <string name="book_page_add_hint">Количество страниц</string>
+    <string name="change_goal">Изменить цели</string>
 </resources>

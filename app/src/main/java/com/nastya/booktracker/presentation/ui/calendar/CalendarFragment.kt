@@ -15,14 +15,15 @@ import android.graphics.Color
 import android.os.Build
 import android.view.LayoutInflater
 import android.view.ViewGroup
+import android.widget.EditText
 import androidx.annotation.RequiresApi
 import androidx.core.widget.addTextChangedListener
 import androidx.fragment.app.Fragment
+import androidx.lifecycle.Observer
 import androidx.lifecycle.ViewModelProvider
 import androidx.lifecycle.viewModelScope
+import com.google.android.material.textfield.TextInputEditText
 import com.kizitonwose.calendar.view.CalendarView
-import com.nastya.booktracker.presentation.ui.calendar.CalendarViewModel
-import com.nastya.booktracker.presentation.ui.calendar.CalendarViewModelFactory
 import com.nastya.booktracker.R
 import com.nastya.booktracker.data.local.database.BookDatabase
 import com.nastya.booktracker.databinding.CalendarDayLayoutBinding
@@ -56,10 +57,6 @@ class CalendarFragment : Fragment() {
             CalendarViewModelFactory(dailyReadingDao, requireActivity().application)
         viewModel = ViewModelProvider(this, viewModelFactory)[CalendarViewModel::class.java]
 
-        binding.dayGoal.setText(viewModel.dailyGoal.value.toString())
-        binding.monthGoal.setText(viewModel.monthlyGoal.value.toString())
-        binding.yearGoal.setText(viewModel.yearlyGoal.value.toString())
-
         return view
     }
 
@@ -71,23 +68,27 @@ class CalendarFragment : Fragment() {
         val endMonth = currentMonth.plusMonths(10)
         val daysOfWeek = daysOfWeek(firstDayOfWeek = DayOfWeek.MONDAY)
 
-        binding.dayGoal.addTextChangedListener { str ->
-            str.toString().toIntOrNull()?.let { goalPage ->
-                viewModel.onDayGoalChanged(goalPage)
+        viewModel.dailyGoal.observe(this.viewLifecycleOwner, Observer {
+            it?.let {
+                binding.dayGoal.text = it.toString()
+                setupWeekCalendar(startMonth, endMonth, currentMonth, daysOfWeek)
             }
-            setupWeekCalendar(startMonth, endMonth, currentMonth, daysOfWeek)
-        }
+        })
+        viewModel.monthlyGoal.observe(this.viewLifecycleOwner, Observer {
+            it?.let {
+                binding.monthGoal.text = it.toString()
+                setupWeekCalendar(startMonth, endMonth, currentMonth, daysOfWeek)
+            }
+        })
+        viewModel.yearlyGoal.observe(this.viewLifecycleOwner, Observer {
+            it?.let {
+                binding.yearGoal.text = it.toString()
+                setupWeekCalendar(startMonth, endMonth, currentMonth, daysOfWeek)
+            }
+        })
 
-        binding.monthGoal.addTextChangedListener { str ->
-            str.toString().toIntOrNull()?.let { goalPage ->
-                viewModel.onMonthGoalChanged(goalPage)
-            }
-        }
-
-        binding.yearGoal.addTextChangedListener { str ->
-            str.toString().toIntOrNull()?.let { goalPage ->
-                viewModel.onYearGoalChanged(goalPage)
-            }
+        binding.changeGoalBtn.setOnClickListener {
+            viewModel.showInfDialogChangeGoal(requireContext())
         }
 
         setupWeekCalendar(startMonth, endMonth, currentMonth, daysOfWeek)
@@ -140,7 +141,7 @@ class CalendarFragment : Fragment() {
                             container.textView.setTextColor(Color.BLACK)
                             container.vBG.setBackgroundResource(R.drawable.selected_bg)
                             viewModel.viewModelScope.launch {
-                                viewModel.showInfDialog(requireContext(), data.date)
+                                viewModel.showInfDialogDetailData(requireContext(), data.date)
                             }
                         }
 
