@@ -10,4 +10,9 @@
         android:title="favorite"
         android:icon="@drawable/icon_heart"
         app:showAsAction="always" />
+
+    <item android:id="@+id/settingsFragment"
+        android:title="add_book"
+        android:icon="@drawable/icon_pencil"
+        app:showAsAction="always" />
 </menu>

@@ -6,7 +6,7 @@
     android:layout_width="match_parent"
     android:layout_height="wrap_content"
     android:scrollbars="none"
-    tools:context=".EditBookFragment">
+    tools:context=".presentation.ui.editBook.EditBookFragment">
 
     <LinearLayout
         android:layout_width="match_parent"
@@ -14,7 +14,7 @@
         android:orientation="vertical"
         android:paddingHorizontal="10dp"
         android:paddingTop="10dp"
-        tools:context=".EditBookFragment">
+        tools:context=".presentation.ui.editBook.EditBookFragment">
 
         <com.google.android.material.textfield.TextInputLayout
             android:layout_width="match_parent"

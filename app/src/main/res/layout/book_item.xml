@@ -6,7 +6,7 @@
     <data>
         <variable
             name="book"
-            type="com.nastya.booktracker.Book" />
+            type="com.nastya.booktracker.domain.model.Book" />
     </data>
 
     <androidx.cardview.widget.CardView

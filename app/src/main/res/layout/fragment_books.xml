@@ -5,7 +5,7 @@
     xmlns:tools="http://schemas.android.com/tools"
     android:layout_width="match_parent"
     android:layout_height="match_parent"
-    tools:context=".BooksFragment">
+    tools:context=".presentation.ui.bookList.BooksFragment">
 
     <androidx.recyclerview.widget.RecyclerView
         android:id="@+id/books_list"
@@ -14,17 +14,19 @@
         android:layout_gravity="top"
         android:layout_weight="1"
         android:clipToPadding="false"
+        android:elevation="1dp"
         android:paddingHorizontal="10dp"
         android:paddingTop="60dp"
-        android:elevation="1dp"
         app:layoutManager="androidx.recyclerview.widget.GridLayoutManager"
         app:layout_constraintBottom_toBottomOf="parent"
         app:layout_constraintEnd_toEndOf="parent"
+        app:layout_constraintHorizontal_bias="0.0"
         app:layout_constraintStart_toStartOf="parent"
         app:layout_constraintTop_toTopOf="parent"
+        app:layout_constraintVertical_bias="0.0"
         app:spanCount="2" />
 
-        <HorizontalScrollView
+    <HorizontalScrollView
             android:id="@+id/horizontalScrollView"
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
@@ -34,22 +36,35 @@
             app:layout_constraintStart_toStartOf="parent"
             app:layout_constraintTop_toTopOf="parent">
 
-            <LinearLayout
+            <androidx.constraintlayout.widget.ConstraintLayout
                 android:layout_width="wrap_content"
                 android:layout_height="match_parent"
                 android:layout_marginTop="10dp"
                 android:orientation="horizontal">
+
+                <ImageView
+                    android:id="@+id/filter"
+                    android:layout_width="25dp"
+                    android:layout_height="25dp"
+                    android:src="@drawable/icon_filter"
+                    android:layout_marginStart="15dp"
+                    app:layout_constraintBottom_toBottomOf="parent"
+                    app:layout_constraintStart_toStartOf="parent"
+                    app:layout_constraintTop_toTopOf="parent" />
 
                 <com.google.android.material.button.MaterialButton
                     android:id="@+id/all_books_btn"
                     android:layout_width="wrap_content"
                     android:layout_height="38dp"
                     android:layout_marginEnd="5dp"
-                    android:layout_marginStart="15dp"
+                    android:layout_marginStart="10dp"
                     android:background="@drawable/button_categ_drawble"
                     android:state_selected="true"
                     android:text="@string/all_books"
-                    app:backgroundTint="@null" />
+                    app:backgroundTint="@null"
+                    app:layout_constraintTop_toTopOf="parent"
+                    app:layout_constraintBottom_toBottomOf="parent"
+                    app:layout_constraintStart_toEndOf="@+id/filter" />
 
                 <com.google.android.material.button.MaterialButton
                     android:id="@+id/reading_books_btn"
@@ -58,7 +73,10 @@
                     android:layout_marginHorizontal="5dp"
                     android:background="@drawable/button_categ_drawble"
                     android:text="@string/reading_books"
-                    app:backgroundTint="@null" />
+                    app:backgroundTint="@null"
+                    app:layout_constraintTop_toTopOf="parent"
+                    app:layout_constraintBottom_toBottomOf="parent"
+                    app:layout_constraintStart_toEndOf="@+id/all_books_btn" />
 
                 <com.google.android.material.button.MaterialButton
                     android:id="@+id/want_books_btn"
@@ -67,7 +85,10 @@
                     android:layout_marginHorizontal="5dp"
                     android:background="@drawable/button_categ_drawble"
                     android:text="@string/want_books"
-                    app:backgroundTint="@null" />
+                    app:backgroundTint="@null"
+                    app:layout_constraintTop_toTopOf="parent"
+                    app:layout_constraintBottom_toBottomOf="parent"
+                    app:layout_constraintStart_toEndOf="@+id/reading_books_btn" />
 
                 <com.google.android.material.button.MaterialButton
                     android:id="@+id/past_books_btn"
@@ -77,8 +98,11 @@
                     android:layout_marginEnd="15dp"
                     android:background="@drawable/button_categ_drawble"
                     android:text="@string/past_books"
-                    app:backgroundTint="@null" />
-            </LinearLayout>
+                    app:backgroundTint="@null"
+                    app:layout_constraintTop_toTopOf="parent"
+                    app:layout_constraintBottom_toBottomOf="parent"
+                    app:layout_constraintStart_toEndOf="@+id/want_books_btn" />
+            </androidx.constraintlayout.widget.ConstraintLayout>
         </HorizontalScrollView>
 
 </androidx.constraintlayout.widget.ConstraintLayout>

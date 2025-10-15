@@ -7,7 +7,7 @@ app:startDestination="@id/booksFragment">
 
     <fragment
         android:id="@+id/booksFragment"
-        android:name="com.nastya.booktracker.BooksFragment"
+        android:name="com.nastya.booktracker.presentation.ui.bookList.BooksFragment"
         android:label="Мои книги"
         tools:layout="@layout/fragment_books" >
         <action
@@ -17,19 +17,19 @@ app:startDestination="@id/booksFragment">
 
     <fragment
         android:id="@+id/calendarFragment"
-        android:name="com.nastya.booktracker.CalendarFragment"
+        android:name="com.nastya.booktracker.presentation.ui.calendar.CalendarFragment"
         android:label="Трекер"
         tools:layout="@layout/fragment_calendar" />
 
     <fragment
         android:id="@+id/statFragment"
-        android:name="com.nastya.booktracker.StatFragment"
+        android:name="com.nastya.booktracker.presentation.ui.stat.StatFragment"
         android:label="Статистика"
         tools:layout="@layout/fragment_stat" />
 
     <fragment
         android:id="@+id/favoriteBooksFragment"
-        android:name="com.nastya.booktracker.FavoriteBooksFragment"
+        android:name="com.nastya.booktracker.presentation.ui.favoriteBook.FavoriteBooksFragment"
         android:label="Любимые книги"
         tools:layout="@layout/fragment_favorite_books" >
         <action
@@ -39,13 +39,13 @@ app:startDestination="@id/booksFragment">
 
     <fragment
         android:id="@+id/addBooksFragment"
-        android:name="com.nastya.booktracker.AddBooksFragment"
+        android:name="com.nastya.booktracker.presentation.ui.addBook.AddBooksFragment"
         android:label="Добавить книгу"
         tools:layout="@layout/fragment_add_books" />
 
     <fragment
         android:id="@+id/editBookFragment"
-        android:name="com.nastya.booktracker.EditBookFragment"
+        android:name="com.nastya.booktracker.presentation.ui.editBook.EditBookFragment"
         android:label="Изменение книги"
         tools:layout="@layout/fragment_edit_book" >
         <argument
