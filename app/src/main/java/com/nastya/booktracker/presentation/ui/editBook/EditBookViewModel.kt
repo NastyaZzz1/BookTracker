@@ -1,13 +1,11 @@
 package com.nastya.booktracker.presentation.ui.editBook
 
-import android.content.Context
 import android.os.Build
 import androidx.annotation.RequiresApi
 import androidx.lifecycle.LiveData
 import androidx.lifecycle.MutableLiveData
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
-import com.google.android.material.dialog.MaterialAlertDialogBuilder
 import com.nastya.booktracker.data.local.dao.BookDao
 import com.nastya.booktracker.data.local.dao.DailyReadingDao
 import com.nastya.booktracker.domain.model.DailyReading
@@ -37,19 +35,6 @@ class EditBookViewModel(bookId: Long, private val bookDao: BookDao, private val 
 
     fun onBookDescChanged(bookDesc: String) {
         book.value?.description = bookDesc
-    }
-
-    fun showDeleteConfirmationDialog(context: Context) {
-        val alertDialog = MaterialAlertDialogBuilder(context)
-            .setTitle("Удаление книги")
-            .setMessage("Вы точно хотите удалить книгу?")
-            .setPositiveButton("Да") { _, _ ->
-                deleteTask()
-            }
-            .setNegativeButton("Отмена", null)
-            .create()
-
-        alertDialog.show()
     }
 
     @RequiresApi(Build.VERSION_CODES.O)
@@ -104,13 +89,6 @@ class EditBookViewModel(bookId: Long, private val bookDao: BookDao, private val 
     fun updateTask() {
         viewModelScope.launch {
             bookDao.update(book.value!!)
-            _navigateToList.value = true
-        }
-    }
-
-    fun deleteTask() {
-        viewModelScope.launch {
-            bookDao.delete(book.value!!)
             _navigateToList.value = true
         }
     }

@@ -43,7 +43,6 @@ class BooksFragment : Fragment() {
             }
         )
         binding.booksList.adapter = adapter
-
         viewModel.filteredProducts.observe(this.viewLifecycleOwner, Observer {
             it?.let {
                 adapter.submitList(it)
@@ -51,16 +50,14 @@ class BooksFragment : Fragment() {
         })
 
         viewModel.updateAllCategories()
-
         viewModel.filterByCategory("all")
         binding.allBooksBtn.isSelected = true
         setupFilterButtons()
 
-
         viewModel.navigateToBook.observe(viewLifecycleOwner, Observer { bookId ->
             bookId?.let {
                 val action = BooksFragmentDirections.
-                actionBooksFragmentToEditBookFragment(bookId)
+                actionBooksFragmentToBookDetailFragment(bookId)
                 this.findNavController().navigate(action)
                 viewModel.onBookNavigated()
             }

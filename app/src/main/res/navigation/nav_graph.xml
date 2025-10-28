@@ -11,8 +11,8 @@ app:startDestination="@id/booksFragment">
         android:label="Мои книги"
         tools:layout="@layout/fragment_books" >
         <action
-            android:id="@+id/action_booksFragment_to_editBookFragment"
-            app:destination="@id/editBookFragment" />
+            android:id="@+id/action_booksFragment_to_bookDetailFragment"
+            app:destination="@id/bookDetailFragment" />
     </fragment>
 
     <fragment
@@ -33,8 +33,8 @@ app:startDestination="@id/booksFragment">
         android:label="Любимые книги"
         tools:layout="@layout/fragment_favorite_books" >
         <action
-            android:id="@+id/action_favoriteBooksFragment_to_editBookFragment"
-            app:destination="@id/editBookFragment" />
+            android:id="@+id/action_favoriteBooksFragment_to_bookDetailFragment"
+            app:destination="@id/bookDetailFragment" />
     </fragment>
 
     <fragment
@@ -52,11 +52,38 @@ app:startDestination="@id/booksFragment">
             android:name="bookId"
             app:argType="long" />
         <action
-            android:id="@+id/action_editBookFragment_to_booksFragment"
+            android:id="@+id/action_editBookFragment_to_bookDetailFragment"
+            app:destination="@id/bookDetailFragment" />
+    </fragment>
+    <fragment
+        android:id="@+id/bookDetailFragment"
+        android:name="com.nastya.booktracker.presentation.ui.bookDetail.BookDetailFragment"
+        android:label="Детали книги"
+        tools:layout="@layout/fragment_book_detail" >
+        <argument
+            android:name="bookId"
+            app:argType="long" />
+        <action
+            android:id="@+id/action_bookDetailFragment_to_booksFragment"
             app:destination="@id/booksFragment" />
         <action
-            android:id="@+id/action_editBookFragment_to_favoriteBooksFragment"
+            android:id="@+id/action_bookDetailFragment_to_editBookFragment"
+            app:destination="@id/editBookFragment" />
+        <action
+            android:id="@+id/action_bookDetailFragment_to_favoriteBooksFragment"
             app:destination="@id/favoriteBooksFragment" />
+        <action
+            android:id="@+id/action_bookDetailFragment_to_bookNotesFragment"
+            app:destination="@id/bookNotesFragment" />
+    </fragment>
+    <fragment
+        android:id="@+id/bookNotesFragment"
+        android:name="com.nastya.booktracker.presentation.ui.bookNotes.BookNotesFragment"
+        android:label="Заметки"
+        tools:layout="@layout/fragment_book_notes" >
+        <action
+            android:id="@+id/action_bookNotesFragment_to_bookDetailFragment"
+            app:destination="@id/bookDetailFragment" />
     </fragment>
 
 </navigation>

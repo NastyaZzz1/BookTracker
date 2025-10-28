@@ -41,8 +41,7 @@ class EditBookFragment : Fragment() {
 
         viewModel.navigateToList.observe(viewLifecycleOwner, Observer { navigate ->
             if (navigate) {
-                view.findNavController()
-                    .navigate(R.id.action_editBookFragment_to_booksFragment)
+                view.findNavController().popBackStack()
                 viewModel.onNavigatedToList()
             }
         })
@@ -106,10 +105,6 @@ class EditBookFragment : Fragment() {
                 Toast.makeText(context, "Изменения сохранены", Toast.LENGTH_SHORT).show()
             }
             else Toast.makeText(context, "Исправьте ошибки перед сохранением", Toast.LENGTH_SHORT).show()
-        }
-
-        binding.deleteButton.setOnClickListener {
-            viewModel.showDeleteConfirmationDialog(requireContext())
         }
     }
 

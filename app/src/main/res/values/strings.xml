@@ -7,6 +7,7 @@
     <string name="want_books">Хочу прочитать</string>
     <string name="content_description_img">Изображение книги</string>
     <string name="content_description_img_heart">Сердечко</string>
+    <string name="content_description_img_notes">Заметки</string>
     <string name="my_goals">Мои цели</string>
     <string name="for_day">На день</string>
     <string name="for_month">На месяц</string>
@@ -16,6 +17,7 @@
     <string name="save">Сохранить</string>
     <string name="del">Удалить</string>
     <string name="year">2024</string>
+    <string name="reading">Читать</string>
     <string name="book_name_hint">Название</string>
     <string name="book_author_hint">Автор</string>
     <string name="book_desc_hint">Описание</string>
@@ -24,4 +26,5 @@
     <string name="book_img_hint">Ссылка на обложку</string>
     <string name="book_page_add_hint">Количество страниц</string>
     <string name="change_goal">Изменить цели</string>
+    <string name="change">Изменить</string>
 </resources>

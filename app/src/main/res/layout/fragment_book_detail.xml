@@ -1,0 +1,163 @@
+<?xml version="1.0" encoding="utf-8"?>
+<ScrollView xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:app="http://schemas.android.com/apk/res-auto"
+    xmlns:tools="http://schemas.android.com/tools"
+    android:id="@+id/horizontalScrollView"
+    android:layout_width="match_parent"
+    android:layout_height="wrap_content"
+    android:scrollbars="none"
+    tools:context=".presentation.ui.bookDetail.BookDetailFragment" >
+
+    <androidx.constraintlayout.widget.ConstraintLayout
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:layout_marginHorizontal="20dp"
+        android:paddingVertical="20dp">
+
+        <ImageView
+            android:id="@+id/fav_btn"
+            android:layout_width="25dp"
+            android:layout_height="25dp"
+            android:contentDescription="@string/content_description_img_heart"
+            android:src="@drawable/icon_heart_empty"
+            app:layout_constraintStart_toStartOf="parent"
+            app:layout_constraintTop_toTopOf="parent"
+            app:layout_constraintEnd_toStartOf="@+id/book_img"/>
+
+        <ImageView
+            android:id="@+id/book_img"
+            android:layout_width="200dp"
+            android:layout_height="200dp"
+            android:layout_gravity="center"
+            app:layout_constraintStart_toEndOf="@+id/fav_btn"
+            app:layout_constraintTop_toTopOf="parent"
+            app:layout_constraintEnd_toStartOf="@+id/notes_btn"/>
+
+        <ImageView
+            android:id="@+id/notes_btn"
+            android:layout_width="25dp"
+            android:layout_height="25dp"
+            android:contentDescription="@string/content_description_img_notes"
+            android:src="@drawable/icon_notes"
+            app:layout_constraintEnd_toEndOf="parent"
+            app:layout_constraintStart_toEndOf="@+id/book_img"
+            app:layout_constraintTop_toTopOf="parent" />
+
+        <TextView
+            android:id="@+id/book_name"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:text="Название книги"
+            android:layout_marginTop="10dp"
+            android:textSize="20sp"
+            app:layout_constraintTop_toBottomOf="@+id/book_img"
+            app:layout_constraintStart_toStartOf="parent"
+            app:layout_constraintEnd_toEndOf="parent" />
+
+        <TextView
+            android:id="@+id/book_author"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:text="Автор"
+            android:layout_marginTop="10dp"
+            android:textSize="18sp"
+            app:layout_constraintTop_toBottomOf="@+id/book_name"
+            app:layout_constraintStart_toStartOf="parent"
+            app:layout_constraintEnd_toEndOf="parent" />
+
+        <FrameLayout
+            android:id="@+id/linProgressBar_layout"
+            android:layout_width="match_parent"
+            android:layout_height="13dp"
+            android:background="@drawable/border_background"
+            android:padding="0.5dp"
+            android:layout_marginTop="10dp"
+            app:layout_constraintTop_toBottomOf="@+id/book_author"
+            app:layout_constraintStart_toStartOf="parent"
+            app:layout_constraintEnd_toEndOf="parent" >
+
+            <com.google.android.material.progressindicator.LinearProgressIndicator
+                android:id="@+id/linProgressBar"
+                android:layout_width="match_parent"
+                android:layout_height="match_parent"
+                app:trackThickness="12dp"
+                style="@style/CustomProgressIndicator"
+                app:trackColor="@color/transparent"
+                app:indicatorColor="@color/light_green"/>
+
+            <TextView
+                android:id="@+id/linProgressText"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:layout_gravity="center"
+                android:textColor="@color/black"
+                android:textSize="11sp"/>
+        </FrameLayout>
+
+        <TextView
+            android:id="@+id/book_desc"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:layout_marginTop="10dp"
+            android:text="Описание книги, описание книги"
+            app:layout_constraintTop_toBottomOf="@+id/linProgressBar_layout"
+            app:layout_constraintStart_toStartOf="parent"
+            app:layout_constraintEnd_toEndOf="parent" />
+
+        <TextView
+            android:id="@+id/book_all_pages"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:text="Всего страниц: 450"
+            android:layout_marginTop="10dp"
+            app:layout_constraintTop_toBottomOf="@+id/book_desc"
+            app:layout_constraintStart_toStartOf="parent" />
+
+        <TextView
+            android:id="@+id/book_read_pages"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:text="Прочитано: 100"
+            app:layout_constraintEnd_toEndOf="parent"
+            app:layout_constraintTop_toTopOf="@+id/book_all_pages" />
+
+        <com.google.android.material.button.MaterialButton
+            android:id="@+id/reading_btn"
+            android:layout_width="wrap_content"
+            android:layout_height="38dp"
+            android:layout_marginEnd="5dp"
+            android:layout_marginStart="10dp"
+            android:background="@drawable/button_categ_drawble"
+            android:state_selected="true"
+            android:text="@string/reading"
+            app:backgroundTint="@null"
+            android:layout_marginTop="25dp"
+            app:layout_constraintTop_toBottomOf="@+id/book_read_pages"
+            app:layout_constraintStart_toStartOf="parent"
+            app:layout_constraintEnd_toEndOf="parent" />
+
+        <com.google.android.material.button.MaterialButton
+            android:id="@+id/change_btn"
+            android:layout_width="wrap_content"
+            android:layout_height="38dp"
+            android:background="@drawable/btn_goal_drawble"
+            android:text="@string/change"
+            android:textColor="@color/light_brown"
+            app:backgroundTint="@null"
+            android:layout_marginTop="25dp"
+            app:layout_constraintStart_toStartOf="parent"
+            app:layout_constraintTop_toBottomOf="@+id/reading_btn" />
+
+        <com.google.android.material.button.MaterialButton
+            android:id="@+id/delete_button"
+            android:layout_width="wrap_content"
+            android:layout_height="38dp"
+            android:background="@drawable/btn_goal_drawble"
+            android:text="@string/del"
+            android:textColor="@color/light_brown"
+            app:backgroundTint="@null"
+            app:layout_constraintEnd_toEndOf="parent"
+            app:layout_constraintTop_toTopOf="@+id/change_btn" />
+
+    </androidx.constraintlayout.widget.ConstraintLayout>
+</ScrollView>
