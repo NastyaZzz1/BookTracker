@@ -1,38 +1,65 @@
 package com.nastya.booktracker.presentation.ui.bookList
 
-import androidx.lifecycle.LiveData
-import androidx.lifecycle.MediatorLiveData
-import androidx.lifecycle.MutableLiveData
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
 import com.nastya.booktracker.data.local.dao.BookDao
 import com.nastya.booktracker.domain.model.Book
+import kotlinx.coroutines.flow.MutableStateFlow
+import kotlinx.coroutines.flow.SharingStarted
+import kotlinx.coroutines.flow.StateFlow
+import kotlinx.coroutines.flow.asStateFlow
+import kotlinx.coroutines.flow.combine
+import kotlinx.coroutines.flow.stateIn
 import kotlinx.coroutines.launch
 
 class BooksViewModel(val dao: BookDao) : ViewModel() {
-    private val _navigateToBook = MutableLiveData<Long?>()
-    val navigateToBook: LiveData<Long?>
-        get() = _navigateToBook
+    private val _navigateToDetail = MutableStateFlow<Long?>(null)
+    val navigateToDetail: StateFlow<Long?> = _navigateToDetail
 
-    private val _books = dao.getAll()
-    private val books: LiveData<List<Book>> = _books
-
-    private val _filteredProducts = MediatorLiveData<List<Book>>()
-    val filteredProducts: LiveData<List<Book>> = _filteredProducts
-
-    init {
-        _filteredProducts.addSource(_books) { allBooks ->
-            _filteredProducts.value = allBooks ?: emptyList()
-        }
+    sealed class SortedState() {
+        object None : SortedState()
+        object Desc : SortedState()
+        object Asc : SortedState()
     }
 
+    private val _sortedBooksState = MutableStateFlow<SortedState>(SortedState.None)
+    val sortedBooksState = _sortedBooksState.asStateFlow()
+
+    private val _selectedCategory = MutableStateFlow<String?>(null)
+
+    val filteredBooks: StateFlow<List<Book>> = combine(
+        dao.getAllFlow(),
+        _sortedBooksState,
+        _selectedCategory
+    ) { allBooks, sortState, category ->
+
+        var result = if (category == null || category == "all") {
+            allBooks
+        } else {
+            allBooks.filter { it.category == category}
+        }
+
+        result = when(sortState) {
+            SortedState.None -> result
+            SortedState.Asc -> result.sortedByDescending { it.bookName }
+            SortedState.Desc -> result.sortedBy { it.bookName }
+        }
+        result
+    }.stateIn(
+        scope = viewModelScope,
+        started = SharingStarted.WhileSubscribed(5000),
+        initialValue = emptyList()
+    )
+
     fun filterByCategory(category: String) {
-        books.value?.let { currentList ->
-            _filteredProducts.value = if (category == "all") {
-                currentList
-            } else {
-                currentList.filter { it.category == category }
-            }
+        _selectedCategory.value = if (category == "all") null else category
+    }
+
+    fun changeSortedState() {
+        _sortedBooksState.value = when (_sortedBooksState.value) {
+            SortedState.None -> SortedState.Desc
+            SortedState.Desc -> SortedState.Asc
+            SortedState.Asc -> SortedState.None
         }
     }
 
@@ -46,7 +73,6 @@ class BooksViewModel(val dao: BookDao) : ViewModel() {
                     book.allPagesCount -> "past"
                     else -> "reading"
                 }
-
                 if (book.category != newCategory) book.copy(category = newCategory)
                 else book
             }
@@ -59,11 +85,15 @@ class BooksViewModel(val dao: BookDao) : ViewModel() {
 
 
     fun onBookClicked(bookId: Long) {
-        _navigateToBook.value = bookId
+        viewModelScope.launch {
+            _navigateToDetail.value = bookId
+        }
     }
 
     fun onBookNavigated() {
-        _navigateToBook.value = null
+        viewModelScope.launch {
+            _navigateToDetail.value = null
+        }
     }
 
     fun toggleBookIsFavorite(bookId: Long) {

@@ -12,7 +12,6 @@ import androidx.fragment.app.Fragment
 import androidx.lifecycle.Observer
 import androidx.lifecycle.ViewModelProvider
 import androidx.navigation.findNavController
-import com.nastya.booktracker.R
 import com.nastya.booktracker.data.local.database.BookDatabase
 import com.nastya.booktracker.databinding.FragmentEditBookBinding
 
@@ -39,7 +38,7 @@ class EditBookFragment : Fragment() {
 
         this.viewModel = viewModel
 
-        viewModel.navigateToList.observe(viewLifecycleOwner, Observer { navigate ->
+        viewModel.navigateToDetail.observe(viewLifecycleOwner, Observer { navigate ->
             if (navigate) {
                 view.findNavController().popBackStack()
                 viewModel.onNavigatedToList()

@@ -26,7 +26,6 @@ class BookDetailFragment : Fragment() {
     ): View? {
         _binding = FragmentBookDetailBinding.inflate(inflater, container, false)
         val view = binding.root
-
         return view
     }
 
@@ -38,29 +37,13 @@ class BookDetailFragment : Fragment() {
         val application = requireNotNull(this.activity).application
         val dao = BookDatabase.Companion.getInstance(application).bookDao
         val viewModelFactory = BookDetailViewModelFactory(bookId, dao)
-        viewModel = ViewModelProvider(
-            this, viewModelFactory
-        )[BookDetailViewModel::class.java]
+        viewModel = ViewModelProvider(this, viewModelFactory)[BookDetailViewModel::class.java]
 
         bookItemObserver()
-
-        binding.favBtn.setOnClickListener{
-            viewModel.isFavoriteChanged()
-        }
-
-        binding.changeBtn.setOnClickListener {
-            val action = BookDetailFragmentDirections.
-            actionBookDetailFragmentToEditBookFragment(bookId)
-            this.findNavController().navigate(action)
-        }
-
-        binding.notesBtn.setOnClickListener {
-            findNavController().navigate(R.id.action_bookDetailFragment_to_bookNotesFragment)
-        }
-
-        binding.deleteButton.setOnClickListener {
-            viewModel.showDeleteConfirmationDialog(requireContext())
-        }
+        setupFavButton()
+        setupChangeButton(bookId)
+        setupNotesButton()
+        setupDeleteButton()
 
         lifecycleScope.launch {
             viewModel.navigateToList.collect {
@@ -68,6 +51,34 @@ class BookDetailFragment : Fragment() {
                     findNavController().popBackStack()
                 }
             }
+        }
+    }
+
+    private fun setupFavButton() {
+        binding.favBtn.setOnClickListener{
+            viewModel.isFavoriteChanged()
+        }
+    }
+
+    private fun setupDeleteButton() {
+        binding.deleteButton.setOnClickListener {
+            viewModel.showDeleteConfirmationDialog(requireContext())
+        }
+    }
+
+    private fun setupNotesButton() {
+        binding.notesBtn.setOnClickListener {
+            findNavController().navigate(
+                R.id.action_bookDetailFragment_to_bookNotesFragment
+            )
+        }
+    }
+
+    private fun setupChangeButton(bookId: Long) {
+        binding.changeBtn.setOnClickListener {
+            val action = BookDetailFragmentDirections.
+            actionBookDetailFragmentToEditBookFragment(bookId)
+            this.findNavController().navigate(action)
         }
     }
 
@@ -92,5 +103,10 @@ class BookDetailFragment : Fragment() {
                 )
             }
         })
+    }
+
+    override fun onDestroyView() {
+        super.onDestroyView()
+        _binding = null
     }
 }

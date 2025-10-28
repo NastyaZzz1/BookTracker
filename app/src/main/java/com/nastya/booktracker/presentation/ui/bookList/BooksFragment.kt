@@ -5,11 +5,15 @@ import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
 import androidx.fragment.app.Fragment
-import androidx.lifecycle.Observer
+import androidx.lifecycle.Lifecycle
 import androidx.lifecycle.ViewModelProvider
+import androidx.lifecycle.lifecycleScope
+import androidx.lifecycle.repeatOnLifecycle
 import androidx.navigation.fragment.findNavController
+import com.nastya.booktracker.R
 import com.nastya.booktracker.data.local.database.BookDatabase
 import com.nastya.booktracker.databinding.FragmentBooksBinding
+import kotlinx.coroutines.launch
 
 class BooksFragment : Fragment() {
     private var _binding: FragmentBooksBinding? = null
@@ -22,7 +26,6 @@ class BooksFragment : Fragment() {
     ): View {
         _binding = FragmentBooksBinding.inflate(inflater, container, false)
         val view = binding.root
-
         return view
     }
 
@@ -30,9 +33,7 @@ class BooksFragment : Fragment() {
         val application = requireNotNull(this.activity).application
         val dao = BookDatabase.Companion.getInstance(application).bookDao
         val viewModelFactory = BookViewModelFactory(dao)
-        viewModel = ViewModelProvider(
-            this, viewModelFactory
-        )[BooksViewModel::class.java]
+        viewModel = ViewModelProvider(this, viewModelFactory)[BooksViewModel::class.java]
 
         val adapter = BookItemAdapter(
             onItemClick = { bookId ->
@@ -43,25 +44,52 @@ class BooksFragment : Fragment() {
             }
         )
         binding.booksList.adapter = adapter
-        viewModel.filteredProducts.observe(this.viewLifecycleOwner, Observer {
-            it?.let {
-                adapter.submitList(it)
+
+        lifecycleScope.launch {
+            viewModel.filteredBooks.collect { books ->
+                books.let {
+                    adapter.submitList(books)
+                }
             }
-        })
+        }
 
         viewModel.updateAllCategories()
         viewModel.filterByCategory("all")
         binding.allBooksBtn.isSelected = true
         setupFilterButtons()
+        setupSortButton()
+        navigateToBookObserver()
 
-        viewModel.navigateToBook.observe(viewLifecycleOwner, Observer { bookId ->
-            bookId?.let {
-                val action = BooksFragmentDirections.
-                actionBooksFragmentToBookDetailFragment(bookId)
-                this.findNavController().navigate(action)
-                viewModel.onBookNavigated()
+        lifecycleScope.launch {
+            viewModel.sortedBooksState.collect { state ->
+                when (state) {
+                    is BooksViewModel.SortedState.None -> binding.sortBtn.setImageResource(R.drawable.icon_sort_none)
+                    is BooksViewModel.SortedState.Desc -> binding.sortBtn.setImageResource(R.drawable.icon_sort_desc)
+                    is BooksViewModel.SortedState.Asc -> binding.sortBtn.setImageResource(R.drawable.icon_sort_asc)
+                }
             }
-        })
+        }
+    }
+
+    private fun setupSortButton() {
+        binding.sortBtn.setOnClickListener {
+            viewModel.changeSortedState()
+        }
+    }
+
+    private fun navigateToBookObserver() {
+        viewLifecycleOwner.lifecycleScope.launch {
+            viewLifecycleOwner.repeatOnLifecycle(Lifecycle.State.STARTED) {
+                viewModel.navigateToDetail.collect { bookId ->
+                    bookId?.let {
+                        val action = BooksFragmentDirections
+                            .actionBooksFragmentToBookDetailFragment(bookId)
+                        findNavController().navigate(action)
+                        viewModel.onBookNavigated()
+                    }
+                }
+            }
+        }
     }
 
     private fun setupFilterButtons() {

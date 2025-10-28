@@ -14,9 +14,9 @@ import java.time.LocalDate
 
 class EditBookViewModel(bookId: Long, private val bookDao: BookDao, private val dailyReadingDao: DailyReadingDao) : ViewModel() {
     val book = bookDao.get(bookId)
-    private val _navigateToList: MutableLiveData<Boolean> = MutableLiveData<Boolean>(false)
-    val navigateToList: LiveData<Boolean>
-        get() = _navigateToList
+    private val _navigateToDetail: MutableLiveData<Boolean> = MutableLiveData<Boolean>(false)
+    val navigateToDetail: LiveData<Boolean>
+        get() = _navigateToDetail
 
     private val _errorMessage = MutableLiveData<String?>()
     val errorMessage: LiveData<String?> get() = _errorMessage
@@ -89,11 +89,11 @@ class EditBookViewModel(bookId: Long, private val bookDao: BookDao, private val 
     fun updateTask() {
         viewModelScope.launch {
             bookDao.update(book.value!!)
-            _navigateToList.value = true
+            _navigateToDetail.value = true
         }
     }
 
     fun onNavigatedToList() {
-        _navigateToList.value = false
+        _navigateToDetail.value = false
     }
 }
