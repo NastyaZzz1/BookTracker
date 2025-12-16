@@ -82,10 +82,6 @@ class EditBookViewModel(bookId: Long, private val bookDao: BookDao, private val 
         }
     }
 
-    fun onBookImgChanged(bookImg: String){
-        book.value?.imageUrl = bookImg
-    }
-
     fun updateTask() {
         viewModelScope.launch {
             bookDao.update(book.value!!)

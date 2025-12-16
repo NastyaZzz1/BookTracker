@@ -26,6 +26,7 @@ class BookDetailFragment : Fragment() {
     ): View? {
         _binding = FragmentBookDetailBinding.inflate(inflater, container, false)
         val view = binding.root
+
         return view
     }
 
@@ -44,6 +45,7 @@ class BookDetailFragment : Fragment() {
         setupChangeButton(bookId)
         setupNotesButton()
         setupDeleteButton()
+        setupReadButton(bookId)
 
         lifecycleScope.launch {
             viewModel.navigateToList.collect {
@@ -74,6 +76,20 @@ class BookDetailFragment : Fragment() {
         }
     }
 
+    private fun setupReadButton(bookId: Long) {
+        binding.readingBtn.setOnClickListener {
+            lifecycleScope.launch {
+                viewModel.book.let {
+                    val action = BookDetailFragmentDirections
+                        .actionBookDetailFragmentToEpubReaderFragment(
+                            bookPath = it.value!!.filePath
+                        )
+                    findNavController().navigate(action)
+                }
+            }
+        }
+    }
+
     private fun setupChangeButton(bookId: Long) {
         binding.changeBtn.setOnClickListener {
             val action = BookDetailFragmentDirections.
@@ -94,7 +110,7 @@ class BookDetailFragment : Fragment() {
                 binding.bookDesc.text = book.description
                 binding.bookReadPages.text = "Прочитано: ${book.readPagesCount}"
                 binding.bookAllPages.text = "Всего страниц: ${book.allPagesCount}"
-                binding.bookImg.load(book.imageUrl) {
+                binding.bookImg.load(book.imageData) {
                     crossfade(true)
                 }
                 binding.favBtn.setImageResource(

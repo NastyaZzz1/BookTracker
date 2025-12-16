@@ -23,7 +23,7 @@ data class Book (
     var description: String = "",
 
     @ColumnInfo(name = "image_url")
-    var imageUrl: String = "",
+    var imageData: ByteArray?,
 
     @ColumnInfo(name = "all_pages_count")
     var allPagesCount: Int = 0,
@@ -33,4 +33,7 @@ data class Book (
 
     @ColumnInfo(name = "is_favorite_book")
     var isFavorite: Boolean = false,
+
+    @ColumnInfo(name = "file_path")
+    var filePath: String = "",
 )

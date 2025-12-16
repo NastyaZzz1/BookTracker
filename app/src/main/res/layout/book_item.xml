@@ -1,97 +1,84 @@
 <?xml version="1.0" encoding="utf-8"?>
-<layout
+<androidx.cardview.widget.CardView
     xmlns:android="http://schemas.android.com/apk/res/android"
-    xmlns:app="http://schemas.android.com/apk/res-auto">
+    xmlns:app="http://schemas.android.com/apk/res-auto"
+    android:layout_width="match_parent"
+    android:layout_height="wrap_content"
+    android:layout_margin="8dp"
+    app:cardElevation="4dp"
+    app:cardCornerRadius="4dp">
 
-    <data>
-        <variable
-            name="book"
-            type="com.nastya.booktracker.domain.model.Book" />
-    </data>
-
-    <androidx.cardview.widget.CardView
+    <LinearLayout
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
-        android:layout_margin="8dp"
-        app:cardElevation="4dp"
-        app:cardCornerRadius="4dp">
+        android:orientation="vertical">
 
-        <LinearLayout
+        <androidx.constraintlayout.widget.ConstraintLayout
+            android:layout_width="match_parent"
+            android:layout_height="match_parent">
+
+            <ImageView
+                android:id="@+id/book_image"
+                android:layout_gravity="center"
+                android:layout_width="120dp"
+                android:layout_height="180dp"
+                android:scaleType="fitCenter"
+                android:adjustViewBounds="true"
+                android:contentDescription="@string/content_description_img"
+                app:layout_constraintBottom_toBottomOf="parent"
+                app:layout_constraintEnd_toEndOf="parent"
+                app:layout_constraintStart_toStartOf="parent"
+                app:layout_constraintTop_toTopOf="parent" />
+
+            <ImageView
+                android:id="@+id/fav_btn"
+                android:layout_width="20dp"
+                android:layout_height="20dp"
+                android:contentDescription="@string/content_description_img_heart"
+                android:src="@drawable/icon_heart_empty"
+                app:layout_constraintEnd_toEndOf="parent"
+                app:layout_constraintTop_toTopOf="parent" />
+
+        </androidx.constraintlayout.widget.ConstraintLayout>
+
+        <TextView
+            android:id="@+id/book_name"
+            android:layout_width="match_parent"
+            android:layout_height="44dp"
+            android:paddingHorizontal="8dp"
+            android:paddingTop="5dp"
+            android:textSize="16sp" />
+
+        <TextView
+            android:id="@+id/book_author"
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
-            android:orientation="vertical">
+            android:textSize="14sp"
+            android:paddingHorizontal="8dp"
+            android:paddingBottom="5dp" />
 
-            <androidx.constraintlayout.widget.ConstraintLayout
+        <FrameLayout
+            android:layout_width="match_parent"
+            android:layout_height="13dp"
+            android:background="@drawable/border_background"
+            android:padding="0.5dp">
+
+            <com.google.android.material.progressindicator.LinearProgressIndicator
+                android:id="@+id/linProgressBar"
                 android:layout_width="match_parent"
-                android:layout_height="match_parent">
-
-                <ImageView
-                    android:id="@+id/book_image"
-                    android:layout_gravity="center"
-                    android:layout_width="120dp"
-                    android:layout_height="180dp"
-                    android:scaleType="fitCenter"
-                    android:adjustViewBounds="true"
-                    android:contentDescription="@string/content_description_img"
-                    app:layout_constraintBottom_toBottomOf="parent"
-                    app:layout_constraintEnd_toEndOf="parent"
-                    app:layout_constraintStart_toStartOf="parent"
-                    app:layout_constraintTop_toTopOf="parent" />
-
-                <ImageView
-                    android:id="@+id/fav_btn"
-                    android:layout_width="20dp"
-                    android:layout_height="20dp"
-                    android:contentDescription="@string/content_description_img_heart"
-                    android:src="@drawable/icon_heart_empty"
-                    app:layout_constraintEnd_toEndOf="parent"
-                    app:layout_constraintTop_toTopOf="parent"
-                    />
-
-            </androidx.constraintlayout.widget.ConstraintLayout>
+                android:layout_height="match_parent"
+                app:trackThickness="12dp"
+                style="@style/CustomProgressIndicator"
+                app:trackColor="@color/transparent"
+                app:indicatorColor="@color/light_green"/>
 
             <TextView
-                android:id="@+id/book_name"
-                android:layout_width="match_parent"
-                android:layout_height="44dp"
-                android:paddingHorizontal="8dp"
-                android:paddingTop="5dp"
-                android:textSize="16sp"
-                android:text="@{book.bookName}"/>
-
-            <TextView
-                android:id="@+id/book_author"
-                android:layout_width="match_parent"
+                android:id="@+id/linProgressText"
+                android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
-                android:textSize="14sp"
-                android:paddingHorizontal="8dp"
-                android:paddingBottom="5dp"
-                android:text="@{book.bookAuthor}"/>
-
-
-            <FrameLayout
-                android:layout_width="match_parent"
-                android:layout_height="13dp"
-                android:background="@drawable/border_background"
-                android:padding="0.5dp">
-
-                <com.google.android.material.progressindicator.LinearProgressIndicator
-                    android:id="@+id/linProgressBar"
-                    android:layout_width="match_parent"
-                    android:layout_height="match_parent"
-                    app:trackThickness="12dp"
-                    style="@style/CustomProgressIndicator"
-                    app:trackColor="@color/transparent"
-                    app:indicatorColor="@color/light_green"/>
-
-                <TextView
-                    android:id="@+id/linProgressText"
-                    android:layout_width="wrap_content"
-                    android:layout_height="wrap_content"
-                    android:layout_gravity="center"
-                    android:textColor="@color/black"
-                    android:textSize="11sp"/>
-            </FrameLayout>
-        </LinearLayout>
-    </androidx.cardview.widget.CardView>
-</layout>
+                android:layout_gravity="center"
+                android:textColor="@color/black"
+                android:textSize="11sp"/>
+        </FrameLayout>
+    </LinearLayout>
+</androidx.cardview.widget.CardView>

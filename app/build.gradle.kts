@@ -20,7 +20,6 @@ android {
     }
 
     buildFeatures{
-        dataBinding = true
         viewBinding = true
     }
 
@@ -43,6 +42,12 @@ android {
 }
 
 dependencies {
+    implementation(libs.readium.shared)
+    implementation(libs.readium.streamer)
+    implementation(libs.readium.navigator)
+    implementation(libs.readium.opds)
+    implementation(libs.readium.lcp)
+    implementation(libs.kotlinx.coroutines)
     implementation (libs.calendarview)
     implementation (libs.mpandroidchart)
     implementation(libs.io.coil.kt)

@@ -56,19 +56,10 @@ class BooksFragment : Fragment() {
         viewModel.updateAllCategories()
         viewModel.filterByCategory("all")
         binding.allBooksBtn.isSelected = true
+        setSortIcon()
         setupFilterButtons()
         setupSortButton()
         navigateToBookObserver()
-
-        lifecycleScope.launch {
-            viewModel.sortedBooksState.collect { state ->
-                when (state) {
-                    is BooksViewModel.SortedState.None -> binding.sortBtn.setImageResource(R.drawable.icon_sort_none)
-                    is BooksViewModel.SortedState.Desc -> binding.sortBtn.setImageResource(R.drawable.icon_sort_desc)
-                    is BooksViewModel.SortedState.Asc -> binding.sortBtn.setImageResource(R.drawable.icon_sort_asc)
-                }
-            }
-        }
     }
 
     private fun setupSortButton() {
@@ -109,6 +100,18 @@ class BooksFragment : Fragment() {
         binding.wantBooksBtn.isSelected = selectedCategory == "want"
         binding.readingBooksBtn.isSelected = selectedCategory == "reading"
         binding.pastBooksBtn.isSelected = selectedCategory == "past"
+    }
+
+    private fun setSortIcon() {
+        lifecycleScope.launch {
+            viewModel.sortedBooksState.collect { state ->
+                when (state) {
+                    is BooksViewModel.SortedState.None -> binding.sortBtn.setImageResource(R.drawable.icon_sort_none)
+                    is BooksViewModel.SortedState.Desc -> binding.sortBtn.setImageResource(R.drawable.icon_sort_desc)
+                    is BooksViewModel.SortedState.Asc -> binding.sortBtn.setImageResource(R.drawable.icon_sort_asc)
+                }
+            }
+        }
     }
 
     override fun onDestroyView() {

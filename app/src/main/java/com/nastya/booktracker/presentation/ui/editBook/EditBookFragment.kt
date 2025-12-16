@@ -50,8 +50,6 @@ class EditBookFragment : Fragment() {
                 binding.bookName.setText(it.bookName)
                 binding.bookAuthor.setText(it.bookAuthor)
                 binding.bookDesc.setText(it.description)
-                binding.bookImg.setText(it.imageUrl)
-                binding.bookReadPages.setText(it.readPagesCount.toString())
                 binding.bookAllPages.setText(it.allPagesCount.toString())
             }
         })
@@ -75,25 +73,14 @@ class EditBookFragment : Fragment() {
             viewModel.onBookDescChanged((str.takeIf { !it.isNullOrBlank() } ?: "").toString())
         }
 
-        binding.bookImg.addTextChangedListener { str ->
-            viewModel.onBookImgChanged((str.takeIf { !it.isNullOrBlank() } ?: "").toString())
-        }
-
         binding.bookAllPages.addTextChangedListener { str ->
             str.toString().toIntOrNull()?.let { bookPage ->
                 viewModel.onAllPagesCountChanged(bookPage)
             }
         }
 
-        binding.bookReadPages.addTextChangedListener { str ->
-            str.toString().toIntOrNull()?.let { bookPage ->
-                viewModel.onReadPagesCountChanged(bookPage)
-            }
-        }
-
         viewModel.errorMessage.observe(viewLifecycleOwner) { errorMessage ->
             errorMessage?.let {
-                binding.bookReadPages.error = it
                 Toast.makeText(context, it, Toast.LENGTH_SHORT).show()
             }
         }

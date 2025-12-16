@@ -42,8 +42,11 @@ class BookItemAdapter(
             item?.let { book ->
                 val allPagesCount = if(book.allPagesCount == 0) 1 else book.allPagesCount
                 val progress = (book.readPagesCount * 100 ) / allPagesCount
-                binding.book = book
                 binding.root.setOnClickListener { onItemClick(book.bookId) }
+
+                binding.bookName.text = book.bookName
+                binding.bookAuthor.text = book.bookAuthor
+
                 binding.linProgressBar.progress = progress
                 binding.linProgressText.text = "$progress%"
 
@@ -61,7 +64,7 @@ class BookItemAdapter(
                     else R.drawable.icon_heart_empty
                 )
 
-                binding.bookImage.load(book.imageUrl) {
+                binding.bookImage.load(book.imageData) {
                     crossfade(true)
                 }
             } ?: run {

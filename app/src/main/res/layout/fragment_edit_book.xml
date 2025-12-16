@@ -87,42 +87,6 @@
                 android:hint="@string/book_all_pages_hint"/>
         </com.google.android.material.textfield.TextInputLayout>
 
-
-        <com.google.android.material.textfield.TextInputLayout
-            android:layout_width="match_parent"
-            android:layout_height="wrap_content"
-            app:hintEnabled="true"
-            app:hintTextColor="@color/dark_green"
-            app:boxStrokeColor="@color/dark_green"
-            app:hintAnimationEnabled="true">
-
-            <com.google.android.material.textfield.TextInputEditText
-                android:id="@+id/book_read_pages"
-                android:layout_width="match_parent"
-                android:layout_height="wrap_content"
-                android:inputType="text"
-                android:textSize="16sp"
-                android:hint="@string/book_read_pages_hint"/>
-        </com.google.android.material.textfield.TextInputLayout>
-
-
-        <com.google.android.material.textfield.TextInputLayout
-            android:layout_width="match_parent"
-            android:layout_height="wrap_content"
-            app:hintEnabled="true"
-            app:hintAnimationEnabled="true"
-            app:boxStrokeColor="@color/dark_green"
-            app:hintTextColor="@color/dark_green">
-
-            <com.google.android.material.textfield.TextInputEditText
-                android:id="@+id/book_img"
-                android:layout_width="match_parent"
-                android:layout_height="wrap_content"
-                android:inputType="text"
-                android:textSize="16sp"
-                android:hint="@string/book_img_hint"/>
-        </com.google.android.material.textfield.TextInputLayout>
-
         <com.google.android.material.button.MaterialButton
             android:id="@+id/update_button"
             android:layout_width="wrap_content"

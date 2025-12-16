@@ -17,8 +17,15 @@ cardview_version = "1.0.0"
 coil_version = "2.4.0"
 calendarview_version = "2.4.0"
 mpandroidchart_version = "v3.1.0"
+readium_version = "2.4.0"
+coroutines_version = "1.7.3"
 
 [libraries]
+readium-shared = { module = "org.readium.kotlin-toolkit:readium-shared", version.ref = "readium_version" }
+readium-streamer = { module = "org.readium.kotlin-toolkit:readium-streamer", version.ref = "readium_version" }
+readium-navigator = { module = "org.readium.kotlin-toolkit:readium-navigator", version.ref = "readium_version" }
+readium-opds = { module = "org.readium.kotlin-toolkit:readium-opds", version.ref = "readium_version" }
+readium-lcp = { module = "org.readium.kotlin-toolkit:readium-lcp", version.ref = "readium_version" }
 androidx-navigation-fragment-ktx = { module = "androidx.navigation:navigation-fragment-ktx", version.ref = "navigationFrgKtx"}
 mpandroidchart = { module = "com.github.PhilJay:MPAndroidChart", version.ref = "mpandroidchart_version" }
 calendarview = { module = "com.kizitonwose.calendar:view", version.ref = "calendarview_version" }
@@ -26,6 +33,7 @@ androidx-navigation-ui-ktx = { module = "androidx.navigation:navigation-ui-ktx",
 androidx-recyclerview = { module = "androidx.recyclerview:recyclerview", version.ref = "recyclerview_version"}
 androidx-lifecycle-livedata-ktx = { module = "androidx.lifecycle:lifecycle-livedata-ktx", version.ref = "lifecycleKtx"}
 androidx-lifecycle-viewmodel-ktx = { module = "androidx.lifecycle:lifecycle-viewmodel-ktx", version.ref = "lifecycleKtx"}
+kotlinx-coroutines = { module = "org.jetbrains.kotlinx:kotlinx-coroutines-android", version.ref = "coroutines_version"}
 androidx-room-runtime = { module = "androidx.room:room-runtime", version.ref = "root_version"}
 androidx-room-ktx = { module = "androidx.room:room-ktx", version.ref = "root_version"}
 io-coil-kt = { module = "io.coil-kt:coil", version.ref = "coil_version"}
