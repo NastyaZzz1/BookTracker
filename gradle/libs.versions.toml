@@ -19,8 +19,10 @@ calendarview_version = "2.4.0"
 mpandroidchart_version = "v3.1.0"
 readium_version = "2.4.0"
 coroutines_version = "1.7.3"
+gson_version = "2.10.1"
 
 [libraries]
+gson = { module = "com.google.code.gson:gson", version.ref = "gson_version" }
 readium-shared = { module = "org.readium.kotlin-toolkit:readium-shared", version.ref = "readium_version" }
 readium-streamer = { module = "org.readium.kotlin-toolkit:readium-streamer", version.ref = "readium_version" }
 readium-navigator = { module = "org.readium.kotlin-toolkit:readium-navigator", version.ref = "readium_version" }

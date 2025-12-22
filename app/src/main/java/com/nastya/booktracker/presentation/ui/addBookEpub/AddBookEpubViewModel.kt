@@ -20,7 +20,7 @@ import java.util.zip.ZipFile
 import com.nastya.booktracker.R
 import java.io.ByteArrayOutputStream
 import androidx.core.graphics.createBitmap
-import org.readium.r2.shared.publication.Publication
+import org.readium.r2.shared.publication.Link
 
 class AddBookEpubViewModel(private val dao: BookDao): ViewModel() {
 
@@ -46,7 +46,8 @@ class AddBookEpubViewModel(private val dao: BookDao): ViewModel() {
                             description = publication.metadata.description ?: "bookDescription",
                             imageData = coverBytes,
                             allPagesCount = 1,
-                            filePath = saveResult.filePath
+                            filePath = saveResult.filePath,
+                            chaptersCount = countChapters(publication.tableOfContents)
                         )
                         dao.insert(book)
 
@@ -57,6 +58,16 @@ class AddBookEpubViewModel(private val dao: BookDao): ViewModel() {
             } catch(e: Exception) {
                 Log.e("BookViewModel", "Ошибка добавления книги", e)
 
+            }
+        }
+    }
+
+    fun countChapters(links: List<Link>): Int {
+        return links.sumOf { link ->
+            if (link.children.isEmpty()) {
+                1
+            } else {
+                countChapters(link.children)
             }
         }
     }

@@ -28,11 +28,17 @@ data class Book (
     @ColumnInfo(name = "all_pages_count")
     var allPagesCount: Int = 0,
 
-    @ColumnInfo(name = "read_pages_count")
-    var readPagesCount: Int = 0,
+    @ColumnInfo(name = "chapters_count")
+    var chaptersCount: Int = 0,
 
     @ColumnInfo(name = "is_favorite_book")
     var isFavorite: Boolean = false,
+
+    @ColumnInfo(name = "position_book")
+    var locatorJson: String = "",
+
+    @ColumnInfo(name = "progress_book")
+    var progress: Int = 0,
 
     @ColumnInfo(name = "file_path")
     var filePath: String = "",

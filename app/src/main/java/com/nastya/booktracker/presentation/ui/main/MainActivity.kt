@@ -13,6 +13,7 @@ import androidx.lifecycle.ViewModelProvider
 import androidx.navigation.NavController
 import androidx.navigation.fragment.NavHostFragment
 import androidx.navigation.ui.AppBarConfiguration
+import androidx.navigation.ui.NavigationUI
 import androidx.navigation.ui.onNavDestinationSelected
 import androidx.navigation.ui.setupWithNavController
 import com.nastya.booktracker.R
@@ -84,7 +85,7 @@ class MainActivity : AppCompatActivity() {
                     checkPermissionAndOpenPicker()
                     true
                 }
-                else -> false
+                else -> NavigationUI.onNavDestinationSelected(item, navController)
             }
         }
     }

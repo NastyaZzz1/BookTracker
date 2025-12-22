@@ -53,6 +53,10 @@ class FavoriteBooksFragment : Fragment() {
             }
         })
 
+        navigateToBookObserve()
+    }
+
+    private fun navigateToBookObserve() {
         viewModel.navigateToBook.observe(viewLifecycleOwner, Observer { bookId ->
             bookId?.let {
                 val action = FavoriteBooksFragmentDirections.

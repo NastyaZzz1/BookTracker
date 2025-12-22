@@ -42,6 +42,7 @@ android {
 }
 
 dependencies {
+    implementation(libs.gson)
     implementation(libs.readium.shared)
     implementation(libs.readium.streamer)
     implementation(libs.readium.navigator)

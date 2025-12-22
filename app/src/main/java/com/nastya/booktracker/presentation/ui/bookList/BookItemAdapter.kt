@@ -6,9 +6,12 @@ import android.view.ViewGroup
 import androidx.recyclerview.widget.ListAdapter
 import androidx.recyclerview.widget.RecyclerView
 import coil.load
+import com.google.gson.Gson
 import com.nastya.booktracker.R
 import com.nastya.booktracker.databinding.BookItemBinding
 import com.nastya.booktracker.domain.model.Book
+import com.nastya.booktracker.domain.model.LocatorDto
+import kotlin.math.roundToInt
 
 class BookItemAdapter(
     val onItemClick: (bookId: Long) -> Unit,
@@ -40,15 +43,14 @@ class BookItemAdapter(
                  onItemClick: (bookId: Long) -> Unit,
                  onFavoriteClick: (bookId: Long) -> Unit) {
             item?.let { book ->
-                val allPagesCount = if(book.allPagesCount == 0) 1 else book.allPagesCount
-                val progress = (book.readPagesCount * 100 ) / allPagesCount
+                val progress = book.progress
+                binding.linProgressBar.progress = progress
+                binding.linProgressText.text = "$progress%"
+
                 binding.root.setOnClickListener { onItemClick(book.bookId) }
 
                 binding.bookName.text = book.bookName
                 binding.bookAuthor.text = book.bookAuthor
-
-                binding.linProgressBar.progress = progress
-                binding.linProgressText.text = "$progress%"
 
                 binding.favBtn.setOnClickListener{
                     book.isFavorite = !book.isFavorite

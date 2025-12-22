@@ -10,10 +10,13 @@ import androidx.lifecycle.ViewModelProvider
 import androidx.lifecycle.lifecycleScope
 import androidx.navigation.fragment.findNavController
 import coil.load
+import com.google.gson.Gson
 import com.nastya.booktracker.R
 import com.nastya.booktracker.data.local.database.BookDatabase
 import com.nastya.booktracker.databinding.FragmentBookDetailBinding
+import com.nastya.booktracker.domain.model.LocatorDto
 import kotlinx.coroutines.launch
+import kotlin.math.roundToInt
 
 class BookDetailFragment : Fragment() {
     private var _binding: FragmentBookDetailBinding? = null
@@ -82,7 +85,8 @@ class BookDetailFragment : Fragment() {
                 viewModel.book.let {
                     val action = BookDetailFragmentDirections
                         .actionBookDetailFragmentToEpubReaderFragment(
-                            bookPath = it.value!!.filePath
+                            bookPath = it.value!!.filePath,
+                            bookId = bookId
                         )
                     findNavController().navigate(action)
                 }
@@ -101,15 +105,14 @@ class BookDetailFragment : Fragment() {
     private fun bookItemObserver() {
         viewModel.book.observe(viewLifecycleOwner, Observer { book ->
             book?.let {
-                val allPagesCount = if(book.allPagesCount == 0) 1 else book.allPagesCount
-                val progress = (book.readPagesCount * 100 ) / allPagesCount
+                val progress = book.progress
                 binding.linProgressBar.progress = progress
                 binding.linProgressText.text = "$progress%"
                 binding.bookName.text = book.bookName
                 binding.bookAuthor.text = book.bookAuthor
                 binding.bookDesc.text = book.description
-                binding.bookReadPages.text = "Прочитано: ${book.readPagesCount}"
-                binding.bookAllPages.text = "Всего страниц: ${book.allPagesCount}"
+                binding.bookReadPages.text = "Глав: ${book.chaptersCount}"
+                binding.bookAllPages.text = "Печатных страниц: ≈${book.allPagesCount}"
                 binding.bookImg.load(book.imageData) {
                     crossfade(true)
                 }

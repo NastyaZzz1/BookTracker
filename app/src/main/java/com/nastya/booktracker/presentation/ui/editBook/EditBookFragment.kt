@@ -27,39 +27,19 @@ class EditBookFragment : Fragment() {
         _binding = FragmentEditBookBinding.inflate(inflater, container, false)
         val view = binding.root
 
-        val bookId = EditBookFragmentArgs.fromBundle(requireArguments()).bookId
-
-        val application = requireNotNull(this.activity).application
-        val bookDao = BookDatabase.Companion.getInstance(application).bookDao
-        val dailyReadingDao = BookDatabase.Companion.getInstance(application).dailyReadingDao
-
-        val viewModelFactory = EditBookViewModelFactory(bookId, bookDao, dailyReadingDao)
-        val viewModel = ViewModelProvider(this, viewModelFactory)[EditBookViewModel::class.java]
-
-        this.viewModel = viewModel
-
-        viewModel.navigateToDetail.observe(viewLifecycleOwner, Observer { navigate ->
-            if (navigate) {
-                view.findNavController().popBackStack()
-                viewModel.onNavigatedToList()
-            }
-        })
-
-        viewModel.book.observe(viewLifecycleOwner, Observer {
-            it?.let {
-                binding.bookName.setText(it.bookName)
-                binding.bookAuthor.setText(it.bookAuthor)
-                binding.bookDesc.setText(it.description)
-                binding.bookAllPages.setText(it.allPagesCount.toString())
-            }
-        })
-
         return view
     }
 
     @RequiresApi(Build.VERSION_CODES.O)
     override fun onViewCreated(view: View, savedInstanceState: Bundle?) {
         super.onViewCreated(view, savedInstanceState)
+
+        val bookId = EditBookFragmentArgs.fromBundle(requireArguments()).bookId
+
+        val application = requireNotNull(this.activity).application
+        val bookDao = BookDatabase.Companion.getInstance(application).bookDao
+        val viewModelFactory = EditBookViewModelFactory(bookId, bookDao)
+        viewModel = ViewModelProvider(this, viewModelFactory)[EditBookViewModel::class.java]
 
         binding.bookName.addTextChangedListener { str ->
             viewModel.onBookNameChanged((str.takeIf { !it.isNullOrBlank() } ?: "").toString())
@@ -73,18 +53,37 @@ class EditBookFragment : Fragment() {
             viewModel.onBookDescChanged((str.takeIf { !it.isNullOrBlank() } ?: "").toString())
         }
 
-        binding.bookAllPages.addTextChangedListener { str ->
-            str.toString().toIntOrNull()?.let { bookPage ->
-                viewModel.onAllPagesCountChanged(bookPage)
-            }
-        }
-
         viewModel.errorMessage.observe(viewLifecycleOwner) { errorMessage ->
             errorMessage?.let {
                 Toast.makeText(context, it, Toast.LENGTH_SHORT).show()
             }
         }
 
+        updateBtnListener()
+        bookObserve()
+        navigateToDetailObserve()
+    }
+
+    private fun bookObserve() {
+        viewModel.book.observe(viewLifecycleOwner, Observer {
+            it?.let {
+                binding.bookName.setText(it.bookName)
+                binding.bookAuthor.setText(it.bookAuthor)
+                binding.bookDesc.setText(it.description)
+            }
+        })
+    }
+
+    private fun navigateToDetailObserve() {
+        viewModel.navigateToDetail.observe(viewLifecycleOwner, Observer { navigate ->
+            if (navigate) {
+                view?.findNavController()?.popBackStack()
+                viewModel.onNavigatedToList()
+            }
+        })
+    }
+
+    private fun updateBtnListener () {
         binding.updateButton.setOnClickListener {
             if (viewModel.errorMessage.value == null) {
                 viewModel.updateTask()

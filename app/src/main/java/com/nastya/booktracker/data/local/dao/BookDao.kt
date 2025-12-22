@@ -29,6 +29,9 @@ interface BookDao {
     @Query("SELECT * FROM book_table WHERE book_id = :bookId")
     fun get(bookId: Long) : LiveData<Book>
 
+    @Query("SELECT * FROM book_table WHERE book_id = :bookId")
+    fun getOneFlow(bookId: Long): Flow<Book>
+
     @Query("SELECT * FROM book_table ORDER BY book_id DESC")
     fun getAll() : LiveData<List<Book>>
 

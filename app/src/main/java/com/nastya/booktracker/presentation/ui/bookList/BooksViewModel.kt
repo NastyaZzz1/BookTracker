@@ -2,8 +2,10 @@ package com.nastya.booktracker.presentation.ui.bookList
 
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
+import com.google.gson.Gson
 import com.nastya.booktracker.data.local.dao.BookDao
 import com.nastya.booktracker.domain.model.Book
+import com.nastya.booktracker.domain.model.LocatorDto
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.SharingStarted
 import kotlinx.coroutines.flow.StateFlow
@@ -11,6 +13,7 @@ import kotlinx.coroutines.flow.asStateFlow
 import kotlinx.coroutines.flow.combine
 import kotlinx.coroutines.flow.stateIn
 import kotlinx.coroutines.launch
+import kotlin.math.roundToInt
 
 class BooksViewModel(val dao: BookDao) : ViewModel() {
     private val _navigateToDetail = MutableStateFlow<Long?>(null)
@@ -68,11 +71,14 @@ class BooksViewModel(val dao: BookDao) : ViewModel() {
             val booksList = dao.getAllOnce()
 
             val updatedBooks = booksList.map { book ->
-                val newCategory = when (book.readPagesCount) {
+                val progress = book.progress
+
+                val newCategory = when (progress) {
                     0 -> "want"
-                    book.allPagesCount -> "past"
+                    100 -> "past"
                     else -> "reading"
                 }
+
                 if (book.category != newCategory) book.copy(category = newCategory)
                 else book
             }

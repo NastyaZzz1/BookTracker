@@ -91,12 +91,15 @@ app:startDestination="@id/booksFragment">
 
     <fragment
         android:id="@+id/epubReaderFragment"
-        android:name="com.nastya.booktracker.presentation.ui.EpubReaderFragment"
+        android:name="com.nastya.booktracker.presentation.ui.epubReader.EpubReaderFragment"
         android:label="Читалка"
         tools:layout="@layout/fragment_epub_reader" >
         <argument
             android:name="bookPath"
             app:argType="string" />
+        <argument
+            android:name="bookId"
+            app:argType="long" />
     </fragment>
 
 </navigation>

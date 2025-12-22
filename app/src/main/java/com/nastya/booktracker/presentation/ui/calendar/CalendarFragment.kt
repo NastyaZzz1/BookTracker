@@ -15,14 +15,11 @@ import android.graphics.Color
 import android.os.Build
 import android.view.LayoutInflater
 import android.view.ViewGroup
-import android.widget.EditText
 import androidx.annotation.RequiresApi
-import androidx.core.widget.addTextChangedListener
 import androidx.fragment.app.Fragment
 import androidx.lifecycle.Observer
 import androidx.lifecycle.ViewModelProvider
 import androidx.lifecycle.viewModelScope
-import com.google.android.material.textfield.TextInputEditText
 import com.kizitonwose.calendar.view.CalendarView
 import com.nastya.booktracker.R
 import com.nastya.booktracker.data.local.database.BookDatabase
