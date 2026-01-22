@@ -38,12 +38,6 @@ app:startDestination="@id/booksFragment">
     </fragment>
 
     <fragment
-        android:id="@+id/addBooksFragment"
-        android:name="com.nastya.booktracker.presentation.ui.addBook.AddBooksFragment"
-        android:label="Добавить книгу"
-        tools:layout="@layout/fragment_add_books" />
-
-    <fragment
         android:id="@+id/editBookFragment"
         android:name="com.nastya.booktracker.presentation.ui.editBook.EditBookFragment"
         android:label="Изменение книги"

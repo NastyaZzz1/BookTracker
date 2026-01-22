@@ -6,6 +6,8 @@
     android:layout_width="match_parent"
     android:layout_height="wrap_content"
     android:scrollbars="none"
+    android:paddingTop="60dp"
+    android:paddingBottom="60dp"
     tools:context=".presentation.ui.calendar.CalendarFragment">
 
     <LinearLayout
@@ -41,7 +43,7 @@
                     android:layout_height="38dp"
                     android:textColor="@color/light_brown"
                     app:backgroundTint="@null"
-                    android:background="@drawable/btn_goal_drawble"
+                    android:background="@drawable/btn_goal_drawable"
                     app:layout_constraintEnd_toEndOf="parent"
                     app:layout_constraintTop_toTopOf="parent"
                     app:layout_constraintBottom_toBottomOf="parent"

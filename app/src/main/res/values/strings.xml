@@ -27,4 +27,8 @@
     <string name="book_page_add_hint">Количество страниц</string>
     <string name="change_goal">Изменить цели</string>
     <string name="change">Изменить</string>
+    <string name="white">Белый</string>
+    <string name="sepia">Сепия</string>
+    <string name="grey">Серый</string>
+    <string name="black">Черный</string>
 </resources>

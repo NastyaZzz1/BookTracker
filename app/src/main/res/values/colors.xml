@@ -12,4 +12,6 @@
     <color name="light_brown">#DDA15E</color>
     <color name="dark_brown">#BC6C25</color>
     <color name="transparent">#00FFFFFF</color>
+    <color name="brown">#684B39</color>
+    <color name="sepia">#faf4e8</color>
 </resources>

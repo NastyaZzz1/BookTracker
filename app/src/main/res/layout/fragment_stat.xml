@@ -6,6 +6,8 @@
     android:layout_width="match_parent"
     android:layout_height="match_parent"
     android:fillViewport="true"
+    android:paddingTop="60dp"
+    android:paddingBottom="60dp"
     tools:context=".presentation.ui.stat.StatFragment">
 
     <androidx.constraintlayout.widget.ConstraintLayout

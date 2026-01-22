@@ -7,12 +7,12 @@
         app:showAsAction="always" />
 
     <item android:id="@+id/favoriteBooksFragment"
-        android:title="favorite"
+        android:title="favorite_book"
         android:icon="@drawable/icon_heart"
         app:showAsAction="always" />
 
-    <item android:id="@+id/settingsFragment"
-        android:title="add_book"
+    <item android:id="@+id/settingsDialog"
+        android:title="settings_book"
         android:icon="@drawable/icon_pencil"
         app:showAsAction="always" />
 </menu>

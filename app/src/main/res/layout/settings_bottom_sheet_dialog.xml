@@ -1,0 +1,63 @@
+<?xml version="1.0" encoding="utf-8"?>
+<androidx.cardview.widget.CardView
+    xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:app="http://schemas.android.com/apk/res-auto"
+    xmlns:tools="http://schemas.android.com/tools"
+    android:layout_width="match_parent"
+    android:layout_height="wrap_content"
+    app:cardElevation="0dp">
+
+    <androidx.constraintlayout.widget.ConstraintLayout
+        android:layout_width="match_parent"
+        android:layout_height="match_parent"
+        android:padding="16dp" >
+
+        <com.google.android.material.button.MaterialButton
+            android:id="@+id/white_style"
+            android:layout_width="wrap_content"
+            android:layout_height="40dp"
+            android:layout_marginStart="10dp"
+            android:layout_marginEnd="5dp"
+            android:text="@string/white"
+            android:checkable="true"
+            android:textColor="@color/dark_gray"
+            app:backgroundTint="@color/white"
+            app:layout_constraintBottom_toBottomOf="parent"
+            app:layout_constraintStart_toStartOf="parent"
+            app:layout_constraintTop_toTopOf="parent"
+            app:layout_constraintEnd_toStartOf="@+id/sepia_style"
+            app:strokeColor="@color/selector_btn_stroke_white"
+            app:strokeWidth="2dp" />
+
+        <com.google.android.material.button.MaterialButton
+            android:id="@+id/sepia_style"
+            android:layout_width="wrap_content"
+            android:layout_height="40dp"
+            android:text="@string/sepia"
+            android:textColor="@color/brown"
+            app:backgroundTint="@color/sepia"
+            android:checkable="true"
+            app:layout_constraintBottom_toBottomOf="parent"
+            app:layout_constraintStart_toEndOf="@+id/white_style"
+            app:layout_constraintTop_toTopOf="parent"
+            app:layout_constraintEnd_toStartOf="@+id/black_style"
+            app:strokeColor="@color/selector_btn_stroke_sepia"
+            app:strokeWidth="2dp" />
+
+        <com.google.android.material.button.MaterialButton
+            android:id="@+id/black_style"
+            android:layout_width="wrap_content"
+            android:layout_height="40dp"
+            android:text="@string/black"
+            android:checkable="true"
+            android:textColor="@color/gray"
+            app:backgroundTint="@color/black"
+            app:layout_constraintBottom_toBottomOf="parent"
+            app:layout_constraintEnd_toEndOf="parent"
+            app:layout_constraintStart_toEndOf="@+id/sepia_style"
+            app:layout_constraintTop_toTopOf="parent"
+            app:strokeColor="@color/selector_btn_stroke_black"
+            app:strokeWidth="2dp" />
+
+    </androidx.constraintlayout.widget.ConstraintLayout>
+</androidx.cardview.widget.CardView>
