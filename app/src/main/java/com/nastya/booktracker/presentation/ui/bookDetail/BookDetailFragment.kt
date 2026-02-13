@@ -5,18 +5,17 @@ import androidx.fragment.app.Fragment
 import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
-import androidx.lifecycle.Observer
+import androidx.lifecycle.Lifecycle
 import androidx.lifecycle.ViewModelProvider
 import androidx.lifecycle.lifecycleScope
+import androidx.lifecycle.repeatOnLifecycle
 import androidx.navigation.fragment.findNavController
 import coil.load
-import com.google.gson.Gson
 import com.nastya.booktracker.R
 import com.nastya.booktracker.data.local.database.BookDatabase
 import com.nastya.booktracker.databinding.FragmentBookDetailBinding
-import com.nastya.booktracker.domain.model.LocatorDto
+import com.nastya.booktracker.domain.model.Book
 import kotlinx.coroutines.launch
-import kotlin.math.roundToInt
 
 class BookDetailFragment : Fragment() {
     private var _binding: FragmentBookDetailBinding? = null
@@ -26,7 +25,7 @@ class BookDetailFragment : Fragment() {
     override fun onCreateView(
         inflater: LayoutInflater, container: ViewGroup?,
         savedInstanceState: Bundle?
-    ): View? {
+    ): View {
         _binding = FragmentBookDetailBinding.inflate(inflater, container, false)
         val view = binding.root
 
@@ -82,7 +81,7 @@ class BookDetailFragment : Fragment() {
     private fun setupReadButton(bookId: Long) {
         binding.readingBtn.setOnClickListener {
             lifecycleScope.launch {
-                viewModel.book.let {
+                viewModel.bookState.let {
                     val action = BookDetailFragmentDirections
                         .actionBookDetailFragmentToEpubReaderFragment(
                             bookPath = it.value!!.filePath,
@@ -103,25 +102,37 @@ class BookDetailFragment : Fragment() {
     }
 
     private fun bookItemObserver() {
-        viewModel.book.observe(viewLifecycleOwner, Observer { book ->
-            book?.let {
-                val progress = book.progress
-                binding.linProgressBar.progress = progress
-                binding.linProgressText.text = "$progress%"
-                binding.bookName.text = book.bookName
-                binding.bookAuthor.text = book.bookAuthor
-                binding.bookDesc.text = book.description
-                binding.bookReadPages.text = "Глав: ${book.chaptersCount}"
-                binding.bookAllPages.text = "Печатных страниц: ≈${book.allPagesCount}"
-                binding.bookImg.load(book.imageData) {
-                    crossfade(true)
+        lifecycleScope.launch {
+            repeatOnLifecycle(Lifecycle.State.STARTED) {
+                viewModel.bookState.collect { book ->
+                    book?.let {
+                        binding.favBtn.setImageResource(
+                            if (it.isFavorite) R.drawable.icon_heart
+                            else R.drawable.icon_heart_empty
+                        )
+                        updateUI(it)
+                    }
                 }
-                binding.favBtn.setImageResource(
-                    if (book.isFavorite) R.drawable.icon_heart
-                    else R.drawable.icon_heart_empty
-                )
             }
-        })
+        }
+    }
+
+    fun updateUI(book: Book) {
+        val progress = book.progress
+        binding.linProgressBar.progress = progress
+        binding.linProgressText.text = "$progress%"
+        binding.bookName.text = book.bookName
+        binding.bookAuthor.text = book.bookAuthor
+        binding.bookDesc.text = book.description
+        binding.bookReadPages.text = "Глав: ${book.chaptersCount}"
+        binding.bookAllPages.text = "Печатных страниц: ≈${book.allPagesCount}"
+
+        if (binding.bookImg.tag != book.filePath) {
+            binding.bookImg.load(book.imageData) {
+                crossfade(true)
+            }
+            binding.bookImg.tag = book.filePath
+        }
     }
 
     override fun onDestroyView() {

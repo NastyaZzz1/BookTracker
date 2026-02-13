@@ -5,13 +5,21 @@ import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
 import com.google.android.material.dialog.MaterialAlertDialogBuilder
 import com.nastya.booktracker.data.local.dao.BookDao
+import com.nastya.booktracker.domain.model.Book
+import com.nastya.booktracker.presentation.ui.BookFileManager
+import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.channels.BufferOverflow
 import kotlinx.coroutines.flow.MutableSharedFlow
+import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.SharedFlow
+import kotlinx.coroutines.flow.StateFlow
+import kotlinx.coroutines.flow.asStateFlow
 import kotlinx.coroutines.launch
 
 class BookDetailViewModel(bookId: Long, private val bookDao: BookDao): ViewModel() {
-    val book = bookDao.get(bookId)
+    private val _bookState = MutableStateFlow<Book?>(null)
+    val bookState: StateFlow<Book?> = _bookState.asStateFlow()
+
     private val _navigateToList = MutableSharedFlow<Unit>(
         replay = 0,
         extraBufferCapacity = 1,
@@ -19,12 +27,20 @@ class BookDetailViewModel(bookId: Long, private val bookDao: BookDao): ViewModel
     )
     val navigateToList: SharedFlow<Unit> = _navigateToList
 
-    fun isFavoriteChanged() {
-        book.value?.let { currentBook ->
-            currentBook.isFavorite = !currentBook.isFavorite
+    init {
+        viewModelScope.launch {
+            bookDao.get(bookId).collect { book ->
+                _bookState.value = book
+            }
+        }
+    }
 
-            viewModelScope.launch {
-                bookDao.update(book.value!!)
+    fun isFavoriteChanged() {
+        viewModelScope.launch {
+            _bookState.value?.let { currentBook ->
+                bookDao.update(
+                    currentBook.copy(isFavorite = !currentBook.isFavorite)
+                )
             }
         }
     }
@@ -34,7 +50,7 @@ class BookDetailViewModel(bookId: Long, private val bookDao: BookDao): ViewModel
             .setTitle("Удаление книги")
             .setMessage("Вы точно хотите удалить книгу?")
             .setPositiveButton("Да") { _, _ ->
-                deleteTaskAndNavigate()
+                deleteTaskAndNavigate(context)
             }
             .setNegativeButton("Отмена", null)
             .create()
@@ -42,9 +58,11 @@ class BookDetailViewModel(bookId: Long, private val bookDao: BookDao): ViewModel
         alertDialog.show()
     }
 
-    private fun deleteTaskAndNavigate() {
+
+    private fun deleteTaskAndNavigate(context: Context) {
         viewModelScope.launch {
-            bookDao.delete(book.value!!)
+            BookFileManager.deleteBook(context, _bookState.value!!.fileNameFromUri)
+            bookDao.delete(_bookState.value!!)
             _navigateToList.emit(Unit)
         }
     }

@@ -29,7 +29,6 @@ import org.readium.r2.shared.publication.Locator
 import org.readium.r2.shared.publication.Publication
 import kotlin.math.roundToInt
 
-
 class EpubReaderFragment : Fragment() {
     private var _binding: FragmentEpubReaderBinding? = null
     private val binding get() = _binding!!
@@ -46,7 +45,7 @@ class EpubReaderFragment : Fragment() {
         inflater: LayoutInflater,
         container: ViewGroup?,
         savedInstanceState: Bundle?
-    ): View? {
+    ): View {
         _binding = FragmentEpubReaderBinding.inflate(inflater, container, false)
         val view = binding.root
         return view

@@ -9,11 +9,15 @@ import android.widget.Toast
 import androidx.annotation.RequiresApi
 import androidx.core.widget.addTextChangedListener
 import androidx.fragment.app.Fragment
+import androidx.lifecycle.Lifecycle
 import androidx.lifecycle.Observer
 import androidx.lifecycle.ViewModelProvider
+import androidx.lifecycle.lifecycleScope
+import androidx.lifecycle.repeatOnLifecycle
 import androidx.navigation.findNavController
 import com.nastya.booktracker.data.local.database.BookDatabase
 import com.nastya.booktracker.databinding.FragmentEditBookBinding
+import kotlinx.coroutines.launch
 
 class EditBookFragment : Fragment() {
     private var _binding: FragmentEditBookBinding? = null
@@ -65,13 +69,17 @@ class EditBookFragment : Fragment() {
     }
 
     private fun bookObserve() {
-        viewModel.book.observe(viewLifecycleOwner, Observer {
-            it?.let {
-                binding.bookName.setText(it.bookName)
-                binding.bookAuthor.setText(it.bookAuthor)
-                binding.bookDesc.setText(it.description)
+        lifecycleScope.launch {
+            repeatOnLifecycle(Lifecycle.State.STARTED) {
+                viewModel.bookState.collect { book ->
+                    book?.let {
+                        binding.bookName.setText(it.bookName)
+                        binding.bookAuthor.setText(it.bookAuthor)
+                        binding.bookDesc.setText(it.description)
+                    }
+                }
             }
-        })
+        }
     }
 
     private fun navigateToDetailObserve() {

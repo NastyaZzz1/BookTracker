@@ -27,7 +27,7 @@ interface BookDao {
     suspend fun getNotLive(bookId: Long): Book?
 
     @Query("SELECT * FROM book_table WHERE book_id = :bookId")
-    fun get(bookId: Long) : LiveData<Book>
+    fun get(bookId: Long) : Flow<Book>
 
     @Query("SELECT * FROM book_table WHERE book_id = :bookId")
     fun getOneFlow(bookId: Long): Flow<Book>

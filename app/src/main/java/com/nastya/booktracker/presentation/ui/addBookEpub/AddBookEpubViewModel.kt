@@ -31,9 +31,7 @@ class AddBookEpubViewModel(private val dao: BookDao): ViewModel() {
     ) {
         viewModelScope.launch {
             try {
-                val saveResult = BookFileManager.saveBookFromUri(context, bookUri)
-
-                when (saveResult) {
+                when (val saveResult = BookFileManager.saveBookFromUri(context, bookUri)) {
                     is BookFileManager.SaveBookResult.Success -> {
                         val publication = epubRepository.extractMetadata(saveResult.filePath)
 
@@ -47,7 +45,8 @@ class AddBookEpubViewModel(private val dao: BookDao): ViewModel() {
                             imageData = coverBytes,
                             allPagesCount = 1,
                             filePath = saveResult.filePath,
-                            chaptersCount = countChapters(publication.tableOfContents)
+                            chaptersCount = countChapters(publication.tableOfContents),
+                            fileNameFromUri = BookFileManager.getFileNameFromUri(context, bookUri)
                         )
                         dao.insert(book)
 
@@ -57,7 +56,6 @@ class AddBookEpubViewModel(private val dao: BookDao): ViewModel() {
                 }
             } catch(e: Exception) {
                 Log.e("BookViewModel", "Ошибка добавления книги", e)
-
             }
         }
     }

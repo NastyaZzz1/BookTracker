@@ -19,6 +19,8 @@
         android:id="@+id/toolbar"
         style="@style/Widget.MaterialComponents.Toolbar.Primary"
         android:layout_width="match_parent"
+        app:title="Мои книги"
+        app:titleMarginBottom="22dp"
         android:layout_height="?attr/actionBarSize"
         app:layout_constraintHorizontal_bias="1.0"
         android:background="@color/dark_green"

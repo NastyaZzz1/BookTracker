@@ -42,4 +42,7 @@ data class Book (
 
     @ColumnInfo(name = "file_path")
     var filePath: String = "",
+
+    @ColumnInfo(name = "file_name_from_uri")
+    var fileNameFromUri: String = "",
 )

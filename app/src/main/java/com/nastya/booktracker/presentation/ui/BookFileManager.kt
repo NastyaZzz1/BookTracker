@@ -4,6 +4,7 @@ import android.content.Context
 import android.net.Uri
 import android.provider.OpenableColumns
 import android.util.Log
+import android.widget.Toast
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.withContext
 import java.io.File
@@ -28,6 +29,7 @@ object BookFileManager {
 
                 val destinationFile = File(booksDir, fileName)
                 if (destinationFile.exists()) {
+                    Toast.makeText(context, "Такая книга уже добавлена", Toast.LENGTH_SHORT).show()
                     return@withContext SaveBookResult.Error(
                         "Файл с именем '$fileName' уже существует"
                     )
@@ -55,7 +57,28 @@ object BookFileManager {
         }
     }
 
-    private fun getFileNameFromUri(context: Context, uri: Uri): String {
+    suspend fun deleteBook(
+        context: Context,
+        fileName: String
+    ) {
+        return withContext(Dispatchers.IO) {
+            try {
+                val booksDir = File(context.filesDir, "books")
+                val file = File(booksDir, fileName)
+
+                if (file.exists()) {
+                    Log.d("BookFileManager", "Файл '$fileName' удален")
+                    file.delete()
+                } else {
+                    Log.d("BookFileManager", "Файл '$fileName' не найден")
+                }
+            } catch (e: Exception) {
+                Log.e("BookFileManager", "Ошибка при удалении файла: $fileName", e)
+            }
+        }
+    }
+
+    fun getFileNameFromUri(context: Context, uri: Uri): String {
         var fileName: String? = null
         try {
             context.contentResolver.query(
