@@ -83,7 +83,7 @@ class EpubReaderFragment : Fragment() {
         publication: Publication,
         initialLocator: Locator?
     ) {
-        val fragmentFactory = EpubNavigatorFragment.Companion.createFactory(
+        val fragmentFactory = EpubNavigatorFragment.createFactory(
             publication = publication,
             initialLocator = initialLocator,
             listener = object : EpubNavigatorFragment.Listener {
@@ -124,8 +124,7 @@ class EpubReaderFragment : Fragment() {
                     if (locator.href == lastHref && percentRead >= 99) 100
                     else percentRead
 
-                binding.countPage.text = "$percentRead%"
-
+                binding.percentagesProgress.text = "$percentRead%"
                 lastLocator = locator
                 maybeSaveProgress()
             }

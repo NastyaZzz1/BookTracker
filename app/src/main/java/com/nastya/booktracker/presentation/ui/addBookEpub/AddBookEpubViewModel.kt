@@ -20,10 +20,12 @@ import java.util.zip.ZipFile
 import com.nastya.booktracker.R
 import java.io.ByteArrayOutputStream
 import androidx.core.graphics.createBitmap
+import kotlinx.coroutines.Dispatchers
+import kotlinx.coroutines.withContext
 import org.readium.r2.shared.publication.Link
+import org.readium.r2.shared.publication.Publication
 
 class AddBookEpubViewModel(private val dao: BookDao): ViewModel() {
-
     fun addBookFromUri(
         context: Context,
         bookUri: Uri,
@@ -43,7 +45,7 @@ class AddBookEpubViewModel(private val dao: BookDao): ViewModel() {
                             bookAuthor = publication.metadata.authors.firstOrNull()?.name ?: "bookAuthor",
                             description = publication.metadata.description ?: "bookDescription",
                             imageData = coverBytes,
-                            allPagesCount = 1,
+                            allPagesCount = calculateApproximatePages(publication),
                             filePath = saveResult.filePath,
                             chaptersCount = countChapters(publication.tableOfContents),
                             fileNameFromUri = BookFileManager.getFileNameFromUri(context, bookUri)
@@ -66,6 +68,41 @@ class AddBookEpubViewModel(private val dao: BookDao): ViewModel() {
                 1
             } else {
                 countChapters(link.children)
+            }
+        }
+    }
+
+    suspend fun calculateApproximatePages(publication: Publication): Int {
+        return withContext(Dispatchers.IO) {
+            try {
+                val charsPerPage = 1800
+                val imagePageEquivalent = 300
+                var totalChars = 0
+                var totalImages = 0
+
+                publication.readingOrder.forEach { link ->
+                    try {
+                        val resource = publication.get(link)
+                        val content = resource.readAsString().getOrNull()
+
+                        if (content != null) {
+                            val textWithoutTags = content.replace(Regex("<[^>]*>"), " ")
+                            val cleanText = textWithoutTags.replace(Regex("\\s+"), " ").trim()
+                            totalChars += cleanText.length
+                            val imgPattern = Regex("<img[^>]*src=[\"']([^\"']*)[\"'][^>]*>", RegexOption.IGNORE_CASE)
+                            totalImages += imgPattern.findAll(content).count()
+                        }
+                    } catch (e: Exception) {
+                        Log.e("BookViewModel", "Ошибка чтения ресурса", e)
+                    }
+                }
+                val pagesFromChars = (totalChars / charsPerPage).coerceAtLeast(1)
+                val pagesFromImages = (totalImages / imagePageEquivalent)
+
+                (pagesFromChars + pagesFromImages).coerceAtLeast(1)
+            } catch (e: Exception) {
+                Log.e("BookViewModel", "Ошибка подсчета страниц", e)
+                10
             }
         }
     }

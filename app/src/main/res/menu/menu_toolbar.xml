@@ -11,6 +11,16 @@
         android:icon="@drawable/icon_heart"
         app:showAsAction="always" />
 
+    <item android:id="@+id/timer_layout"
+        android:title=""
+        android:actionLayout="@layout/timer_layout"
+        app:showAsAction="always" />
+
+    <item android:id="@+id/pause_timer"
+        android:title="pause_timer"
+        android:icon="@drawable/icon_pause_start"
+        app:showAsAction="always" />
+
     <item android:id="@+id/settingsDialog"
         android:title="settings_book"
         android:icon="@drawable/icon_pencil"
