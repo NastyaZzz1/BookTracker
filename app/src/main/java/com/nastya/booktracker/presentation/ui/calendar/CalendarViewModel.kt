@@ -16,6 +16,7 @@ import java.time.format.DateTimeFormatter
 import java.util.Locale
 import androidx.core.content.edit
 import androidx.core.widget.addTextChangedListener
+import kotlin.String
 
 class CalendarViewModel(private val dailyReadingDao: DailyReadingDao, val context: Context) : ViewModel() {
     private val _dailyGoal = MutableLiveData<Int>()
@@ -72,7 +73,7 @@ class CalendarViewModel(private val dailyReadingDao: DailyReadingDao, val contex
     @RequiresApi(Build.VERSION_CODES.O)
     suspend fun dailyProgressGet (date: LocalDate) : Float {
         val currentGoal = _dailyGoal.value ?: 1
-        val countPage = dailyReadingDao.getAllPagesOfBook(date) ?: 0
+        val countPage = dailyReadingDao.getAllTimeOfBook(date) ?: 0
         val newProgress = (countPage * 100f).div(currentGoal)
         return newProgress
     }
@@ -80,18 +81,21 @@ class CalendarViewModel(private val dailyReadingDao: DailyReadingDao, val contex
     @RequiresApi(Build.VERSION_CODES.O)
     suspend fun showInfDialogDetailData(context: Context, date: LocalDate) {
         val booksProgress = dailyReadingDao.getAllBookOnDate(date)
-        val countPage = dailyReadingDao.getAllPagesOfBook(date) ?: 0
+        val readingTime = dailyReadingDao.getAllTimeOfBook(date) ?: 0
+
         val message = booksProgress.joinToString(separator = "\n") { reading ->
-            "${reading.bookTitle}: ${reading.countPage} стр.".trimIndent()
+            "${reading.bookTitle}: ${timeFormated(reading.readingTime)}".trimIndent()
         }
         val dateFormat = formatLocalDate(date)
         val alertDialog = MaterialAlertDialogBuilder(context)
             .setTitle(dateFormat)
-            .setMessage("Всего страниц: $countPage\n$message")
+            .setMessage("Время чтения: ${timeFormated(readingTime)}\n$message")
             .setNegativeButton("Окей", null)
             .create()
         alertDialog.show()
     }
+
+    fun timeFormated(readingTime: Long) = String.format("%02d:%02d", readingTime / 60, readingTime % 60)
 
     @RequiresApi(Build.VERSION_CODES.O)
     fun showInfDialogChangeGoal(context: Context) {

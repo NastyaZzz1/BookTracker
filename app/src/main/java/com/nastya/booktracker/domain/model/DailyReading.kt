@@ -11,8 +11,8 @@ import java.time.LocalDate
             entity = Book::class,
             parentColumns = ["book_id"],
             childColumns = ["book_id"],
-            onDelete = ForeignKey.Companion.CASCADE,
-            onUpdate = ForeignKey.Companion.CASCADE
+            onDelete = ForeignKey.CASCADE,
+            onUpdate = ForeignKey.CASCADE
         )])
 data class DailyReading (
     @PrimaryKey(autoGenerate = true)
@@ -25,5 +25,8 @@ data class DailyReading (
     var bookId: Long = 0L,
 
     @ColumnInfo(name = "count_page")
-    var countPage: Int,
+    var countPage: Int = 0,
+
+    @ColumnInfo(name = "reading_time")
+    var readingTime: Long = 0L,
 )

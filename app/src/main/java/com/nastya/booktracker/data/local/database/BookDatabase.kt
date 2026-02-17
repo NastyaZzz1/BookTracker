@@ -8,7 +8,6 @@ import androidx.room.TypeConverters
 import com.nastya.booktracker.domain.model.Book
 import com.nastya.booktracker.domain.model.DailyReading
 import com.nastya.booktracker.data.local.dao.DailyReadingDao
-import com.nastya.booktracker.data.local.database.TypeConverter
 import com.nastya.booktracker.data.local.dao.BookDao
 
 @Database(

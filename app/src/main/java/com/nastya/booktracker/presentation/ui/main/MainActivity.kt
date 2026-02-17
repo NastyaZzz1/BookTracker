@@ -1,6 +1,7 @@
 package com.nastya.booktracker.presentation.ui.main
 
 import android.Manifest
+import android.R.string
 import android.content.Intent
 import android.graphics.Color
 import android.os.Build
@@ -154,7 +155,7 @@ class MainActivity : AppCompatActivity() {
 
             setTextColor(Color.WHITE)
             textSize = 18f
-            text = "00:00"
+            text = getString(R.string.zero_time)
             base = SystemClock.elapsedRealtime()
 
             setOnChronometerTickListener {
@@ -208,6 +209,26 @@ class MainActivity : AppCompatActivity() {
             stop()
             pauseOffset = SystemClock.elapsedRealtime() - base
         }
+    }
+
+    fun resetTimerFromReader(): Long {
+        return chronometer?.let {
+            val elapsedTime = if(isTimerRunning) {
+                SystemClock.elapsedRealtime() - it.base
+            } else {
+                pauseOffset
+            }
+
+            it.stop()
+            it.base = SystemClock.elapsedRealtime()
+            it.text = getString(R.string.zero_time)
+            pauseOffset = 0
+            isTimerRunning = false
+
+            toolbarMenu?.findItem(R.id.pause_timer)?.setIcon(R.drawable.icon_pause_start)
+
+            elapsedTime
+        } ?: 0L
     }
 
     fun hideSystemUi() {

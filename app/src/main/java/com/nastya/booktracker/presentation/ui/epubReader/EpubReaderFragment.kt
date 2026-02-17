@@ -3,7 +3,6 @@ package com.nastya.booktracker.presentation.ui.epubReader
 import android.graphics.PointF
 import android.os.Build
 import android.os.Bundle
-import android.util.Log
 import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
@@ -57,11 +56,11 @@ class EpubReaderFragment : Fragment() {
         val bookPath = EpubReaderFragmentArgs.fromBundle(requireArguments()).bookPath
         val bookId = EpubReaderFragmentArgs.fromBundle(requireArguments()).bookId
 
-        Log.d("fragment", bookId.toString())
-
         val application = requireNotNull(this.activity).application
-        val dao = BookDatabase.Companion.getInstance(application).bookDao
-        val viewModelFactory = EpubReaderViewModelFactory(dao, bookId)
+        val bookDao = BookDatabase.getInstance(application).bookDao
+        val dailyReadingDao = BookDatabase.getInstance(application).dailyReadingDao
+
+        val viewModelFactory = EpubReaderViewModelFactory(bookDao, dailyReadingDao, bookId)
         viewModel = ViewModelProvider(this, viewModelFactory)[EpubReaderViewModel::class.java]
 
         lifecycleScope.launch {
@@ -194,8 +193,14 @@ class EpubReaderFragment : Fragment() {
         _binding = null
     }
 
+    @RequiresApi(Build.VERSION_CODES.O)
     override fun onStop() {
         super.onStop()
         viewModel.saveProgressToDb(lastLocator, percentRead)
+
+        val elapsedTime = ((requireActivity() as? MainActivity)
+            ?.resetTimerFromReader()
+            ?: 0L) / 1000
+        viewModel.saveReadingTime(elapsedTime)
     }
 }

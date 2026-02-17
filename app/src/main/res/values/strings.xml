@@ -31,4 +31,5 @@
     <string name="sepia">Сепия</string>
     <string name="grey">Серый</string>
     <string name="black">Черный</string>
+    <string name="zero_time">00:00</string>
 </resources>

@@ -5,6 +5,6 @@ import java.time.LocalDate
 data class DailyReadingWithTitle (
     val dataId: Long,
     val readDate: LocalDate,
-    val countPage: Int,
+    val readingTime: Long,
     val bookTitle: String
 )
