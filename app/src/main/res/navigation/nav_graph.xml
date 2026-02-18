@@ -19,13 +19,15 @@ app:startDestination="@id/booksFragment">
         android:id="@+id/calendarFragment"
         android:name="com.nastya.booktracker.presentation.ui.calendar.CalendarFragment"
         android:label="Трекер"
-        tools:layout="@layout/fragment_calendar" />
+        tools:layout="@layout/fragment_calendar"
+        tools:targetApi="26" />
 
     <fragment
         android:id="@+id/statFragment"
         android:name="com.nastya.booktracker.presentation.ui.stat.StatFragment"
         android:label="Статистика"
-        tools:layout="@layout/fragment_stat" />
+        tools:layout="@layout/fragment_stat"
+        tools:targetApi="26" />
 
     <fragment
         android:id="@+id/favoriteBooksFragment"
@@ -86,7 +88,7 @@ app:startDestination="@id/booksFragment">
     <fragment
         android:id="@+id/epubReaderFragment"
         android:name="com.nastya.booktracker.presentation.ui.epubReader.EpubReaderFragment"
-        android:label="Читалка"
+        android:label=""
         tools:layout="@layout/fragment_epub_reader" >
         <argument
             android:name="bookPath"

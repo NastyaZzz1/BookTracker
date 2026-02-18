@@ -20,7 +20,7 @@ interface DailyReadingDao {
        SELECT dr.dataId, dr.read_date as readDate, dr.reading_time as readingTime, b.book_name as bookTitle
        FROM daily_reading_table dr 
        JOIN book_table b ON dr.book_id = b.book_id
-       WHERE dr.read_date = :readDate
+       WHERE dr.read_date = :readDate AND dr.reading_time != 0
     """)
     suspend fun getAllBookOnDate(readDate: LocalDate) : List<DailyReadingWithTitle>
 

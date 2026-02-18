@@ -1,7 +1,6 @@
 package com.nastya.booktracker.presentation.ui.main
 
 import android.Manifest
-import android.R.string
 import android.content.Intent
 import android.graphics.Color
 import android.os.Build
@@ -36,11 +35,14 @@ class MainActivity : AppCompatActivity() {
     lateinit var binding: ActivityMainBinding
     private lateinit var navController: NavController
     private lateinit var viewModel: AddBookEpubViewModel
+    private lateinit var navHostFragment: NavHostFragment
     private var toolbarMenu: Menu? = null
 
     private var isTimerRunning = false
     private var chronometer: Chronometer? = null
     private var pauseOffset: Long = 0
+
+    private var currentDestinationId: Int = R.id.booksFragment
 
     private val requestStoragePermission = registerForActivityResult(
         ActivityResultContracts.RequestPermission()
@@ -69,50 +71,61 @@ class MainActivity : AppCompatActivity() {
     @RequiresApi(Build.VERSION_CODES.M)
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
-        binding = ActivityMainBinding.inflate(layoutInflater)
 
+        if (savedInstanceState != null) {
+            isTimerRunning = savedInstanceState.getBoolean("isTimerRunning", false)
+            pauseOffset = savedInstanceState.getLong("pauseOffset", 0)
+        }
+
+        binding = ActivityMainBinding.inflate(layoutInflater)
         setContentView(binding.root)
         setSupportActionBar(binding.toolbar)
 
-        val navHostFragment = supportFragmentManager
+        initViewModel()
+        setupNavigation()
+        setupToolbarMenu()
+    }
+
+    override fun onCreateOptionsMenu(menu: Menu?): Boolean {
+        menuInflater.inflate(R.menu.menu_toolbar, menu)
+        toolbarMenu = menu
+
+        setupChronometer(menu)
+        restoreTimerState(menu)
+        updateMenuVisibility(currentDestinationId)
+
+        return super.onCreateOptionsMenu(menu)
+    }
+
+    private fun initViewModel() {
+        val dao = BookDatabase.getInstance(application).bookDao
+        val viewModelFactory = AddBookEpubViewModelFactory(dao)
+        viewModel = ViewModelProvider(this, viewModelFactory)[AddBookEpubViewModel::class.java]
+    }
+
+    private fun setupNavigation() {
+        navHostFragment = supportFragmentManager
             .findFragmentById(R.id.cvFragment) as NavHostFragment
         navController = navHostFragment.navController
 
         navController.addOnDestinationChangedListener { _, destination, _ ->
-            if (destination.id != R.id.booksFragment) {
-                binding.toolbar.navigationIcon = null
-            }
-            when (destination.id) {
-                R.id.epubReaderFragment -> {
-                    toolbarMenu?.findItem(R.id.settingsDialog)?.isVisible = true
-                    toolbarMenu?.findItem(R.id.pause_timer)?.isVisible = true
-                    toolbarMenu?.findItem(R.id.timer_layout)?.isVisible = true
-                    toolbarMenu?.findItem(R.id.favoriteBooksFragment)?.isVisible = false
-                    toolbarMenu?.findItem(R.id.addBookEpub)?.isVisible = false
-                    binding.toolbar.doOnPreDraw { hideSystemUi() }
-                    binding.bottomNavigationView.doOnPreDraw { hideSystemUi() }
-                }
-                else -> {
-                    toolbarMenu?.findItem(R.id.settingsDialog)?.isVisible = false
-                    toolbarMenu?.findItem(R.id.pause_timer)?.isVisible = false
-                    toolbarMenu?.findItem(R.id.timer_layout)?.isVisible = false
-                    toolbarMenu?.findItem(R.id.favoriteBooksFragment)?.isVisible = true
-                    toolbarMenu?.findItem(R.id.addBookEpub)?.isVisible = true
-                    showSystemUi()
-                }
-            }
+            currentDestinationId = destination.id
+            updateMenuVisibility(currentDestinationId)
         }
 
-        val dao = BookDatabase.getInstance(application).bookDao
-        val viewModelFactory = AddBookEpubViewModelFactory(dao)
-        viewModel = ViewModelProvider(this, viewModelFactory)[AddBookEpubViewModel::class.java]
+        val topLevelDestinations = setOf(
+            R.id.booksFragment,
+            R.id.calendarFragment,
+            R.id.statFragment
+        )
 
-        val builder = AppBarConfiguration.Builder(navController.graph)
-        val appBarConfiguration = builder.build()
-
+        val appBarConfiguration = AppBarConfiguration.Builder(topLevelDestinations).build()
         binding.toolbar.setupWithNavController(navController, appBarConfiguration)
         binding.bottomNavigationView.setupWithNavController(navController)
+    }
 
+    @RequiresApi(Build.VERSION_CODES.M)
+    private fun setupToolbarMenu() {
         binding.toolbar.setOnMenuItemClickListener { item ->
             when (item.itemId) {
                 R.id.addBookEpub -> {
@@ -120,19 +133,11 @@ class MainActivity : AppCompatActivity() {
                     true
                 }
                 R.id.settingsDialog -> {
-                    openReaderSettings(navHostFragment)
+                    openReaderSettings()
                     true
                 }
                 R.id.pause_timer -> {
-                    isTimerRunning = !isTimerRunning
-
-                    if (isTimerRunning) {
-                        item.setIcon(R.drawable.icon_pause_ticking)
-                        startTimer()
-                    } else {
-                        item.setIcon(R.drawable.icon_pause_start)
-                        stopTimer()
-                    }
+                    toggleTimer(item)
                     true
                 }
                 else -> NavigationUI.onNavDestinationSelected(item, navController)
@@ -140,13 +145,41 @@ class MainActivity : AppCompatActivity() {
         }
     }
 
-    override fun onCreateOptionsMenu(menu: Menu?): Boolean {
-        menuInflater.inflate(R.menu.menu_toolbar, menu)
-        toolbarMenu = menu
-        menu?.findItem(R.id.settingsDialog)?.isVisible = false
-        menu?.findItem(R.id.pause_timer)?.isVisible = false
-        menu?.findItem(R.id.timer_layout)?.isVisible = false
+    private fun toggleTimer(item: MenuItem) {
+        isTimerRunning = !isTimerRunning
 
+        if (isTimerRunning) {
+            item.setIcon(R.drawable.icon_pause_ticking)
+            startTimer()
+        } else {
+            item.setIcon(R.drawable.icon_pause_start)
+            stopTimer()
+        }
+    }
+
+    private fun updateMenuVisibility(destinationId: Int) {
+        when (destinationId) {
+            R.id.epubReaderFragment -> {
+                toolbarMenu?.findItem(R.id.settingsDialog)?.isVisible = true
+                toolbarMenu?.findItem(R.id.pause_timer)?.isVisible = true
+                toolbarMenu?.findItem(R.id.timer_layout)?.isVisible = true
+                toolbarMenu?.findItem(R.id.favoriteBooksFragment)?.isVisible = false
+                toolbarMenu?.findItem(R.id.addBookEpub)?.isVisible = false
+                binding.toolbar.doOnPreDraw { hideSystemUi() }
+                binding.bottomNavigationView.doOnPreDraw { hideSystemUi() }
+            }
+            else -> {
+                toolbarMenu?.findItem(R.id.settingsDialog)?.isVisible = false
+                toolbarMenu?.findItem(R.id.pause_timer)?.isVisible = false
+                toolbarMenu?.findItem(R.id.timer_layout)?.isVisible = false
+                toolbarMenu?.findItem(R.id.favoriteBooksFragment)?.isVisible = true
+                toolbarMenu?.findItem(R.id.addBookEpub)?.isVisible = true
+                showSystemUi()
+            }
+        }
+    }
+
+    private fun setupChronometer(menu: Menu?) {
         chronometer = Chronometer(this).apply {
             layoutParams = Toolbar.LayoutParams(
                 Toolbar.LayoutParams.WRAP_CONTENT,
@@ -155,31 +188,45 @@ class MainActivity : AppCompatActivity() {
 
             setTextColor(Color.WHITE)
             textSize = 18f
+
             text = getString(R.string.zero_time)
-            base = SystemClock.elapsedRealtime()
+            base = SystemClock.elapsedRealtime() - pauseOffset
 
             setOnChronometerTickListener {
                 val elapsed = (SystemClock.elapsedRealtime() - base) / 1000
                 text = String.format("%02d:%02d", elapsed / 60, elapsed % 60)
             }
+
+            if(isTimerRunning) {
+                start()
+            }
         }
         menu?.findItem(R.id.timer_layout)?.actionView = chronometer
-        return super.onCreateOptionsMenu(menu)
     }
 
-    override fun onOptionsItemSelected(item: MenuItem): Boolean {
-        return item.onNavDestinationSelected(navController)
-                || super.onOptionsItemSelected(item)
+    private fun restoreTimerState(menu: Menu?) {
+        val pauseMenuItem = menu?.findItem(R.id.pause_timer)
+
+        if (isTimerRunning) {
+            pauseMenuItem?.setIcon(R.drawable.icon_pause_ticking)
+        } else {
+            pauseMenuItem?.setIcon(R.drawable.icon_pause_start)
+        }
     }
 
     @RequiresApi(Build.VERSION_CODES.M)
-    private fun openReaderSettings(navHostFragment: NavHostFragment) {
+    private fun openReaderSettings() {
         val currentFragment =
             navHostFragment.childFragmentManager.primaryNavigationFragment
 
         if (currentFragment is EpubReaderFragment) {
             currentFragment.setSettingsBottomDialog()
         }
+    }
+
+    override fun onOptionsItemSelected(item: MenuItem): Boolean {
+        return item.onNavDestinationSelected(navController)
+                || super.onOptionsItemSelected(item)
     }
 
     private fun checkPermissionAndOpenPicker() {
@@ -195,13 +242,7 @@ class MainActivity : AppCompatActivity() {
     }
 
     private fun startTimer() {
-        chronometer?.apply {
-            base = when {
-                (pauseOffset > 0) -> SystemClock.elapsedRealtime() - pauseOffset
-                else -> SystemClock.elapsedRealtime()
-            }
-            start()
-        }
+        chronometer?.start()
     }
 
     private fun stopTimer() {
@@ -226,7 +267,6 @@ class MainActivity : AppCompatActivity() {
             isTimerRunning = false
 
             toolbarMenu?.findItem(R.id.pause_timer)?.setIcon(R.drawable.icon_pause_start)
-
             elapsedTime
         } ?: 0L
     }
@@ -258,5 +298,16 @@ class MainActivity : AppCompatActivity() {
             .alpha(1f)
             .setDuration(500)
             .start()
+    }
+
+    override fun onSaveInstanceState(outState: Bundle) {
+        super.onSaveInstanceState(outState)
+        pauseOffset = if (isTimerRunning && chronometer != null) {
+            SystemClock.elapsedRealtime() - chronometer!!.base
+        } else {
+            pauseOffset
+        }
+        outState.putLong("pauseOffset", pauseOffset)
+        outState.putBoolean("isTimerRunning", isTimerRunning)
     }
 }

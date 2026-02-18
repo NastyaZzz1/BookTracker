@@ -17,7 +17,6 @@ import com.nastya.booktracker.R
 import com.nastya.booktracker.data.local.database.BookDatabase
 import com.nastya.booktracker.databinding.FragmentEpubReaderBinding
 import com.nastya.booktracker.domain.model.LocatorDto
-import com.nastya.booktracker.presentation.ui.EpubRepository
 import com.nastya.booktracker.presentation.ui.main.MainActivity
 import kotlinx.coroutines.flow.firstOrNull
 import kotlinx.coroutines.launch
@@ -40,6 +39,53 @@ class EpubReaderFragment : Fragment() {
     private var lastLocator: Locator? = null
     private var percentRead: Int = 0
 
+    private lateinit var bookPath: String
+    private var bookId: Long = 0L
+
+    private val tapListener = object : EpubNavigatorFragment.Listener {
+        override fun onTap(point: PointF): Boolean {
+            val activity = requireActivity() as MainActivity
+            val toolbarAlpha = activity.binding.toolbar.alpha
+            if (toolbarAlpha > 0f) {
+                activity.hideSystemUi()
+            } else {
+                activity.showSystemUi()
+            }
+            return true
+        }
+    }
+
+    override fun onCreate(savedInstanceState: Bundle?) {
+        arguments?.let {
+            bookPath = EpubReaderFragmentArgs.fromBundle(it).bookPath
+            bookId = EpubReaderFragmentArgs.fromBundle(it).bookId
+        }
+        initViewModel()
+
+        viewModel.publication.value?.let { publication ->
+            childFragmentManager.fragmentFactory =
+                EpubNavigatorFragment.createFactory(
+                    publication = publication,
+                    initialLocator = null,
+                    listener = tapListener,
+                    paginationListener = null,
+                    config = EpubNavigatorFragment.Configuration()
+                )
+        }
+        super.onCreate(savedInstanceState)
+    }
+
+    private fun initViewModel() {
+        val application = requireNotNull(this.activity).application
+        val bookDao = BookDatabase.getInstance(application).bookDao
+        val dailyReadingDao = BookDatabase.getInstance(application).dailyReadingDao
+
+        val viewModelFactory = EpubReaderViewModelFactory(bookDao, dailyReadingDao, bookId)
+        viewModel = ViewModelProvider(this, viewModelFactory)[EpubReaderViewModel::class.java]
+
+        viewModel.loadPublication(requireContext(), bookPath)
+    }
+
     override fun onCreateView(
         inflater: LayoutInflater,
         container: ViewGroup?,
@@ -53,29 +99,43 @@ class EpubReaderFragment : Fragment() {
     override fun onViewCreated(view: View, savedInstanceState: Bundle?) {
         super.onViewCreated(view, savedInstanceState)
 
-        val bookPath = EpubReaderFragmentArgs.fromBundle(requireArguments()).bookPath
-        val bookId = EpubReaderFragmentArgs.fromBundle(requireArguments()).bookId
-
-        val application = requireNotNull(this.activity).application
-        val bookDao = BookDatabase.getInstance(application).bookDao
-        val dailyReadingDao = BookDatabase.getInstance(application).dailyReadingDao
-
-        val viewModelFactory = EpubReaderViewModelFactory(bookDao, dailyReadingDao, bookId)
-        viewModel = ViewModelProvider(this, viewModelFactory)[EpubReaderViewModel::class.java]
-
-        lifecycleScope.launch {
-            val epubRepository = EpubRepository(requireContext())
-            val publication = epubRepository.extractMetadata(bookPath)
-
-            val locator = viewModel.book
-                .firstOrNull()
-                ?.locatorJson
-                ?.takeIf { it.isNotEmpty() }
-                ?.let { Gson().fromJson(it, LocatorDto::class.java) }
-                ?.toLocator()
-
-            displayPublication(publication, locator)
+        if(savedInstanceState == null) {
+            observePublication()
+        } else {
+            restoreNavigatorFragment()
         }
+    }
+
+    private fun observePublication() {
+        viewLifecycleOwner.lifecycleScope.launch {
+            viewModel.publication.collect { publication ->
+                if (publication != null && navigatorFragment == null) {
+                    createNewNavigatorFragment(publication)
+                }
+            }
+        }
+    }
+
+    private fun restoreNavigatorFragment() {
+        navigatorFragment =
+            childFragmentManager.findFragmentByTag("EPUB_NAVIGATOR")
+                    as EpubNavigatorFragment
+
+        navigatorFragment?.let { setPrecentRead(it) }
+    }
+
+    private suspend fun createNewNavigatorFragment(publication: Publication) {
+        val initialLocator = getInitialLocator()
+        displayPublication(publication, initialLocator)
+    }
+
+    private suspend fun getInitialLocator(): Locator? {
+        return viewModel.book
+            .firstOrNull()
+            ?.locatorJson
+            ?.takeIf { it.isNotEmpty() }
+            ?.let { Gson().fromJson(it, LocatorDto::class.java) }
+            ?.toLocator()
     }
 
     private fun displayPublication(
@@ -85,18 +145,7 @@ class EpubReaderFragment : Fragment() {
         val fragmentFactory = EpubNavigatorFragment.createFactory(
             publication = publication,
             initialLocator = initialLocator,
-            listener = object : EpubNavigatorFragment.Listener {
-                override fun onTap(point: PointF): Boolean {
-                    val activity = requireActivity() as MainActivity
-                    val toolbarAlpha = activity.binding.toolbar.alpha
-                    if (toolbarAlpha > 0f) {
-                        activity.hideSystemUi()
-                    } else {
-                        activity.showSystemUi()
-                    }
-                    return true
-                }
-            },
+            listener = tapListener,
             paginationListener = null,
             config = EpubNavigatorFragment.Configuration()
         )
@@ -123,7 +172,9 @@ class EpubReaderFragment : Fragment() {
                     if (locator.href == lastHref && percentRead >= 99) 100
                     else percentRead
 
-                binding.percentagesProgress.text = "$percentRead%"
+                if (binding.percentagesProgress.text != "$percentRead%") {
+                    binding.percentagesProgress.text = "$percentRead%"
+                }
                 lastLocator = locator
                 maybeSaveProgress()
             }
@@ -172,12 +223,9 @@ class EpubReaderFragment : Fragment() {
     }
 
     private fun selectButton(selectedBtn: MaterialButton) {
-        themeButtons.forEach {
-            it.isChecked = false
-        }
+        themeButtons.forEach { it.isChecked = false }
         selectedBtn.isChecked = true
     }
-
 
     private fun maybeSaveProgress() {
         val now = System.currentTimeMillis()
@@ -187,20 +235,33 @@ class EpubReaderFragment : Fragment() {
         }
     }
 
-    override fun onDestroyView() {
-        super.onDestroyView()
-        navigatorFragment = null
-        _binding = null
+    override fun onSaveInstanceState(outState: Bundle) {
+        outState.putString("bookPath", bookPath)
+        super.onSaveInstanceState(outState)
+    }
+
+    override fun onViewStateRestored(savedInstanceState: Bundle?) {
+        super.onViewStateRestored(savedInstanceState)
+        if (savedInstanceState != null) {
+            bookPath = savedInstanceState.getString("bookPath") ?: bookPath
+        }
     }
 
     @RequiresApi(Build.VERSION_CODES.O)
-    override fun onStop() {
-        super.onStop()
+    override fun onDestroyView() {
+        super.onDestroyView()
+        _binding = null
+
         viewModel.saveProgressToDb(lastLocator, percentRead)
 
         val elapsedTime = ((requireActivity() as? MainActivity)
             ?.resetTimerFromReader()
             ?: 0L) / 1000
         viewModel.saveReadingTime(elapsedTime)
+    }
+
+    override fun onDestroy() {
+        super.onDestroy()
+        navigatorFragment = null
     }
 }

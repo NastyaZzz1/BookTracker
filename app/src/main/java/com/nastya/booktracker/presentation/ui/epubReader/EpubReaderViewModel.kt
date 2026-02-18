@@ -1,5 +1,6 @@
 package com.nastya.booktracker.presentation.ui.epubReader
 
+import android.content.Context
 import android.os.Build
 import androidx.annotation.RequiresApi
 import androidx.lifecycle.ViewModel
@@ -9,10 +10,14 @@ import com.nastya.booktracker.data.local.dao.BookDao
 import com.nastya.booktracker.data.local.dao.DailyReadingDao
 import com.nastya.booktracker.domain.model.DailyReading
 import com.nastya.booktracker.domain.model.LocatorDto
+import com.nastya.booktracker.presentation.ui.EpubRepository
 import kotlinx.coroutines.Dispatchers
+import kotlinx.coroutines.flow.MutableStateFlow
+import kotlinx.coroutines.flow.StateFlow
 import kotlinx.coroutines.launch
 import kotlinx.coroutines.withContext
 import org.readium.r2.shared.publication.Locator
+import org.readium.r2.shared.publication.Publication
 import java.time.LocalDate
 
 class EpubReaderViewModel(
@@ -20,6 +25,16 @@ class EpubReaderViewModel(
     private val dailyReadingDao: DailyReadingDao,
     private val bookId: Long
 ): ViewModel() {
+    private val _publication = MutableStateFlow<Publication?>(null)
+    val publication: StateFlow<Publication?> = _publication
+
+    fun loadPublication(context: Context, bookPath: String) {
+        viewModelScope.launch {
+            val epubRepository = EpubRepository(context)
+            _publication.value = epubRepository.extractMetadata(bookPath)
+        }
+    }
+
     val book = bookDao.getOneFlow(bookId)
 
     fun saveProgressToDb(

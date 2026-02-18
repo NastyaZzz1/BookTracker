@@ -1,0 +1,102 @@
+<?xml version="1.0" encoding="utf-8"?>
+<navigation xmlns:android="http://schemas.android.com/apk/res/android"
+xmlns:app="http://schemas.android.com/apk/res-auto"
+xmlns:tools="http://schemas.android.com/tools"
+android:id="@+id/nav_graph.xml"
+app:startDestination="@id/booksFragment">
+
+    <fragment
+        android:id="@+id/booksFragment"
+        android:name="com.nastya.booktracker.presentation.ui.bookList.BooksFragment"
+        android:label="Мои книги"
+        tools:layout="@layout/fragment_books" >
+        <action
+            android:id="@+id/action_booksFragment_to_bookDetailFragment"
+            app:destination="@id/bookDetailFragment" />
+        <action
+            android:id="@+id/action_booksFragment_to_calendarFragment"
+            app:destination="@id/calendarFragment" />
+    </fragment>
+
+    <fragment
+        android:id="@+id/calendarFragment"
+        android:name="com.nastya.booktracker.presentation.ui.calendar.CalendarFragment"
+        android:label="Трекер"
+        tools:layout="@layout/fragment_calendar" />
+
+    <fragment
+        android:id="@+id/statFragment"
+        android:name="com.nastya.booktracker.presentation.ui.stat.StatFragment"
+        android:label="Статистика"
+        tools:layout="@layout/fragment_stat" />
+
+    <fragment
+        android:id="@+id/favoriteBooksFragment"
+        android:name="com.nastya.booktracker.presentation.ui.favoriteBook.FavoriteBooksFragment"
+        android:label="Любимые книги"
+        tools:layout="@layout/fragment_favorite_books" >
+        <action
+            android:id="@+id/action_favoriteBooksFragment_to_bookDetailFragment"
+            app:destination="@id/bookDetailFragment" />
+    </fragment>
+
+    <fragment
+        android:id="@+id/editBookFragment"
+        android:name="com.nastya.booktracker.presentation.ui.editBook.EditBookFragment"
+        android:label="Изменение книги"
+        tools:layout="@layout/fragment_edit_book" >
+        <argument
+            android:name="bookId"
+            app:argType="long" />
+        <action
+            android:id="@+id/action_editBookFragment_to_bookDetailFragment"
+            app:destination="@id/bookDetailFragment" />
+    </fragment>
+    <fragment
+        android:id="@+id/bookDetailFragment"
+        android:name="com.nastya.booktracker.presentation.ui.bookDetail.BookDetailFragment"
+        android:label="Детали книги"
+        tools:layout="@layout/fragment_book_detail" >
+        <argument
+            android:name="bookId"
+            app:argType="long" />
+        <action
+            android:id="@+id/action_bookDetailFragment_to_booksFragment"
+            app:destination="@id/booksFragment" />
+        <action
+            android:id="@+id/action_bookDetailFragment_to_editBookFragment"
+            app:destination="@id/editBookFragment" />
+        <action
+            android:id="@+id/action_bookDetailFragment_to_favoriteBooksFragment"
+            app:destination="@id/favoriteBooksFragment" />
+        <action
+            android:id="@+id/action_bookDetailFragment_to_bookNotesFragment"
+            app:destination="@id/bookNotesFragment" />
+        <action
+            android:id="@+id/action_bookDetailFragment_to_epubReaderFragment"
+            app:destination="@id/epubReaderFragment" />
+    </fragment>
+    <fragment
+        android:id="@+id/bookNotesFragment"
+        android:name="com.nastya.booktracker.presentation.ui.bookNotes.BookNotesFragment"
+        android:label="Заметки"
+        tools:layout="@layout/fragment_book_notes" >
+        <action
+            android:id="@+id/action_bookNotesFragment_to_bookDetailFragment"
+            app:destination="@id/bookDetailFragment" />
+    </fragment>
+
+    <fragment
+        android:id="@+id/epubReaderFragment"
+        android:name="com.nastya.booktracker.presentation.ui.epubReader.EpubReaderFragment"
+        android:label=""
+        tools:layout="@layout/fragment_epub_reader" >
+        <argument
+            android:name="bookPath"
+            app:argType="string" />
+        <argument
+            android:name="bookId"
+            app:argType="long" />
+    </fragment>
+
+</navigation>
