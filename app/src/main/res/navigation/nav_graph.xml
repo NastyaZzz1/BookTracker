@@ -69,9 +69,6 @@ app:startDestination="@id/booksFragment">
             android:id="@+id/action_bookDetailFragment_to_favoriteBooksFragment"
             app:destination="@id/favoriteBooksFragment" />
         <action
-            android:id="@+id/action_bookDetailFragment_to_bookNotesFragment"
-            app:destination="@id/bookNotesFragment" />
-        <action
             android:id="@+id/action_bookDetailFragment_to_epubReaderFragment"
             app:destination="@id/epubReaderFragment" />
     </fragment>
@@ -80,9 +77,9 @@ app:startDestination="@id/booksFragment">
         android:name="com.nastya.booktracker.presentation.ui.bookNotes.BookNotesFragment"
         android:label="Заметки"
         tools:layout="@layout/fragment_book_notes" >
-        <action
-            android:id="@+id/action_bookNotesFragment_to_bookDetailFragment"
-            app:destination="@id/bookDetailFragment" />
+        <argument
+            android:name="bookId"
+            app:argType="long" />
     </fragment>
 
     <fragment
@@ -96,6 +93,10 @@ app:startDestination="@id/booksFragment">
         <argument
             android:name="bookId"
             app:argType="long" />
+        <action
+            android:id="@+id/action_to_notes_fragment"
+            app:destination="@id/bookNotesFragment"
+            app:popUpTo="@id/epubReaderFragment"
+            app:popUpToInclusive="false" />
     </fragment>
-
 </navigation>

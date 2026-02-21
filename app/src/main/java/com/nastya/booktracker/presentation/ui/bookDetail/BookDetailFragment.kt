@@ -38,14 +38,13 @@ class BookDetailFragment : Fragment() {
         val bookId = BookDetailFragmentArgs.fromBundle(requireArguments()).bookId
 
         val application = requireNotNull(this.activity).application
-        val dao = BookDatabase.Companion.getInstance(application).bookDao
+        val dao = BookDatabase.getInstance(application).bookDao
         val viewModelFactory = BookDetailViewModelFactory(bookId, dao)
         viewModel = ViewModelProvider(this, viewModelFactory)[BookDetailViewModel::class.java]
 
         bookItemObserver()
         setupFavButton()
         setupChangeButton(bookId)
-        setupNotesButton()
         setupDeleteButton()
         setupReadButton(bookId)
 
@@ -67,14 +66,6 @@ class BookDetailFragment : Fragment() {
     private fun setupDeleteButton() {
         binding.deleteButton.setOnClickListener {
             viewModel.showDeleteConfirmationDialog(requireContext())
-        }
-    }
-
-    private fun setupNotesButton() {
-        binding.notesBtn.setOnClickListener {
-            findNavController().navigate(
-                R.id.action_bookDetailFragment_to_bookNotesFragment
-            )
         }
     }
 

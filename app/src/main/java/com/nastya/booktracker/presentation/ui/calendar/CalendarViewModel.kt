@@ -18,7 +18,10 @@ import androidx.core.content.edit
 import androidx.core.widget.addTextChangedListener
 import kotlin.String
 
-class CalendarViewModel(private val dailyReadingDao: DailyReadingDao, val context: Context) : ViewModel() {
+class CalendarViewModel(
+    private val dailyReadingDao: DailyReadingDao,
+    val context: Context
+): ViewModel() {
     private val _dailyGoal = MutableLiveData<Int>()
     val dailyGoal: LiveData<Int> = _dailyGoal
     private val _monthlyGoal = MutableLiveData<Int>()

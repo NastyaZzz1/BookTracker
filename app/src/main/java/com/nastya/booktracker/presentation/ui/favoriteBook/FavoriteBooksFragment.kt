@@ -29,11 +29,9 @@ class FavoriteBooksFragment : Fragment() {
 
     override fun onViewCreated(view: View, savedInstanceState: Bundle?) {
         val application = requireNotNull(this.activity).application
-        val dao = BookDatabase.Companion.getInstance(application).bookDao
+        val dao = BookDatabase.getInstance(application).bookDao
         val viewModelFactory = FavoriteBooksViewModelFactory(dao)
-        viewModel = ViewModelProvider(
-            this, viewModelFactory
-        )[FavoriteBooksViewModel::class.java]
+        viewModel = ViewModelProvider(this, viewModelFactory)[FavoriteBooksViewModel::class.java]
 
         val adapter = BookItemAdapter(
             onItemClick = { bookId ->

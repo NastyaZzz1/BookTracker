@@ -7,7 +7,6 @@ import com.google.android.material.dialog.MaterialAlertDialogBuilder
 import com.nastya.booktracker.data.local.dao.BookDao
 import com.nastya.booktracker.domain.model.Book
 import com.nastya.booktracker.presentation.ui.BookFileManager
-import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.channels.BufferOverflow
 import kotlinx.coroutines.flow.MutableSharedFlow
 import kotlinx.coroutines.flow.MutableStateFlow

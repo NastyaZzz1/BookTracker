@@ -27,9 +27,20 @@
     <string name="book_page_add_hint">Количество страниц</string>
     <string name="change_goal">Изменить цели</string>
     <string name="change">Изменить</string>
+
     <string name="white">Белый</string>
     <string name="sepia">Сепия</string>
-    <string name="grey">Серый</string>
     <string name="black">Черный</string>
+
     <string name="zero_time">00:00</string>
+
+    <string name="yellow">Yellow</string>
+    <string name="green">Green</string>
+    <string name="blue">Blue</string>
+    <string name="red">Red</string>
+    <string name="purple">Purple</string>
+    <string name="add_an_annotation">Add an annotation</string>
+    <string name="delete_highlight_or_annotation">Delete highlight or annotation</string>
+
+
 </resources>

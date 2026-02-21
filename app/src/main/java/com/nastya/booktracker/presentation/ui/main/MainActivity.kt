@@ -140,8 +140,28 @@ class MainActivity : AppCompatActivity() {
                     toggleTimer(item)
                     true
                 }
+                R.id.bookNotesFragment -> {
+                    openNotesScreen()
+                    true
+                }
                 else -> NavigationUI.onNavDestinationSelected(item, navController)
             }
+        }
+    }
+
+    private fun openNotesScreen() {
+        val currentFragment = supportFragmentManager
+            .findFragmentById(R.id.cvFragment)
+            ?.childFragmentManager
+            ?.fragments
+            ?.firstOrNull()
+        if (currentFragment is EpubReaderFragment) {
+            val bookId = currentFragment.getBookId()
+
+            val bundle = Bundle().apply {
+                putLong("bookId", bookId)
+            }
+            navController.navigate(R.id.bookNotesFragment, bundle)
         }
     }
 
@@ -163,6 +183,7 @@ class MainActivity : AppCompatActivity() {
                 toolbarMenu?.findItem(R.id.settingsDialog)?.isVisible = true
                 toolbarMenu?.findItem(R.id.pause_timer)?.isVisible = true
                 toolbarMenu?.findItem(R.id.timer_layout)?.isVisible = true
+                toolbarMenu?.findItem(R.id.bookNotesFragment)?.isVisible = true
                 toolbarMenu?.findItem(R.id.favoriteBooksFragment)?.isVisible = false
                 toolbarMenu?.findItem(R.id.addBookEpub)?.isVisible = false
                 binding.toolbar.doOnPreDraw { hideSystemUi() }
@@ -172,6 +193,7 @@ class MainActivity : AppCompatActivity() {
                 toolbarMenu?.findItem(R.id.settingsDialog)?.isVisible = false
                 toolbarMenu?.findItem(R.id.pause_timer)?.isVisible = false
                 toolbarMenu?.findItem(R.id.timer_layout)?.isVisible = false
+                toolbarMenu?.findItem(R.id.bookNotesFragment)?.isVisible = false
                 toolbarMenu?.findItem(R.id.favoriteBooksFragment)?.isVisible = true
                 toolbarMenu?.findItem(R.id.addBookEpub)?.isVisible = true
                 showSystemUi()

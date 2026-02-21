@@ -41,7 +41,7 @@ class EditBookFragment : Fragment() {
         val bookId = EditBookFragmentArgs.fromBundle(requireArguments()).bookId
 
         val application = requireNotNull(this.activity).application
-        val bookDao = BookDatabase.Companion.getInstance(application).bookDao
+        val bookDao = BookDatabase.getInstance(application).bookDao
         val viewModelFactory = EditBookViewModelFactory(bookId, bookDao)
         viewModel = ViewModelProvider(this, viewModelFactory)[EditBookViewModel::class.java]
 

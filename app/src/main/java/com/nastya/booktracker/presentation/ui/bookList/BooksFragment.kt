@@ -31,7 +31,7 @@ class BooksFragment : Fragment() {
 
     override fun onViewCreated(view: View, savedInstanceState: Bundle?) {
         val application = requireNotNull(this.activity).application
-        val dao = BookDatabase.Companion.getInstance(application).bookDao
+        val dao = BookDatabase.getInstance(application).bookDao
         val viewModelFactory = BookViewModelFactory(dao)
         viewModel = ViewModelProvider(this, viewModelFactory)[BooksViewModel::class.java]
 

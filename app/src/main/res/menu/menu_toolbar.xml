@@ -25,4 +25,9 @@
         android:title="settings_book"
         android:icon="@drawable/icon_pencil"
         app:showAsAction="always" />
+
+    <item android:id="@+id/bookNotesFragment"
+        android:title="book_notes"
+        android:icon="@drawable/icon_notes"
+        app:showAsAction="always" />
 </menu>

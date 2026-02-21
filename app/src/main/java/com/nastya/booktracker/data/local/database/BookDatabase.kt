@@ -9,9 +9,11 @@ import com.nastya.booktracker.domain.model.Book
 import com.nastya.booktracker.domain.model.DailyReading
 import com.nastya.booktracker.data.local.dao.DailyReadingDao
 import com.nastya.booktracker.data.local.dao.BookDao
+import com.nastya.booktracker.data.local.dao.HighlightDao
+import com.nastya.booktracker.domain.model.Highlight
 
 @Database(
-    entities = [Book::class, DailyReading::class],
+    entities = [Book::class, DailyReading::class, Highlight::class],
     version = 1,
     exportSchema = false
 )
@@ -19,6 +21,7 @@ import com.nastya.booktracker.data.local.dao.BookDao
 abstract class BookDatabase : RoomDatabase()  {
     abstract val bookDao: BookDao
     abstract val dailyReadingDao: DailyReadingDao
+    abstract val highlightDao: HighlightDao
 
     companion object {
         @Volatile

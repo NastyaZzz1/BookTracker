@@ -6,16 +6,26 @@ data class LocatorDto(
     val href: String,
     val type: String?,
     val progression: Double?,
-    val totalProgression: Double?
+    val totalProgression: Double?,
+    val position: Int?,
+    val text: TextDto?
 ) {
+    data class TextDto(
+        val highlight: String
+    )
+
     fun toLocator(): Locator {
         return Locator(
             href = href,
             type = type ?: "application/xhtml+xml",
             locations = Locator.Locations(
                 progression = progression,
-                totalProgression = totalProgression
-            )
+                totalProgression = totalProgression,
+                position = position,
+            ),
+            text = text?.let {
+                Locator.Text(highlight = it.highlight)
+            } ?: Locator.Text()
         )
     }
 
@@ -25,7 +35,11 @@ data class LocatorDto(
                 href = locator.href,
                 type = locator.type,
                 progression = locator.locations.progression,
-                totalProgression = locator.locations.totalProgression
+                totalProgression = locator.locations.totalProgression,
+                position = locator.locations.position,
+                text = locator.text.let {
+                    it.highlight?.let { highlight -> TextDto(highlight = highlight) }
+                }
             )
         }
     }

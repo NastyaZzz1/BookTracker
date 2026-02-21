@@ -14,9 +14,7 @@ class EpubRepository(
     suspend fun extractMetadata(filePath: String): Publication {
         val streamer = Streamer(context.applicationContext)
         val asset = FileAsset(File(filePath))
-        val result = streamer.open(asset, allowUserInteraction = false)
-
-        return when (result) {
+        return when (val result = streamer.open(asset, allowUserInteraction = false)) {
             is Try.Success -> when (val value = result.value) {
                 is Publication -> value
                 is PubBox -> value.publication

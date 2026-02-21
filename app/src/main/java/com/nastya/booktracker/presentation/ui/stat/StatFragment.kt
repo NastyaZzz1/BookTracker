@@ -12,11 +12,8 @@ import com.github.mikephil.charting.components.AxisBase
 import com.github.mikephil.charting.components.XAxis
 import com.github.mikephil.charting.data.BarData
 import com.github.mikephil.charting.data.BarDataSet
-import com.github.mikephil.charting.data.BarEntry
 import com.github.mikephil.charting.formatter.ValueFormatter
 import com.nastya.booktracker.R
-import com.nastya.booktracker.presentation.ui.stat.StatViewModel
-import com.nastya.booktracker.presentation.ui.stat.StatViewModelFactory
 import com.nastya.booktracker.data.local.database.BookDatabase
 import com.nastya.booktracker.databinding.FragmentStatBinding
 import java.text.SimpleDateFormat
@@ -30,7 +27,6 @@ class StatFragment : Fragment() {
     private val binding get() = _binding!!
     private lateinit var barData: BarData
     private lateinit var barDataSet: BarDataSet
-    private lateinit var barEntriesList: ArrayList<BarEntry>
     private lateinit var viewModel: StatViewModel
 
     override fun onCreateView(
@@ -41,7 +37,7 @@ class StatFragment : Fragment() {
         val view = binding.root
 
         val application = requireNotNull(this.activity).application
-        val dailyReadingDao = BookDatabase.Companion.getInstance(application).dailyReadingDao
+        val dailyReadingDao = BookDatabase.getInstance(application).dailyReadingDao
 
         val viewModelFactory = StatViewModelFactory(dailyReadingDao)
         val viewModel = ViewModelProvider(this, viewModelFactory)[StatViewModel::class.java]
