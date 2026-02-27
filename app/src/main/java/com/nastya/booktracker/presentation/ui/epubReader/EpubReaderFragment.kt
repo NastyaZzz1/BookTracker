@@ -1,33 +1,27 @@
 package com.nastya.booktracker.presentation.ui.epubReader
 
-import android.graphics.Color
 import android.graphics.PointF
-import android.graphics.RectF
 import android.os.Build
 import android.os.Bundle
-import android.util.Log
 import android.view.ActionMode
-import android.view.Gravity
 import android.view.LayoutInflater
 import android.view.Menu
 import android.view.MenuItem
 import android.view.View
 import android.view.ViewGroup
-import android.widget.LinearLayout
-import android.widget.PopupWindow
-import androidx.annotation.ColorInt
 import androidx.annotation.RequiresApi
 import androidx.fragment.app.Fragment
 import androidx.lifecycle.ViewModelProvider
 import androidx.lifecycle.lifecycleScope
-import com.google.android.material.bottomsheet.BottomSheetDialog
-import com.google.android.material.button.MaterialButton
 import com.google.gson.Gson
+import com.nastya.booktracker.presentation.ui.HighlightsManager
+import com.nastya.booktracker.presentation.ui.NotesManager
 import com.nastya.booktracker.R
 import com.nastya.booktracker.data.local.database.BookDatabase
 import com.nastya.booktracker.databinding.FragmentEpubReaderBinding
 import com.nastya.booktracker.domain.model.Highlight
 import com.nastya.booktracker.domain.model.LocatorDto
+import com.nastya.booktracker.presentation.ui.ThemeManager
 import com.nastya.booktracker.presentation.ui.main.MainActivity
 import kotlinx.coroutines.delay
 import kotlinx.coroutines.flow.firstOrNull
@@ -37,8 +31,6 @@ import org.readium.r2.navigator.Decoration
 import org.readium.r2.navigator.ExperimentalDecorator
 import org.readium.r2.navigator.SelectableNavigator
 import org.readium.r2.navigator.epub.EpubNavigatorFragment
-import org.readium.r2.navigator.epub.EpubPreferences
-import org.readium.r2.navigator.preferences.Theme
 import org.readium.r2.navigator.util.BaseActionModeCallback
 import org.readium.r2.shared.ExperimentalReadiumApi
 import org.readium.r2.shared.publication.Locator
@@ -51,7 +43,11 @@ class EpubReaderFragment : Fragment() {
     private val binding get() = _binding!!
     private lateinit var viewModel: EpubReaderViewModel
     private var navigatorFragment: EpubNavigatorFragment? = null
-    private lateinit var themeButtons: List<MaterialButton>
+
+    private lateinit var highlightsManager: HighlightsManager
+    private lateinit var notesManager: NotesManager
+    private lateinit var themeManager: ThemeManager
+
     private val decorationListener by lazy { DecorationListener() }
 
     private val saveInternalMs = 3000L
@@ -83,20 +79,17 @@ class EpubReaderFragment : Fragment() {
             bookId = EpubReaderFragmentArgs.fromBundle(it).bookId
         }
         initViewModel()
-
-        Log.d("epub", "$bookId")
-
         viewModel.publication.value?.let { publication ->
             childFragmentManager.fragmentFactory =
                 EpubNavigatorFragment.createFactory(
-                    publication = publication,
-                    initialLocator = null,
-                    listener = tapListener,
-                    paginationListener = null,
-                    config = EpubNavigatorFragment.Configuration(
-                        selectionActionModeCallback = SelectionActionModeCallback()
-                    )
+                publication = publication,
+                initialLocator = null,
+                listener = tapListener,
+                paginationListener = null,
+                config = EpubNavigatorFragment.Configuration(
+                    selectionActionModeCallback = SelectionActionModeCallback()
                 )
+            )
         }
         super.onCreate(savedInstanceState)
     }
@@ -125,7 +118,33 @@ class EpubReaderFragment : Fragment() {
 
     override fun onViewCreated(view: View, savedInstanceState: Bundle?) {
         super.onViewCreated(view, savedInstanceState)
+        setupObservers(savedInstanceState)
+        initManagers()
+    }
 
+    private fun initManagers() {
+        highlightsManager = HighlightsManager(
+            viewModel = viewModel,
+            lifecycleScope = viewLifecycleOwner.lifecycleScope,
+            navigatorFragment = { navigatorFragment },
+            showAnnotationPopup = { highlight ->
+                lifecycleScope.launch {
+                    notesManager.showAnnotationPopup(highlight)
+                }
+            }
+        )
+
+        notesManager = NotesManager(
+            viewModel = viewModel,
+            context = requireContext(),
+            inflater = layoutInflater,
+            navigatorFragment = { navigatorFragment as? SelectableNavigator }
+        )
+
+        themeManager = ThemeManager { navigatorFragment }
+    }
+
+    private fun setupObservers(savedInstanceState: Bundle?) {
         if(savedInstanceState == null) {
             observePublication()
         } else {
@@ -137,9 +156,7 @@ class EpubReaderFragment : Fragment() {
     private fun observeDecoration() {
         viewLifecycleOwner.lifecycleScope.launch {
             viewModel.highlightDecorations.collect { decorations ->
-                while (navigatorFragment == null) {
-                    delay(100)
-                }
+                while (navigatorFragment == null) { delay(100) }
                 (navigatorFragment as? DecorableNavigator)?.apply {
                     applyDecorations(decorations, "highlights")
                     addDecorationListener("highlights", decorationListener)
@@ -162,7 +179,6 @@ class EpubReaderFragment : Fragment() {
         navigatorFragment =
             childFragmentManager.findFragmentByTag("EPUB_NAVIGATOR")
                     as EpubNavigatorFragment
-
         navigatorFragment?.let { setPrecentRead(it) }
     }
 
@@ -172,19 +188,14 @@ class EpubReaderFragment : Fragment() {
     }
 
     private suspend fun getInitialLocator(): Locator? {
-        return viewModel.book
-            .firstOrNull()
-            ?.locatorJson
+        return viewModel.book.firstOrNull()?.locatorJson
             ?.takeIf { it.isNotEmpty() }
             ?.let { Gson().fromJson(it, LocatorDto::class.java) }
             ?.toLocator()
     }
 
-    private fun displayPublication(
-        publication: Publication,
-        initialLocator: Locator?
-    ) {
-        val fragmentFactory = EpubNavigatorFragment.createFactory(
+    private fun displayPublication(publication: Publication, initialLocator: Locator?) {
+        childFragmentManager.fragmentFactory = EpubNavigatorFragment.createFactory(
             publication = publication,
             initialLocator = initialLocator,
             listener = tapListener,
@@ -194,8 +205,6 @@ class EpubReaderFragment : Fragment() {
             )
         )
 
-        childFragmentManager.fragmentFactory = fragmentFactory
-
         childFragmentManager.beginTransaction()
             .replace(R.id.reader_container, EpubNavigatorFragment::class.java, null, "EPUB_NAVIGATOR")
             .commitNow()
@@ -203,7 +212,6 @@ class EpubReaderFragment : Fragment() {
         navigatorFragment =
             childFragmentManager.findFragmentByTag("EPUB_NAVIGATOR")
                     as EpubNavigatorFragment
-
         navigatorFragment?.let { setPrecentRead(it) }
     }
 
@@ -225,61 +233,9 @@ class EpubReaderFragment : Fragment() {
         }
     }
 
-    @RequiresApi(Build.VERSION_CODES.M)
-    fun setSettingsBottomDialog() {
-        val viewDialog = layoutInflater.inflate(R.layout.settings_bottom_sheet_dialog, null)
-        val dialog = BottomSheetDialog(requireContext())
+    // ==================== CALLBACKS ====================
 
-        setStyleButtons(viewDialog)
-        dialog.setCancelable(true)
-        dialog.setCanceledOnTouchOutside(true)
-        dialog.setContentView(viewDialog)
-        dialog.show()
-    }
-
-    @RequiresApi(Build.VERSION_CODES.M)
-    private fun setStyleButtons(viewDialog: View) {
-        val whiteBtn = viewDialog.findViewById<MaterialButton>(R.id.white_style)
-        val sepiaBtn = viewDialog.findViewById<MaterialButton>(R.id.sepia_style)
-        val blackBtn = viewDialog.findViewById<MaterialButton>(R.id.black_style)
-
-        themeButtons = listOf(whiteBtn, sepiaBtn, blackBtn)
-
-        whiteBtn.setOnClickListener {
-            viewDialog.setBackgroundColor(requireContext().getColor(R.color.white))
-            selectButton(whiteBtn)
-            applyTheme(Theme.LIGHT)
-        }
-        sepiaBtn.setOnClickListener {
-            viewDialog.setBackgroundColor(requireContext().getColor(R.color.sepia))
-            selectButton(sepiaBtn)
-            applyTheme(Theme.SEPIA)
-        }
-        blackBtn.setOnClickListener {
-            viewDialog.setBackgroundColor(requireContext().getColor(R.color.black))
-            selectButton(blackBtn)
-            applyTheme(Theme.DARK)
-        }
-    }
-
-    private fun applyTheme(theme: Theme) {
-        navigatorFragment?.submitPreferences(EpubPreferences(theme = theme))
-    }
-
-    private fun selectButton(selectedBtn: MaterialButton) {
-        themeButtons.forEach { it.isChecked = false }
-        selectedBtn.isChecked = true
-    }
-
-    private fun maybeSaveProgress() {
-        val now = System.currentTimeMillis()
-        if (now - lastSavedAt > saveInternalMs) {
-            viewModel.saveProgressToDb(lastLocator, percentRead)
-            lastSavedAt = now
-        }
-    }
-
-    private inner class SelectionActionModeCallback : BaseActionModeCallback() {
+    private inner class SelectionActionModeCallback() : BaseActionModeCallback() {
         override fun onCreateActionMode(mode: ActionMode, menu: Menu): Boolean {
             mode.menuInflater.inflate(R.menu.menu_action_mode, menu)
             if (navigatorFragment is DecorableNavigator) {
@@ -291,124 +247,15 @@ class EpubReaderFragment : Fragment() {
 
         override fun onActionItemClicked(mode: ActionMode, item: MenuItem): Boolean {
             when (item.itemId) {
-                R.id.quote_highlighting -> showHighlightPopupWithStyle(Highlight.Style.HIGHLIGHT)
-                R.id.note_underline -> showHighlightPopupWithStyle(Highlight.Style.UNDERLINE)
+                R.id.quote_highlighting ->
+                    this@EpubReaderFragment.highlightsManager.showHighlightPopupWithStyle(Highlight.Style.HIGHLIGHT)
+                R.id.note_underline ->
+                    this@EpubReaderFragment.highlightsManager.showHighlightPopupWithStyle(Highlight.Style.UNDERLINE)
                 else -> return false
             }
             mode.finish()
             return true
         }
-    }
-
-    private fun showAnnotationPopup() {
-
-    }
-
-    private fun showHighlightPopupWithStyle(style: Highlight.Style) {
-        viewLifecycleOwner.lifecycleScope.launch {
-            (navigatorFragment as? SelectableNavigator)?.currentSelection()?.rect?.let { selectionRect ->
-                showHighlightPopup(selectionRect, style)
-            }
-        }
-    }
-
-    private var popupWindow: PopupWindow? = null
-    private var mode: ActionMode? = null
-
-    private val highlightTints = mapOf(
-        R.id.red to Color.rgb(247, 124, 124),
-        R.id.green to Color.rgb(173, 247, 123),
-        R.id.blue to Color.rgb(124, 198, 247),
-        R.id.yellow to Color.rgb(249, 239, 125),
-        R.id.purple to Color.rgb(182, 153, 255)
-    )
-
-    private fun showHighlightPopup(rect: RectF, style: Highlight.Style, highlightId: Long? = null) {
-        viewLifecycleOwner.lifecycleScope.launch {
-            if (popupWindow?.isShowing == true) return@launch
-
-            val popupView = layoutInflater.inflate(
-                R.layout.view_action_mode,
-                null,
-                false
-            )
-            popupView.measure(
-                View.MeasureSpec.makeMeasureSpec(0, View.MeasureSpec.UNSPECIFIED),
-                View.MeasureSpec.makeMeasureSpec(0, View.MeasureSpec.UNSPECIFIED)
-            )
-
-            popupWindow = PopupWindow(
-                popupView,
-                LinearLayout.LayoutParams.WRAP_CONTENT,
-                LinearLayout.LayoutParams.WRAP_CONTENT
-            ).apply {
-                isFocusable = true
-            }
-
-            val x = rect.left
-            val y = rect.top
-            popupWindow?.showAtLocation(popupView, Gravity.NO_GRAVITY, x.toInt(), y.toInt())
-
-            popupView.run {
-                findViewById<View>(R.id.notch).run {
-                    setX(rect.left * 2)
-                }
-
-                fun selectTint(view: View) {
-                    val tint = highlightTints[view.id] ?: return
-
-                    viewLifecycleOwner.lifecycleScope.launch {
-                        selectHighlightTint(highlightId, style, tint)
-                    }
-                }
-
-                findViewById<View>(R.id.red).setOnClickListener(::selectTint)
-                findViewById<View>(R.id.green).setOnClickListener(::selectTint)
-                findViewById<View>(R.id.blue).setOnClickListener(::selectTint)
-                findViewById<View>(R.id.yellow).setOnClickListener(::selectTint)
-                findViewById<View>(R.id.purple).setOnClickListener(::selectTint)
-
-                findViewById<View>(R.id.annotation).setOnClickListener {
-                    popupWindow?.dismiss()
-                    showAnnotationPopup()
-                }
-
-                val highlight = highlightId?.let {
-                    viewModel.getHighlightById(it)
-                }
-
-                findViewById<View>(R.id.del).run {
-                    visibility = if (highlight != null) View.VISIBLE else View.GONE
-
-                    setOnClickListener {
-                        highlightId?.let {
-                            viewModel.deleteHighlight(it)
-                        }
-                        popupWindow?.dismiss()
-                        mode?.finish()
-                    }
-                }
-            }
-        }
-    }
-
-    private suspend fun selectHighlightTint(
-        highlightId: Long? = null,
-        style: Highlight.Style,
-        @ColorInt tint: Int,
-    ) {
-        if (highlightId != null) {
-            viewModel.updateHighlightStyle(highlightId, style, tint)
-        } else {
-            (navigatorFragment as? SelectableNavigator)?.let { navigator ->
-                navigator.currentSelection()?.let { selection ->
-                    viewModel.addHighlight(style, tint, selection.locator)
-                }
-                navigator.clearSelection()
-            }
-        }
-        popupWindow?.dismiss()
-        mode?.finish()
     }
 
     private inner class DecorationListener : DecorableNavigator.Listener {
@@ -423,7 +270,7 @@ class EpubReaderFragment : Fragment() {
                         else -> null
                     }
                     style?.let {
-                        showHighlightPopup(rect, it, highlightId)
+                        highlightsManager.showHighlightPopup(rect, it, highlightId)
                     }
                 }
             }
@@ -431,25 +278,18 @@ class EpubReaderFragment : Fragment() {
         }
     }
 
+    @RequiresApi(Build.VERSION_CODES.M)
+    fun setSettingsBottomDialog() {
+        themeManager.showThemeDialog(layoutInflater, requireContext())
+    }
 
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
+    private fun maybeSaveProgress() {
+        val now = System.currentTimeMillis()
+        if (now - lastSavedAt > saveInternalMs) {
+            viewModel.saveProgressToDb(lastLocator, percentRead)
+            lastSavedAt = now
+        }
+    }
 
     override fun onViewStateRestored(savedInstanceState: Bundle?) {
         super.onViewStateRestored(savedInstanceState)

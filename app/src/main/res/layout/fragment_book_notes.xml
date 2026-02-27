@@ -9,6 +9,56 @@
     android:paddingBottom="60dp"
     tools:context=".presentation.ui.bookNotes.BookNotesFragment">
 
+    <com.google.android.material.button.MaterialButtonToggleGroup
+        android:id="@+id/toggleGroup"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        app:singleSelection="true"
+        app:selectionRequired="true"
+        android:paddingHorizontal="12dp"
+        android:paddingTop="5dp"
+        app:layout_constraintStart_toStartOf="parent"
+        app:layout_constraintEnd_toEndOf="parent"
+        app:layout_constraintTop_toTopOf="parent"
+        app:checkedButton="@id/btnAll">
+
+        <com.google.android.material.button.MaterialButton
+            android:id="@+id/btnAll"
+            style="@style/Widget.Material3.Button.OutlinedButton"
+            android:textColor="@color/white"
+            app:strokeColor="@color/selector_toggle_background"
+            android:backgroundTint="@color/selector_toggle_background"
+            android:layout_width="0dp"
+            android:layout_weight="1"
+            android:insetBottom="0dp"
+            android:layout_height="38dp"
+            android:text="Все" />
+
+        <com.google.android.material.button.MaterialButton
+            android:id="@+id/btnQuotes"
+            style="@style/Widget.Material3.Button.OutlinedButton"
+            android:textColor="@color/white"
+            app:strokeColor="@color/selector_toggle_background"
+            android:backgroundTint="@color/selector_toggle_background"
+            android:layout_width="0dp"
+            android:layout_weight="1"
+            android:insetBottom="0dp"
+            android:layout_height="38dp"
+            android:text="@string/quotes" />
+
+        <com.google.android.material.button.MaterialButton
+            android:id="@+id/btnNotes"
+            style="@style/Widget.Material3.Button.OutlinedButton"
+            android:textColor="@color/white"
+            app:strokeColor="@color/selector_toggle_background"
+            android:backgroundTint="@color/selector_toggle_background"
+            android:layout_width="0dp"
+            android:layout_weight="1"
+            android:insetBottom="0dp"
+            android:layout_height="38dp"
+            android:text="@string/notes" />
+    </com.google.android.material.button.MaterialButtonToggleGroup>
+
     <androidx.recyclerview.widget.RecyclerView
         android:id="@+id/notes_list"
         android:layout_width="match_parent"
@@ -18,11 +68,12 @@
         android:clipToPadding="false"
         android:elevation="1dp"
         android:paddingHorizontal="8dp"
+        android:paddingTop="5dp"
         app:layoutManager="androidx.recyclerview.widget.GridLayoutManager"
         app:layout_constraintBottom_toBottomOf="parent"
         app:layout_constraintEnd_toEndOf="parent"
         app:layout_constraintStart_toStartOf="parent"
-        app:layout_constraintTop_toTopOf="parent"
+        app:layout_constraintTop_toBottomOf="@+id/toggleGroup"
         app:layout_constraintHorizontal_bias="0.0"
         app:layout_constraintVertical_bias="0.0" />
 </androidx.constraintlayout.widget.ConstraintLayout>

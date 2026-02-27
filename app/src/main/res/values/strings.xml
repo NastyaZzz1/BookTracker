@@ -42,5 +42,7 @@
     <string name="add_an_annotation">Add an annotation</string>
     <string name="delete_highlight_or_annotation">Delete highlight or annotation</string>
 
-
+    <string name="quotes">Цитаты</string>
+    <string name="notes">Заметки</string>
+    <string name="create_notes">Ваша заметка</string>
 </resources>

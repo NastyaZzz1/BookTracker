@@ -84,13 +84,13 @@ class BooksFragment : Fragment() {
     }
 
     private fun setupFilterButtons() {
-        binding.allBooksBtn.setOnClickListener { filterProducts("all") }
-        binding.wantBooksBtn.setOnClickListener { filterProducts("want") }
-        binding.readingBooksBtn.setOnClickListener { filterProducts("reading") }
-        binding.pastBooksBtn.setOnClickListener { filterProducts("past") }
+        binding.allBooksBtn.setOnClickListener { filterBooks("all") }
+        binding.wantBooksBtn.setOnClickListener { filterBooks("want") }
+        binding.readingBooksBtn.setOnClickListener { filterBooks("reading") }
+        binding.pastBooksBtn.setOnClickListener { filterBooks("past") }
     }
 
-    private fun filterProducts(category: String) {
+    private fun filterBooks(category: String) {
         viewModel.filterByCategory(category)
         updateButtonStates(category)
     }

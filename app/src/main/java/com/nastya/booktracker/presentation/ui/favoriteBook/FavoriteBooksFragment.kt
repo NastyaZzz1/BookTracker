@@ -23,15 +23,11 @@ class FavoriteBooksFragment : Fragment() {
     ): View {
         _binding = FragmentFavoriteBooksBinding.inflate(inflater, container, false)
         val view = binding.root
-
         return view
     }
 
     override fun onViewCreated(view: View, savedInstanceState: Bundle?) {
-        val application = requireNotNull(this.activity).application
-        val dao = BookDatabase.getInstance(application).bookDao
-        val viewModelFactory = FavoriteBooksViewModelFactory(dao)
-        viewModel = ViewModelProvider(this, viewModelFactory)[FavoriteBooksViewModel::class.java]
+        initViewModel()
 
         val adapter = BookItemAdapter(
             onItemClick = { bookId ->
@@ -52,6 +48,13 @@ class FavoriteBooksFragment : Fragment() {
         })
 
         navigateToBookObserve()
+    }
+
+    private fun initViewModel() {
+        val application = requireNotNull(this.activity).application
+        val dao = BookDatabase.getInstance(application).bookDao
+        val viewModelFactory = FavoriteBooksViewModelFactory(dao)
+        viewModel = ViewModelProvider(this, viewModelFactory)[FavoriteBooksViewModel::class.java]
     }
 
     private fun navigateToBookObserve() {

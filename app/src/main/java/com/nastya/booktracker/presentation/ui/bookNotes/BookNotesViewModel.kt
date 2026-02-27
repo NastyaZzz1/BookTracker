@@ -5,23 +5,35 @@ import androidx.lifecycle.viewModelScope
 import com.nastya.booktracker.data.local.dao.HighlightDao
 import com.nastya.booktracker.domain.model.Highlight
 import kotlinx.coroutines.flow.MutableStateFlow
+import kotlinx.coroutines.flow.SharingStarted
 import kotlinx.coroutines.flow.StateFlow
-import kotlinx.coroutines.flow.asStateFlow
-import kotlinx.coroutines.launch
+import kotlinx.coroutines.flow.combine
+import kotlinx.coroutines.flow.stateIn
 
 class BookNotesViewModel(
-    val highlightDao: HighlightDao
+    val highlightDao: HighlightDao,
+    bookId: Long
 ): ViewModel() {
-    private val _highlights = MutableStateFlow<List<Highlight>>(emptyList())
-    val highlights: StateFlow<List<Highlight>> = _highlights.asStateFlow()
+    private val selectedCategory = MutableStateFlow<Highlight.Style?>(null)
 
-    fun loadNotesForBook(bookId: Long) {
-        viewModelScope.launch {
-            highlightDao.getHighlightsForBookFlow(bookId)
-                .collect { highlights ->
-                    _highlights.value = highlights
+    val filteredHighlights: StateFlow<List<Highlight>> = combine(
+            highlightDao.getHighlightsForBookFlow(bookId),
+            selectedCategory
+        ) { allHighlights, category ->
+
+            var result = if (category == null) {
+                allHighlights
+            } else {
+                allHighlights.filter { it.style == category }
             }
-        }
-    }
+            result
+        }.stateIn(
+            scope = viewModelScope,
+            started = SharingStarted.WhileSubscribed(5000),
+            initialValue = emptyList()
+        )
 
+    fun filterByCategory(category: Highlight.Style?) {
+        selectedCategory.value = category
+    }
 }

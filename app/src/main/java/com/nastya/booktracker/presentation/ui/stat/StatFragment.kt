@@ -35,33 +35,24 @@ class StatFragment : Fragment() {
     ): View {
         _binding = FragmentStatBinding.inflate(inflater, container, false)
         val view = binding.root
-
-        val application = requireNotNull(this.activity).application
-        val dailyReadingDao = BookDatabase.getInstance(application).dailyReadingDao
-
-        val viewModelFactory = StatViewModelFactory(dailyReadingDao)
-        val viewModel = ViewModelProvider(this, viewModelFactory)[StatViewModel::class.java]
-
-        this.viewModel = viewModel
-
         return view
     }
 
     override fun onViewCreated(view: View, savedInstanceState: Bundle?) {
         super.onViewCreated(view, savedInstanceState)
+        initViewModel()
 
-        viewModel.getBarChartData()  //добавляем данным в массив
+        viewModel.getBarChartData()
 
         viewModel.barChartData.observe(viewLifecycleOwner) { entries ->
-            barDataSet = BarDataSet(entries, "Bar Chart Data") //инициализируем DataSet
-            barData = BarData(barDataSet) //инициализируем Data
-            binding.idBarChart.data = barData  //устанавливаем данные для диаграммы
+            barDataSet = BarDataSet(entries, "Bar Chart Data")
+            barData = BarData(barDataSet)
+            binding.idBarChart.data = barData
             binding.idBarChart.description.isEnabled = false
             binding.idBarChart.legend.isEnabled = false
             binding.idBarChart.axisRight.isEnabled = false
             barDataSet.setColor(resources.getColor(R.color.light_brown))
             binding.idBarChart.xAxis.position = XAxis.XAxisPosition.BOTTOM
-
 
             val months = arrayOf("Я", "Ф", "М", "А", "М", "И", "И", "А", "С", "О", "Н", "Д")
 
@@ -78,12 +69,18 @@ class StatFragment : Fragment() {
             binding.idBarChart.xAxis.setLabelCount(months.size, true)
             binding.yearStat.text = SimpleDateFormat("yyyy", Locale.getDefault()).format(Date())
 
-
             with(binding.idBarChart) {
                 axisLeft.axisMinimum = 0f
                 invalidate()
             }
         }
+    }
+
+    private fun initViewModel() {
+        val application = requireNotNull(this.activity).application
+        val dailyReadingDao = BookDatabase.getInstance(application).dailyReadingDao
+        val viewModelFactory = StatViewModelFactory(dailyReadingDao)
+        viewModel = ViewModelProvider(this, viewModelFactory)[StatViewModel::class.java]
     }
 
     override fun onDestroyView() {

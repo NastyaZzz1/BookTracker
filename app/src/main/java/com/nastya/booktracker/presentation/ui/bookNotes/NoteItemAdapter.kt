@@ -1,5 +1,10 @@
 package com.nastya.booktracker.presentation.ui.bookNotes
 
+import android.text.Spannable
+import android.text.SpannableString
+import android.text.style.BackgroundColorSpan
+import android.text.style.ForegroundColorSpan
+import android.text.style.UnderlineSpan
 import android.view.LayoutInflater
 import android.view.ViewGroup
 import androidx.recyclerview.widget.ListAdapter
@@ -35,10 +40,38 @@ class NoteItemAdapter(
 
         fun bind(item: Highlight?) {
             item?.let { note ->
-                binding.textNote.text = note.locatorJson
+                val text = note.locatorJson
                     .let { Gson().fromJson(it, LocatorDto::class.java) }
                     .toLocator()
                     .text.highlight
+
+                val spannable = SpannableString(text)
+
+                when (note.style) {
+                    Highlight.Style.HIGHLIGHT -> {
+                        val transparentTint = (note.tint and 0x00FFFFFF) or (0x4C shl 24)
+                        spannable.setSpan(
+                            BackgroundColorSpan(transparentTint),
+                            0, text!!.length,
+                            Spannable.SPAN_EXCLUSIVE_EXCLUSIVE
+                        )
+                    }
+
+                    Highlight.Style.UNDERLINE -> {
+                        spannable.setSpan(
+                            UnderlineSpan(),
+                            0, text!!.length,
+                            Spannable.SPAN_EXCLUSIVE_EXCLUSIVE
+                        )
+                        spannable.setSpan(
+                            ForegroundColorSpan(note.tint),
+                            0, text.length,
+                            Spannable.SPAN_EXCLUSIVE_EXCLUSIVE
+                        )
+                    }
+                }
+                binding.textNote.text = spannable
+                binding.annotation.text = note.annotation.ifEmpty { "" }
             }
         }
     }

@@ -7,8 +7,10 @@ import android.view.View
 import android.view.ViewGroup
 import androidx.lifecycle.ViewModelProvider
 import androidx.lifecycle.lifecycleScope
+import com.nastya.booktracker.R
 import com.nastya.booktracker.data.local.database.BookDatabase
 import com.nastya.booktracker.databinding.FragmentBookNotesBinding
+import com.nastya.booktracker.domain.model.Highlight
 import com.nastya.booktracker.presentation.ui.bookDetail.BookDetailFragmentArgs
 import kotlinx.coroutines.launch
 
@@ -31,25 +33,38 @@ class BookNotesFragment : Fragment() {
 
         val bookId = BookDetailFragmentArgs.fromBundle(requireArguments()).bookId
 
-        initViewModel()
+        initViewModel(bookId)
 
         val adapter = NoteItemAdapter()
         binding.notesList.adapter = adapter
 
-        viewModel.loadNotesForBook(bookId)
-
         viewLifecycleOwner.lifecycleScope.launch {
-            viewModel.highlights.collect { highlights ->
+            viewModel.filteredHighlights.collect { highlights ->
                 adapter.submitList(highlights)
             }
         }
+        setupFilterButtons()
     }
 
-    private fun initViewModel() {
+    private fun initViewModel(bookId: Long) {
         val application = requireNotNull(this.activity).application
         val highlightDao = BookDatabase.getInstance(application).highlightDao
-        val viewModelFactory = BookNotesViewModelFactory(highlightDao)
+        val viewModelFactory = BookNotesViewModelFactory(highlightDao, bookId)
         viewModel = ViewModelProvider(this, viewModelFactory)[BookNotesViewModel::class.java]
+    }
+
+    private fun setupFilterButtons() {
+        binding.toggleGroup.addOnButtonCheckedListener { _, checkedId, isChecked ->
+            if (isChecked) {
+                val category = when (checkedId) {
+                    R.id.btnAll -> null
+                    R.id.btnQuotes -> Highlight.Style.HIGHLIGHT
+                    R.id.btnNotes -> Highlight.Style.UNDERLINE
+                    else -> null
+                }
+                viewModel.filterByCategory(category)
+            }
+        }
     }
 
     override fun onDestroyView() {

@@ -48,9 +48,7 @@
                 android:layout_weight="1"
                 android:layout_height="38dp"
                 android:text="Год" />
-
         </com.google.android.material.button.MaterialButtonToggleGroup>
-
 
         <TextView
             android:id="@+id/yearStat"

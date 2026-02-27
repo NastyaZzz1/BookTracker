@@ -10,7 +10,7 @@ import kotlinx.coroutines.flow.Flow
 @Dao
 interface HighlightDao {
     @Insert
-    suspend fun insert(highlight: Highlight)
+    suspend fun insert(highlight: Highlight): Long
 
     @Update
     suspend fun update(highlight: Highlight)

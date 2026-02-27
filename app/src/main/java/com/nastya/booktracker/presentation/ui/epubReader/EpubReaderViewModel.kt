@@ -1,6 +1,7 @@
 package com.nastya.booktracker.presentation.ui.epubReader
 
 import android.content.Context
+import android.graphics.Color
 import android.os.Build
 import androidx.annotation.ColorInt
 import androidx.annotation.RequiresApi
@@ -20,7 +21,6 @@ import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.StateFlow
 import kotlinx.coroutines.flow.map
 import kotlinx.coroutines.launch
-import kotlinx.coroutines.withContext
 import org.readium.r2.navigator.Decoration
 import org.readium.r2.navigator.ExperimentalDecorator
 import org.readium.r2.shared.publication.Locator
@@ -52,9 +52,7 @@ class EpubReaderViewModel(
             highlights.map { highlight ->
                 Decoration(
                     id = "highlight_${highlight.id}",
-                    locator = highlight.locatorJson
-                        .let { Gson().fromJson(it, LocatorDto::class.java) }
-                        .toLocator(),
+                    locator = getLocator(highlight),
                     style = when (highlight.style) {
                         Highlight.Style.HIGHLIGHT ->
                             Decoration.Style.Highlight(tint = highlight.tint)
@@ -67,86 +65,85 @@ class EpubReaderViewModel(
         }
 
     suspend fun addHighlight(
-        style: Highlight.Style,
-        @ColorInt tint: Int,
+        style: Highlight.Style = Highlight.Style.UNDERLINE,
+        @ColorInt tint: Int = Color.rgb(124, 198, 247),
         locator: Locator,
         annotation: String = "",
-    ) {
-        highlightDao.insert(
+    ): Long {
+        return highlightDao.insert(
             Highlight(
                 bookId = bookId,
                 style = style,
                 tint = tint,
-                locatorJson = Gson().toJson(
-                    LocatorDto.fromLocator(locator)
-                ),
+                locatorJson = Gson().toJson(LocatorDto.fromLocator(locator)),
                 annotation = annotation
             )
         )
     }
 
     suspend fun updateHighlightStyle(
-        highlightId: Long,
+        highlight: Highlight,
         style: Highlight.Style,
         @ColorInt tint: Int
     ) {
-        getHighlightById(highlightId)
-            ?.copy(
-                style = style,
-                tint = tint,
-            )?.let {
-                highlightDao.update(it)
-            }
+        highlight.copy(style = style, tint = tint)
+            .let { highlightDao.update(it) }
     }
 
-    suspend fun getHighlightById(id: Long): Highlight? {
-        return highlightDao.getHighlightById(id)
-    }
-
-    fun deleteHighlight(id: Long) {
+    fun saveAnnotation(
+        noteText: String,
+        highlight: Highlight? = null,
+        locator: Locator?
+    ) {
         viewModelScope.launch {
-            highlightDao.deleteHighlightById(id)
+            if (highlight != null) {
+                highlight.copy(annotation = noteText)
+                    .let { highlightDao.update(it) }
+            } else {
+                locator?.let {
+                    addHighlight(annotation = noteText, locator = locator)
+                }
+            }
         }
     }
 
-    fun saveProgressToDb(
-        locator: Locator?,
-        presentRead: Int
-    ) {
+    suspend fun getHighlightById(id: Long): Highlight? = highlightDao.getHighlightById(id)
+
+    fun deleteHighlight(id: Long) {
+        viewModelScope.launch { highlightDao.deleteHighlightById(id) }
+    }
+
+    fun getLocator(highlight: Highlight): Locator {
+        return Gson().fromJson(highlight.locatorJson, LocatorDto::class.java).toLocator()
+    }
+
+    fun saveProgressToDb(locator: Locator?, presentRead: Int) {
         if(locator == null) return
-
         viewModelScope.launch {
-            val bookEntity = bookDao.getNotLive(bookId) ?: return@launch
-
-            val dto = LocatorDto.fromLocator(locator)
-            bookEntity.locatorJson = Gson().toJson(dto)
-            bookEntity.progress = presentRead
-
-            bookDao.update(bookEntity)
+            bookDao.getNotLive(bookId)?.apply {
+                locatorJson = Gson().toJson(LocatorDto.fromLocator(locator))
+                progress = presentRead
+                bookDao.update(this)
+            }
         }
     }
 
     @RequiresApi(Build.VERSION_CODES.O)
     fun saveReadingTime(readingTime: Long) {
-        viewModelScope.launch {
-            withContext(Dispatchers.IO) {
-                val readingTimeItem = dailyReadingDao.getPagesReadForBookOnDate(LocalDate.now(), bookId)
-
-                if(readingTimeItem != null) {
-                    val updatedReading = readingTimeItem.copy (
-                        readingTime = readingTimeItem.readingTime + readingTime
-                    )
-                    dailyReadingDao.update(updatedReading)
-                }
-                else {
-                    val dailyReadingEntity = DailyReading (
-                        readDate = LocalDate.now(),
+        viewModelScope.launch(Dispatchers.IO) {
+            val today = LocalDate.now()
+            dailyReadingDao.getPagesReadForBookOnDate(today, bookId)?.let {
+                dailyReadingDao.update(
+                    it.copy (readingTime = it.readingTime + readingTime)
+                )
+            } ?:
+                dailyReadingDao.insert(
+                    DailyReading (
+                        readDate = today,
                         bookId = bookId,
                         readingTime = readingTime
                     )
-                    dailyReadingDao.insert(dailyReadingEntity)
-                }
-            }
+                )
         }
     }
 }

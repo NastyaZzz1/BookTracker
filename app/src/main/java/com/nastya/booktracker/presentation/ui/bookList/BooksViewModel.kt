@@ -36,7 +36,7 @@ class BooksViewModel(val dao: BookDao) : ViewModel() {
         var result = if (category == null || category == "all") {
             allBooks
         } else {
-            allBooks.filter { it.category == category}
+            allBooks.filter { it.category == category }
         }
 
         result = when(sortState) {
