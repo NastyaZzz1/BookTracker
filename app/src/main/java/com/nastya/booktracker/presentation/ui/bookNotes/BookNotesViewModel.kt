@@ -2,6 +2,7 @@ package com.nastya.booktracker.presentation.ui.bookNotes
 
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
+import com.nastya.booktracker.data.local.dao.BookDao
 import com.nastya.booktracker.data.local.dao.HighlightDao
 import com.nastya.booktracker.domain.model.Highlight
 import kotlinx.coroutines.flow.MutableStateFlow
@@ -12,9 +13,12 @@ import kotlinx.coroutines.flow.stateIn
 
 class BookNotesViewModel(
     val highlightDao: HighlightDao,
-    bookId: Long
+    val bookDao: BookDao,
+    val bookId: Long
 ): ViewModel() {
     private val selectedCategory = MutableStateFlow<Highlight.Style?>(null)
+
+    suspend fun getBookPath() = bookDao.getNotLive(bookId)?.filePath
 
     val filteredHighlights: StateFlow<List<Highlight>> = combine(
             highlightDao.getHighlightsForBookFlow(bookId),

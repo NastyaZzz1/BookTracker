@@ -3,6 +3,7 @@ package com.nastya.booktracker.presentation.ui.epubReader
 import android.graphics.PointF
 import android.os.Build
 import android.os.Bundle
+import android.util.Log
 import android.view.ActionMode
 import android.view.LayoutInflater
 import android.view.Menu
@@ -57,6 +58,7 @@ class EpubReaderFragment : Fragment() {
 
     private lateinit var bookPath: String
     private var bookId: Long = 0L
+    private var pendingHighlightId: Long? = null
 
     private val tapListener = object : EpubNavigatorFragment.Listener {
         override fun onTap(point: PointF): Boolean {
@@ -77,6 +79,7 @@ class EpubReaderFragment : Fragment() {
         arguments?.let {
             bookPath = EpubReaderFragmentArgs.fromBundle(it).bookPath
             bookId = EpubReaderFragmentArgs.fromBundle(it).bookId
+            pendingHighlightId = EpubReaderFragmentArgs.fromBundle(it).highlightId
         }
         initViewModel()
         viewModel.publication.value?.let { publication ->
@@ -120,6 +123,11 @@ class EpubReaderFragment : Fragment() {
         super.onViewCreated(view, savedInstanceState)
         setupObservers(savedInstanceState)
         initManagers()
+
+        pendingHighlightId?.let {
+            navigateToHighlight(it)
+            pendingHighlightId = null
+        }
     }
 
     private fun initManagers() {
@@ -229,6 +237,17 @@ class EpubReaderFragment : Fragment() {
                 }
                 lastLocator = locator
                 maybeSaveProgress()
+            }
+        }
+    }
+
+    private fun navigateToHighlight(highlightId: Long) {
+        viewLifecycleOwner.lifecycleScope.launch {
+            while (navigatorFragment == null) { delay(100) }
+            val highlight = viewModel.getHighlightById(highlightId)
+            if (highlight != null) {
+                val locator = viewModel.getLocator(highlight)
+                navigatorFragment?.go(locator, animated = true)
             }
         }
     }

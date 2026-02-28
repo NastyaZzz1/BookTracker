@@ -7,6 +7,7 @@ import android.view.View
 import android.view.ViewGroup
 import androidx.lifecycle.ViewModelProvider
 import androidx.lifecycle.lifecycleScope
+import androidx.navigation.fragment.findNavController
 import com.nastya.booktracker.R
 import com.nastya.booktracker.data.local.database.BookDatabase
 import com.nastya.booktracker.databinding.FragmentBookNotesBinding
@@ -35,7 +36,9 @@ class BookNotesFragment : Fragment() {
 
         initViewModel(bookId)
 
-        val adapter = NoteItemAdapter()
+        val adapter = NoteItemAdapter { highlight ->
+            openReaderAtHighlight(highlight)
+        }
         binding.notesList.adapter = adapter
 
         viewLifecycleOwner.lifecycleScope.launch {
@@ -49,7 +52,8 @@ class BookNotesFragment : Fragment() {
     private fun initViewModel(bookId: Long) {
         val application = requireNotNull(this.activity).application
         val highlightDao = BookDatabase.getInstance(application).highlightDao
-        val viewModelFactory = BookNotesViewModelFactory(highlightDao, bookId)
+        val bookDao = BookDatabase.getInstance(application).bookDao
+        val viewModelFactory = BookNotesViewModelFactory(highlightDao, bookDao, bookId)
         viewModel = ViewModelProvider(this, viewModelFactory)[BookNotesViewModel::class.java]
     }
 
@@ -64,6 +68,20 @@ class BookNotesFragment : Fragment() {
                 }
                 viewModel.filterByCategory(category)
             }
+        }
+    }
+
+    private fun openReaderAtHighlight(highlight: Highlight) {
+        lifecycleScope.launch {
+            val bundle = Bundle().apply {
+                putString("bookPath", viewModel.getBookPath())
+                putLong("bookId", highlight.bookId)
+                putLong("highlightId", highlight.id)
+            }
+            findNavController().navigate(
+                R.id.epubReaderFragment,
+                bundle
+            )
         }
     }
 

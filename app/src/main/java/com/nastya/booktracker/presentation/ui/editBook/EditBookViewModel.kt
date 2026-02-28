@@ -15,14 +15,13 @@ class EditBookViewModel(bookId: Long, private val bookDao: BookDao) : ViewModel(
     private val _bookState = MutableStateFlow<Book?>(null)
     val bookState: StateFlow<Book?> = _bookState.asStateFlow()
 
-    val book = bookDao.get(bookId)
     private val _navigateToDetail: MutableLiveData<Boolean> = MutableLiveData<Boolean>(false)
     val navigateToDetail: LiveData<Boolean>
         get() = _navigateToDetail
 
     init {
         viewModelScope.launch {
-            bookDao.get(bookId).collect { book ->
+            bookDao.getOneFlow(bookId).collect { book ->
                 _bookState.value = book
             }
         }

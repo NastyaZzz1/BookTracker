@@ -15,7 +15,7 @@ import com.nastya.booktracker.domain.model.Highlight
 import com.nastya.booktracker.domain.model.LocatorDto
 
 class NoteItemAdapter(
-
+    private val onItemClick: (Highlight) -> Unit
 ): ListAdapter<Highlight, NoteItemAdapter.NoteItemViewHolder>(NoteDiffItemCallback()) {
 
     override fun onCreateViewHolder(parent: ViewGroup, viewType: Int): NoteItemViewHolder {
@@ -24,7 +24,7 @@ class NoteItemAdapter(
 
     override fun onBindViewHolder(holder: NoteItemViewHolder, position: Int) {
         val item = getItem(position)
-        holder.bind(item)
+        holder.bind(item, onItemClick)
     }
 
     class NoteItemViewHolder(val binding: NoteItemBinding)
@@ -38,7 +38,10 @@ class NoteItemAdapter(
             }
         }
 
-        fun bind(item: Highlight?) {
+        fun bind(
+            item: Highlight?,
+            onItemClick: (Highlight) -> Unit
+        ) {
             item?.let { note ->
                 val text = note.locatorJson
                     .let { Gson().fromJson(it, LocatorDto::class.java) }
@@ -72,6 +75,7 @@ class NoteItemAdapter(
                 }
                 binding.textNote.text = spannable
                 binding.annotation.text = note.annotation.ifEmpty { "" }
+                binding.root.setOnClickListener { onItemClick(note) }
             }
         }
     }

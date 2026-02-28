@@ -80,6 +80,9 @@ app:startDestination="@id/booksFragment">
         <argument
             android:name="bookId"
             app:argType="long" />
+        <action
+            android:id="@+id/action_bookNotesFragment_to_epubReaderFragment"
+            app:destination="@id/epubReaderFragment" />
     </fragment>
 
     <fragment
@@ -93,6 +96,10 @@ app:startDestination="@id/booksFragment">
         <argument
             android:name="bookId"
             app:argType="long" />
+        <argument
+            android:name="highlightId"
+            app:argType="long"
+            android:defaultValue="-1L" />
         <action
             android:id="@+id/action_to_notes_fragment"
             app:destination="@id/bookNotesFragment"

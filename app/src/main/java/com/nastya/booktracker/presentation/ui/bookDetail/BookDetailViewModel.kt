@@ -28,7 +28,7 @@ class BookDetailViewModel(bookId: Long, private val bookDao: BookDao): ViewModel
 
     init {
         viewModelScope.launch {
-            bookDao.get(bookId).collect { book ->
+            bookDao.getOneFlow(bookId).collect { book ->
                 _bookState.value = book
             }
         }
@@ -56,7 +56,6 @@ class BookDetailViewModel(bookId: Long, private val bookDao: BookDao): ViewModel
 
         alertDialog.show()
     }
-
 
     private fun deleteTaskAndNavigate(context: Context) {
         viewModelScope.launch {
