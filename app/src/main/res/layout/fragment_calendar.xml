@@ -23,36 +23,22 @@
             android:paddingHorizontal="5dp"
             android:orientation="vertical">
 
-            <androidx.constraintlayout.widget.ConstraintLayout
-                android:layout_width="match_parent"
-                android:layout_height="wrap_content" >
-
-                <TextView
-                    android:id="@+id/goal_title"
-                    android:layout_width="wrap_content"
-                    android:layout_height="wrap_content"
-                    android:text="@string/my_goals"
-                    android:textSize="24sp"
-                    app:layout_constraintStart_toStartOf="parent"
-                    app:layout_constraintTop_toTopOf="parent"
-                    app:layout_constraintBottom_toBottomOf="parent" />
-
-                <com.google.android.material.button.MaterialButton
-                    android:id="@+id/change_goal_btn"
-                    android:layout_width="wrap_content"
-                    android:layout_height="38dp"
-                    android:textColor="@color/light_brown"
-                    app:backgroundTint="@null"
-                    android:background="@drawable/btn_goal_drawable"
-                    app:layout_constraintEnd_toEndOf="parent"
-                    app:layout_constraintTop_toTopOf="parent"
-                    app:layout_constraintBottom_toBottomOf="parent"
-                    android:text="@string/change_goal" />
-            </androidx.constraintlayout.widget.ConstraintLayout>
+            <TextView
+                android:id="@+id/goal_title"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:text="@string/my_goals"
+                android:textSize="24sp"
+                app:layout_constraintStart_toStartOf="parent"
+                app:layout_constraintTop_toTopOf="parent"
+                app:layout_constraintBottom_toBottomOf="parent" />
 
             <androidx.constraintlayout.widget.ConstraintLayout
+                android:id="@+id/item_day_goal"
+                android:padding="5dp"
                 android:layout_width="match_parent"
                 android:layout_height="match_parent"
+                android:background="@drawable/rounded_background"
                 android:layout_marginTop="5dp">
 
                 <TextView
@@ -92,8 +78,11 @@
 
 
             <androidx.constraintlayout.widget.ConstraintLayout
+                android:id="@+id/item_month_goal"
                 android:layout_width="match_parent"
                 android:layout_height="match_parent"
+                android:padding="5dp"
+                android:background="@drawable/rounded_background"
                 android:layout_marginVertical="8dp">
 
                 <TextView
@@ -133,8 +122,11 @@
             </androidx.constraintlayout.widget.ConstraintLayout>
 
             <androidx.constraintlayout.widget.ConstraintLayout
+                android:id="@+id/item_year_goal"
                 android:layout_width="match_parent"
                 android:layout_height="match_parent"
+                android:padding="5dp"
+                android:background="@drawable/rounded_background"
                 android:layout_marginBottom="15dp" >
 
                 <TextView

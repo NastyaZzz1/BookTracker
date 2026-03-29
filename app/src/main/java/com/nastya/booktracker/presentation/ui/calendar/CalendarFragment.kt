@@ -64,6 +64,52 @@ class CalendarFragment : Fragment() {
         val endMonth = currentMonth.plusMonths(10)
         val daysOfWeek = daysOfWeek(firstDayOfWeek = DayOfWeek.MONDAY)
 
+        setupGoalListener()
+        setupGoalsObserved(startMonth, endMonth, currentMonth, daysOfWeek)
+        setupWeekCalendar(startMonth, endMonth, currentMonth, daysOfWeek)
+    }
+
+    private fun setupGoalListener() {
+        binding.itemDayGoal.setOnLongClickListener {
+            viewModel.showDialogChangeGoal(
+                "На день",
+                requireContext(),
+                viewModel.dailyGoal
+            ) { goalDay ->
+                viewModel.onDayGoalChanged(goalDay)
+            }
+            true
+        }
+
+        binding.itemMonthGoal.setOnLongClickListener {
+            viewModel.showDialogChangeGoal(
+                "На месяц",
+                requireContext(),
+                viewModel.monthlyGoal
+            ) { goalMonth ->
+                viewModel.onMonthGoalChanged(goalMonth)
+            }
+            true
+        }
+
+        binding.itemYearGoal.setOnLongClickListener {
+            viewModel.showDialogChangeGoal(
+                "На год",
+                requireContext(),
+                viewModel.yearlyGoal
+            ) { goalYear ->
+                viewModel.onYearGoalChanged(goalYear)
+            }
+            true
+        }
+    }
+
+    private fun setupGoalsObserved(
+        startMonth: YearMonth,
+        endMonth: YearMonth,
+        currentMonth: YearMonth,
+        daysOfWeek: List<DayOfWeek>
+    ) {
         viewModel.dailyGoal.observe(this.viewLifecycleOwner, Observer {
             it?.let {
                 binding.dayGoal.text = it.toString()
@@ -82,12 +128,6 @@ class CalendarFragment : Fragment() {
                 setupWeekCalendar(startMonth, endMonth, currentMonth, daysOfWeek)
             }
         })
-
-        binding.changeGoalBtn.setOnClickListener {
-            viewModel.showInfDialogChangeGoal(requireContext())
-        }
-
-        setupWeekCalendar(startMonth, endMonth, currentMonth, daysOfWeek)
     }
 
     private fun setupWeekCalendar(

@@ -4,6 +4,7 @@ import android.content.Context
 import android.os.Build
 import android.view.LayoutInflater
 import android.widget.EditText
+import android.widget.TextView
 import com.nastya.booktracker.R
 import androidx.annotation.RequiresApi
 import androidx.lifecycle.LiveData
@@ -101,7 +102,12 @@ class CalendarViewModel(
     fun timeFormated(readingTime: Long) = String.format("%02d:%02d", readingTime / 60, readingTime % 60)
 
     @RequiresApi(Build.VERSION_CODES.O)
-    fun showInfDialogChangeGoal(context: Context) {
+    fun showDialogChangeGoal(
+        title: String,
+        context: Context,
+        currentValue: LiveData<Int>,
+        onGoalChanged: (Int) -> Unit
+    ) {
         val dialogView = LayoutInflater.from(context).inflate(R.layout.dialog_change_goal, null)
         val alertDialog = MaterialAlertDialogBuilder(context)
             .setTitle("Изменить цели")
@@ -109,29 +115,15 @@ class CalendarViewModel(
             .setPositiveButton("Окей", null)
             .create()
 
-        val dayGoal = dialogView.findViewById<EditText>(R.id.day_goal)
-        val monthGoal = dialogView.findViewById<EditText>(R.id.month_goal)
-        val yearGoal = dialogView.findViewById<EditText>(R.id.year_goal)
+        val labelTextView = dialogView.findViewById<TextView>(R.id.goal_label)
+        labelTextView.text = title
 
-        dayGoal.setText(_dailyGoal.value.toString())
-        monthGoal.setText(_monthlyGoal.value.toString())
-        yearGoal.setText(_yearlyGoal.value.toString())
+        val goal = dialogView.findViewById<EditText>(R.id.goal)
+        goal.setText(currentValue.value.toString())
 
-        dayGoal.addTextChangedListener { str ->
+        goal.addTextChangedListener { str ->
             str.toString().toIntOrNull()?.let { goalPage ->
-                onDayGoalChanged(goalPage)
-            }
-        }
-
-        monthGoal.addTextChangedListener { str ->
-            str.toString().toIntOrNull()?.let { goalPage ->
-                onMonthGoalChanged(goalPage)
-            }
-        }
-
-        yearGoal.addTextChangedListener { str ->
-            str.toString().toIntOrNull()?.let { goalPage ->
-                onYearGoalChanged(goalPage)
+                onGoalChanged(goalPage)
             }
         }
 
