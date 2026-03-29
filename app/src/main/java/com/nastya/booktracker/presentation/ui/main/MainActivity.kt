@@ -214,11 +214,6 @@ class MainActivity : AppCompatActivity() {
             text = getString(R.string.zero_time)
             base = SystemClock.elapsedRealtime() - pauseOffset
 
-            setOnChronometerTickListener {
-                val elapsed = (SystemClock.elapsedRealtime() - base) / 1000
-                text = String.format("%02d:%02d", elapsed / 60, elapsed % 60)
-            }
-
             if(isTimerRunning) {
                 start()
             }
@@ -264,7 +259,10 @@ class MainActivity : AppCompatActivity() {
     }
 
     private fun startTimer() {
-        chronometer?.start()
+        chronometer?.apply {
+            base = SystemClock.elapsedRealtime() - pauseOffset
+            start()
+        }
     }
 
     private fun stopTimer() {

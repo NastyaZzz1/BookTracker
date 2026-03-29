@@ -21,6 +21,7 @@ import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.StateFlow
 import kotlinx.coroutines.flow.map
 import kotlinx.coroutines.launch
+import kotlinx.coroutines.runBlocking
 import org.readium.r2.navigator.Decoration
 import org.readium.r2.navigator.ExperimentalDecorator
 import org.readium.r2.shared.publication.Locator
@@ -119,7 +120,7 @@ class EpubReaderViewModel(
 
     fun saveProgressToDb(locator: Locator?, presentRead: Int) {
         if(locator == null) return
-        viewModelScope.launch {
+        runBlocking(Dispatchers.IO) {
             bookDao.getNotLive(bookId)?.apply {
                 locatorJson = Gson().toJson(LocatorDto.fromLocator(locator))
                 progress = presentRead
@@ -130,7 +131,7 @@ class EpubReaderViewModel(
 
     @RequiresApi(Build.VERSION_CODES.O)
     fun saveReadingTime(readingTime: Long) {
-        viewModelScope.launch(Dispatchers.IO) {
+        runBlocking(Dispatchers.IO) {
             val today = LocalDate.now()
             dailyReadingDao.getPagesReadForBookOnDate(today, bookId)?.let {
                 dailyReadingDao.update(
