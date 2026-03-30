@@ -15,12 +15,16 @@ import android.graphics.Color
 import android.os.Build
 import android.view.LayoutInflater
 import android.view.ViewGroup
+import android.widget.TimePicker
 import androidx.annotation.RequiresApi
 import androidx.fragment.app.Fragment
-import androidx.lifecycle.Observer
+import androidx.lifecycle.Lifecycle
 import androidx.lifecycle.ViewModelProvider
-import androidx.lifecycle.viewModelScope
+import androidx.lifecycle.lifecycleScope
+import androidx.lifecycle.repeatOnLifecycle
+import com.google.android.material.dialog.MaterialAlertDialogBuilder
 import com.kizitonwose.calendar.view.CalendarView
+import com.nastya.booktracker.GoalPreferencesRepository
 import com.nastya.booktracker.R
 import com.nastya.booktracker.data.local.database.BookDatabase
 import com.nastya.booktracker.databinding.CalendarDayLayoutBinding
@@ -54,9 +58,10 @@ class CalendarFragment : Fragment() {
 
         val application = requireNotNull(this.activity).application
         val dailyReadingDao = BookDatabase.getInstance(application).dailyReadingDao
+        val goalRepo = GoalPreferencesRepository(requireContext().applicationContext)
 
         val viewModelFactory =
-            CalendarViewModelFactory(dailyReadingDao, requireActivity().application)
+            CalendarViewModelFactory(dailyReadingDao, goalRepo)
         viewModel = ViewModelProvider(this, viewModelFactory)[CalendarViewModel::class.java]
 
         val currentMonth = YearMonth.now()
@@ -64,76 +69,72 @@ class CalendarFragment : Fragment() {
         val endMonth = currentMonth.plusMonths(10)
         val daysOfWeek = daysOfWeek(firstDayOfWeek = DayOfWeek.MONDAY)
 
+        observeEvents()
         setupGoalListener()
-        setupGoalsObserved(startMonth, endMonth, currentMonth, daysOfWeek)
-        setupWeekCalendar(startMonth, endMonth, currentMonth, daysOfWeek)
+        setupGoalsObserved()
+        setupWeekCalendar(currentMonth, startMonth, endMonth, daysOfWeek)
     }
 
     private fun setupGoalListener() {
         binding.itemDayGoal.setOnLongClickListener {
-            viewModel.showDialogChangeGoal(
-                "На день",
-                requireContext(),
-                viewModel.dailyGoal
-            ) { goalDay ->
-                viewModel.onDayGoalChanged(goalDay)
-            }
+            viewModel.onChangeGoalClicked(GoalType.DAY)
             true
         }
 
         binding.itemMonthGoal.setOnLongClickListener {
-            viewModel.showDialogChangeGoal(
-                "На месяц",
-                requireContext(),
-                viewModel.monthlyGoal
-            ) { goalMonth ->
-                viewModel.onMonthGoalChanged(goalMonth)
-            }
+            viewModel.onChangeGoalClicked(GoalType.MONTH)
             true
         }
 
         binding.itemYearGoal.setOnLongClickListener {
-            viewModel.showDialogChangeGoal(
-                "На год",
-                requireContext(),
-                viewModel.yearlyGoal
-            ) { goalYear ->
-                viewModel.onYearGoalChanged(goalYear)
-            }
+            viewModel.onChangeGoalClicked(GoalType.YEAR)
             true
         }
     }
 
-    private fun setupGoalsObserved(
-        startMonth: YearMonth,
-        endMonth: YearMonth,
-        currentMonth: YearMonth,
-        daysOfWeek: List<DayOfWeek>
-    ) {
-        viewModel.dailyGoal.observe(this.viewLifecycleOwner, Observer {
-            it?.let {
-                binding.dayGoal.text = it.toString()
-                setupWeekCalendar(startMonth, endMonth, currentMonth, daysOfWeek)
+    private fun setupGoalsObserved() {
+        viewLifecycleOwner.lifecycleScope.launch {
+            viewLifecycleOwner.repeatOnLifecycle(Lifecycle.State.STARTED) {
+                launch {
+                    viewModel.dailyGoal.collect {
+                        binding.dayGoal.text = formatMinutes(it)
+                        binding.calendarView.notifyMonthChanged(
+                            binding.calendarView.findFirstVisibleMonth()?.yearMonth
+                                ?: return@collect
+                        )
+                    }
+                }
+                launch {
+                    viewModel.monthlyGoal.collect {
+                        binding.monthGoal.text = formatMinutes(it)
+                    }
+                }
+                launch {
+                    viewModel.yearlyGoal.collect {
+                        binding.yearGoal.text = formatMinutes(it)
+                    }
+                }
             }
-        })
-        viewModel.monthlyGoal.observe(this.viewLifecycleOwner, Observer {
-            it?.let {
-                binding.monthGoal.text = it.toString()
-                setupWeekCalendar(startMonth, endMonth, currentMonth, daysOfWeek)
+        }
+    }
+
+    private fun observeEvents() {
+        viewLifecycleOwner.lifecycleScope.launch {
+            viewLifecycleOwner.repeatOnLifecycle(Lifecycle.State.STARTED) {
+                viewModel.events.collect { event ->
+                    when (event) {
+                        is UiEvent.ShowGoalDialog -> showGoalDialog(event.goalType)
+                        is UiEvent.ShowDayDetailDialog -> showDayDetailDialog(event.date)
+                    }
+                }
             }
-        })
-        viewModel.yearlyGoal.observe(this.viewLifecycleOwner, Observer {
-            it?.let {
-                binding.yearGoal.text = it.toString()
-                setupWeekCalendar(startMonth, endMonth, currentMonth, daysOfWeek)
-            }
-        })
+        }
     }
 
     private fun setupWeekCalendar(
+        currentMonth: YearMonth,
         startMonth: YearMonth,
         endMonth: YearMonth,
-        currentMonth: YearMonth,
         daysOfWeek: List<DayOfWeek>
     ) {
         class DayViewContainer(view: View) : ViewContainer(view) {
@@ -145,6 +146,8 @@ class CalendarFragment : Fragment() {
             init {
                 view.setOnClickListener {
                     if (day.position == DayPosition.MonthDate) {
+                        viewModel.onDayClicked(day.date)
+
                         val currentSelection = selectedDate
                         if (currentSelection == day.date) {
                             selectedDate = null
@@ -167,8 +170,9 @@ class CalendarFragment : Fragment() {
                 container.day = data
                 container.textView.text = data.date.dayOfMonth.toString()
 
-                viewModel.viewModelScope.launch {
-                    container.progressView.progress = viewModel.dailyProgressGet(data.date).toInt()
+                lifecycleScope.launch {
+                    val progress = viewModel.getDailyProgress(data.date)
+                    container.progressView.progress = progress.toInt()
                 }
 
                 if (data.position == DayPosition.MonthDate) {
@@ -176,9 +180,6 @@ class CalendarFragment : Fragment() {
                         selectedDate == data.date -> {
                             container.textView.setTextColor(Color.BLACK)
                             container.vBG.setBackgroundResource(R.drawable.selected_bg)
-                            viewModel.viewModelScope.launch {
-                                viewModel.showInfDialogDetailData(requireContext(), data.date)
-                            }
                         }
 
                         today == data.date -> {
@@ -207,6 +208,69 @@ class CalendarFragment : Fragment() {
         binding.calendarView.monthScrollListener = { updateTitle() }
         binding.calendarView.setup(startMonth, endMonth, daysOfWeek.first())
         binding.calendarView.scrollToMonth(currentMonth)
+    }
+
+    private fun showGoalDialog(type: GoalType) {
+        val dialogView = layoutInflater.inflate(R.layout.dialog_change_goal, null)
+        val dialog = MaterialAlertDialogBuilder(requireContext())
+            .setTitle("Изменить цель")
+            .setView(dialogView)
+            .setPositiveButton("Окей", null)
+            .create()
+
+        val label = dialogView.findViewById<TextView>(R.id.goal_label)
+        val timePicker = dialogView.findViewById<TimePicker>(R.id.timePicker)
+        timePicker.setIs24HourView(true)
+
+        val (currentFlow, onChange) = when (type) {
+            GoalType.DAY -> viewModel.dailyGoal to viewModel::onDayGoalChanged
+            GoalType.MONTH -> viewModel.monthlyGoal to viewModel::onMonthGoalChanged
+            GoalType.YEAR -> viewModel.yearlyGoal to viewModel::onYearGoalChanged
+        }
+
+        label.text = when (type) {
+            GoalType.DAY -> "На день"
+            GoalType.MONTH -> "На месяц"
+            GoalType.YEAR -> "На год"
+        }
+
+        val value = currentFlow.value
+        timePicker.hour = value / 60
+        timePicker.minute = value % 60
+
+        timePicker.setOnTimeChangedListener { _, h, m ->
+            onChange(h * 60 + m)
+        }
+
+        dialog.show()
+    }
+
+    private fun showDayDetailDialog(date: LocalDate) {
+        viewLifecycleOwner.lifecycleScope.launch {
+            val books = viewModel.getBooksForDate(date)
+            val time = viewModel.getReadingTimeForDate(date)
+
+            val message = books.joinToString("\n") {
+                "${it.bookTitle}: ${viewModel.formatTimeMinutes(it.readingTime)}"
+            }
+
+            MaterialAlertDialogBuilder(requireContext())
+                .setTitle(viewModel.formatLocalDate(date))
+                .setMessage("Время чтения: ${viewModel.formatTimeMinutes(time)}\n$message")
+                .setNegativeButton("Окей", null)
+                .show()
+        }
+    }
+
+    private fun formatMinutes(totalMinutes: Int): String {
+        val hours = totalMinutes / 60
+        val minutes = totalMinutes % 60
+
+        return when {
+            hours == 0 -> "$minutes мин"
+            minutes == 0 -> "$hours ч"
+            else -> "$hours ч $minutes мин"
+        }
     }
 
     private fun updateTitle() {

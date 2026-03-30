@@ -1,138 +1,77 @@
 package com.nastya.booktracker.presentation.ui.calendar
 
-import android.content.Context
 import android.os.Build
-import android.view.LayoutInflater
-import android.widget.EditText
-import android.widget.TextView
-import com.nastya.booktracker.R
 import androidx.annotation.RequiresApi
-import androidx.lifecycle.LiveData
-import androidx.lifecycle.MutableLiveData
 import androidx.lifecycle.ViewModel
-import com.google.android.material.dialog.MaterialAlertDialogBuilder
 import com.nastya.booktracker.data.local.dao.DailyReadingDao
 import java.time.LocalDate
+import androidx.lifecycle.viewModelScope
+import com.nastya.booktracker.GoalPreferencesRepository
+import kotlinx.coroutines.flow.MutableSharedFlow
+import kotlinx.coroutines.flow.asSharedFlow
+import kotlinx.coroutines.launch
 import java.time.format.DateTimeFormatter
 import java.util.Locale
-import androidx.core.content.edit
-import androidx.core.widget.addTextChangedListener
 import kotlin.String
 
 class CalendarViewModel(
     private val dailyReadingDao: DailyReadingDao,
-    val context: Context
+    private val goalRepo: GoalPreferencesRepository
 ): ViewModel() {
-    private val _dailyGoal = MutableLiveData<Int>()
-    val dailyGoal: LiveData<Int> = _dailyGoal
-    private val _monthlyGoal = MutableLiveData<Int>()
-    val monthlyGoal: LiveData<Int> = _monthlyGoal
-    private val _yearlyGoal = MutableLiveData<Int>()
-    val yearlyGoal: LiveData<Int> = _yearlyGoal
+    val dailyGoal = goalRepo.dailyGoal
+    val monthlyGoal = goalRepo.monthlyGoal
+    val yearlyGoal = goalRepo.yearlyGoal
 
-    private val dayGoalKey = "daily_goal"
-    private val monthGoalKey = "monthly_goal"
-    private val yearGoalKey = "yearly_goal"
+    private val _events = MutableSharedFlow<UiEvent>()
+    val events = _events.asSharedFlow()
 
-    init {
-        val sharedPref = context.getSharedPreferences("app_prefs", Context.MODE_PRIVATE)
-        val savedDayGoal = sharedPref.getInt(dayGoalKey, 1)
-        val savedMonthGoal = sharedPref.getInt(monthGoalKey, 1)
-        val savedYearGoal = sharedPref.getInt(yearGoalKey, 1)
-        _dailyGoal.value = savedDayGoal
-        _monthlyGoal.value = savedMonthGoal
-        _yearlyGoal.value = savedYearGoal
+    fun onDayGoalChanged(value: Int) =
+        goalRepo.setDailyGoal(value)
+
+    fun onMonthGoalChanged(value: Int) =
+        goalRepo.setMonthlyGoal(value)
+
+    fun onYearGoalChanged(value: Int) =
+        goalRepo.setYearlyGoal(value)
+
+    suspend fun getDailyProgress (date: LocalDate) : Float {
+        val goal = dailyGoal.value
+        val time = dailyReadingDao.getAllTimeOfBook(date) ?: 0
+        return (time * 100f / goal)
     }
 
-    fun onDayGoalChanged(goalPageNew: Int) {
-        _dailyGoal.value = goalPageNew
-        saveDayGoal(goalPageNew)
-    }
+    suspend fun getBooksForDate(date: LocalDate) =
+        dailyReadingDao.getAllBookOnDate(date)
 
-    fun onMonthGoalChanged(goalPageNew: Int) {
-        _monthlyGoal.value = goalPageNew
-        saveMonthGoal(goalPageNew)
-    }
+    suspend fun getReadingTimeForDate(date: LocalDate) =
+        dailyReadingDao.getAllTimeOfBook(date) ?: 0
 
-    fun onYearGoalChanged(goalPageNew: Int) {
-        _yearlyGoal.value = goalPageNew
-        saveYearGoal(goalPageNew)
-    }
-
-    private fun saveDayGoal(goalPageNew: Int) {
-        val sharedPref = context.getSharedPreferences("app_prefs", Context.MODE_PRIVATE)
-        sharedPref.edit { putInt(dayGoalKey, goalPageNew) }
-    }
-
-    private fun saveMonthGoal(goalPageNew: Int) {
-        val sharedPref = context.getSharedPreferences("app_prefs", Context.MODE_PRIVATE)
-        sharedPref.edit { putInt(monthGoalKey, goalPageNew) }
-    }
-
-    private fun saveYearGoal(goalPageNew: Int) {
-        val sharedPref = context.getSharedPreferences("app_prefs", Context.MODE_PRIVATE)
-        sharedPref.edit { putInt(yearGoalKey, goalPageNew) }
-    }
-
-    @RequiresApi(Build.VERSION_CODES.O)
-    suspend fun dailyProgressGet (date: LocalDate) : Float {
-        val currentGoal = _dailyGoal.value ?: 1
-        val countPage = dailyReadingDao.getAllTimeOfBook(date) ?: 0
-        val newProgress = (countPage * 100f).div(currentGoal)
-        return newProgress
-    }
-
-    @RequiresApi(Build.VERSION_CODES.O)
-    suspend fun showInfDialogDetailData(context: Context, date: LocalDate) {
-        val booksProgress = dailyReadingDao.getAllBookOnDate(date)
-        val readingTime = dailyReadingDao.getAllTimeOfBook(date) ?: 0
-
-        val message = booksProgress.joinToString(separator = "\n") { reading ->
-            "${reading.bookTitle}: ${timeFormated(reading.readingTime)}".trimIndent()
-        }
-        val dateFormat = formatLocalDate(date)
-        val alertDialog = MaterialAlertDialogBuilder(context)
-            .setTitle(dateFormat)
-            .setMessage("Время чтения: ${timeFormated(readingTime)}\n$message")
-            .setNegativeButton("Окей", null)
-            .create()
-        alertDialog.show()
-    }
-
-    fun timeFormated(readingTime: Long) = String.format("%02d:%02d", readingTime / 60, readingTime % 60)
-
-    @RequiresApi(Build.VERSION_CODES.O)
-    fun showDialogChangeGoal(
-        title: String,
-        context: Context,
-        currentValue: LiveData<Int>,
-        onGoalChanged: (Int) -> Unit
-    ) {
-        val dialogView = LayoutInflater.from(context).inflate(R.layout.dialog_change_goal, null)
-        val alertDialog = MaterialAlertDialogBuilder(context)
-            .setTitle("Изменить цели")
-            .setView(dialogView)
-            .setPositiveButton("Окей", null)
-            .create()
-
-        val labelTextView = dialogView.findViewById<TextView>(R.id.goal_label)
-        labelTextView.text = title
-
-        val goal = dialogView.findViewById<EditText>(R.id.goal)
-        goal.setText(currentValue.value.toString())
-
-        goal.addTextChangedListener { str ->
-            str.toString().toIntOrNull()?.let { goalPage ->
-                onGoalChanged(goalPage)
-            }
-        }
-
-        alertDialog.show()
-    }
+    fun formatTimeMinutes(readingTime: Long) = String.format("%02d:%02d", readingTime / 60, readingTime % 60)
 
     @RequiresApi(Build.VERSION_CODES.O)
     fun formatLocalDate(date: LocalDate): String {
         val formatter = DateTimeFormatter.ofPattern("d MMMM yyyy", Locale("ru"))
         return date.format(formatter)
     }
+
+    fun onDayClicked(date: LocalDate) {
+        viewModelScope.launch {
+            _events.emit(UiEvent.ShowDayDetailDialog(date))
+        }
+    }
+
+    fun onChangeGoalClicked(type: GoalType) {
+        viewModelScope.launch {
+            _events.emit(UiEvent.ShowGoalDialog(type))
+        }
+    }
+}
+
+sealed class UiEvent {
+    data class ShowGoalDialog(val goalType: GoalType) : UiEvent()
+    data class ShowDayDetailDialog(val date: LocalDate) : UiEvent()
+}
+
+enum class GoalType {
+    DAY, MONTH, YEAR
 }
