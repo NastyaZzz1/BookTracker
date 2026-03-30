@@ -10,7 +10,6 @@ import androidx.annotation.RequiresApi
 import androidx.core.widget.addTextChangedListener
 import androidx.fragment.app.Fragment
 import androidx.lifecycle.Lifecycle
-import androidx.lifecycle.Observer
 import androidx.lifecycle.ViewModelProvider
 import androidx.lifecycle.lifecycleScope
 import androidx.lifecycle.repeatOnLifecycle
@@ -30,7 +29,6 @@ class EditBookFragment : Fragment() {
     ): View {
         _binding = FragmentEditBookBinding.inflate(inflater, container, false)
         val view = binding.root
-
         return view
     }
 
@@ -39,65 +37,91 @@ class EditBookFragment : Fragment() {
         super.onViewCreated(view, savedInstanceState)
 
         val bookId = EditBookFragmentArgs.fromBundle(requireArguments()).bookId
-
         val application = requireNotNull(this.activity).application
         val bookDao = BookDatabase.getInstance(application).bookDao
         val viewModelFactory = EditBookViewModelFactory(bookId, bookDao)
         viewModel = ViewModelProvider(this, viewModelFactory)[EditBookViewModel::class.java]
 
-        binding.bookName.addTextChangedListener { str ->
-            viewModel.onBookNameChanged((str.takeIf { !it.isNullOrBlank() } ?: "").toString())
-        }
-
-        binding.bookAuthor.addTextChangedListener { str ->
-            viewModel.onBookAuthorChanged((str.takeIf { !it.isNullOrBlank() } ?: "").toString())
-        }
-
-        binding.bookDesc.addTextChangedListener { str ->
-            viewModel.onBookDescChanged((str.takeIf { !it.isNullOrBlank() } ?: "").toString())
-        }
-
-        viewModel.errorMessage.observe(viewLifecycleOwner) { errorMessage ->
-            errorMessage?.let {
-                Toast.makeText(context, it, Toast.LENGTH_SHORT).show()
-            }
-        }
-
-        updateBtnListener()
-        bookObserve()
-        navigateToDetailObserve()
+        observeBooks()
+        observeSaveSuccess()
+        observeFieldErrors()
+        observeNavigation()
+        setupTextWatchers()
+        setupUpdateButton()
     }
 
-    private fun bookObserve() {
-        lifecycleScope.launch {
+    private fun observeBooks() {
+        viewLifecycleOwner.lifecycleScope.launch {
             repeatOnLifecycle(Lifecycle.State.STARTED) {
                 viewModel.bookState.collect { book ->
                     book?.let {
-                        binding.bookName.setText(it.bookName)
-                        binding.bookAuthor.setText(it.bookAuthor)
-                        binding.bookDesc.setText(it.description)
+                        if (binding.bookName.text.toString() != book.bookName)
+                            binding.bookName.setText(book.bookName)
+
+                        if (binding.bookAuthor.text.toString() != book.bookAuthor)
+                            binding.bookAuthor.setText(book.bookAuthor)
+
+                        if (binding.bookDesc.text.toString() != book.description)
+                            binding.bookDesc.setText(book.description)
                     }
                 }
             }
         }
     }
 
-    private fun navigateToDetailObserve() {
-        viewModel.navigateToDetail.observe(viewLifecycleOwner, Observer { navigate ->
-            if (navigate) {
-                view?.findNavController()?.popBackStack()
-                viewModel.onNavigatedToList()
+    private fun observeSaveSuccess() {
+        viewLifecycleOwner.lifecycleScope.launch {
+            repeatOnLifecycle(Lifecycle.State.STARTED) {
+                viewModel.saveSuccess.collect {
+                    Toast.makeText(context, "Изменения сохранены", Toast.LENGTH_SHORT).show()
+                }
             }
-        })
+        }
     }
 
-    private fun updateBtnListener () {
-        binding.updateButton.setOnClickListener {
-            if (viewModel.errorMessage.value == null) {
-                viewModel.updateTask()
-                Toast.makeText(context, "Изменения сохранены", Toast.LENGTH_SHORT).show()
+    private fun observeFieldErrors() {
+        viewLifecycleOwner.lifecycleScope.launch {
+            repeatOnLifecycle(Lifecycle.State.STARTED) {
+                viewModel.fieldErrors.collect { errors ->
+                    binding.bookName.error = errors?.nameError
+                    binding.bookAuthor.error = errors?.authorError
+
+                    when {
+                        errors?.nameError != null -> binding.bookName.requestFocus()
+                        errors?.authorError != null -> binding.bookAuthor.requestFocus()
+                    }
+                }
             }
-            else Toast.makeText(context, "Исправьте ошибки перед сохранением", Toast.LENGTH_SHORT).show()
+        }
+    }
+
+    private fun observeNavigation() {
+        viewLifecycleOwner.lifecycleScope.launch {
+            repeatOnLifecycle(Lifecycle.State.STARTED) {
+                viewModel.navigateToDetail.collect {
+                    view?.findNavController()?.popBackStack()
+                }
+            }
+        }
+    }
+
+    private fun setupTextWatchers() {
+        binding.bookName.addTextChangedListener { str ->
+            viewModel.onBookNameChanged(str?.toString() ?: "")
+        }
+
+        binding.bookAuthor.addTextChangedListener { str ->
+            viewModel.onBookAuthorChanged(str?.toString() ?: "")
+        }
+
+        binding.bookDesc.addTextChangedListener { str ->
+            viewModel.onBookDescChanged(str?.toString() ?: "")
+        }
+    }
+
+    private fun setupUpdateButton () {
+        binding.updateButton.setOnClickListener {
+            viewModel.updateTask()
         }
     }
 
