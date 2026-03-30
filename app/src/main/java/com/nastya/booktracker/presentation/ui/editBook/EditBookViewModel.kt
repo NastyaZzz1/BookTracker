@@ -30,7 +30,7 @@ class EditBookViewModel(
 
     init {
         viewModelScope.launch {
-            bookDao.getOneFlow(bookId)
+            bookDao.getBook(bookId)
                 .collect { book ->
                     _bookState.value = book
                 }

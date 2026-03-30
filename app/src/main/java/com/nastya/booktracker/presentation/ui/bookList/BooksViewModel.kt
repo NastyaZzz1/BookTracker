@@ -28,7 +28,7 @@ class BooksViewModel(val dao: BookDao) : ViewModel() {
     private val _selectedCategory = MutableStateFlow<String?>(null)
 
     val filteredBooks: StateFlow<List<Book>> = combine(
-        dao.getAllFlow(),
+        dao.getAll(),
         _sortedBooksState,
         _selectedCategory
     ) { allBooks, sortState, category ->

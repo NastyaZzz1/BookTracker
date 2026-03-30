@@ -1,32 +1,35 @@
 package com.nastya.booktracker.presentation.ui.favoriteBook
 
 import android.util.Log
-import androidx.lifecycle.LiveData
-import androidx.lifecycle.MutableLiveData
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
 import com.nastya.booktracker.data.local.dao.BookDao
 import com.nastya.booktracker.domain.model.Book
+import kotlinx.coroutines.flow.MutableSharedFlow
+import kotlinx.coroutines.flow.SharingStarted
+import kotlinx.coroutines.flow.StateFlow
+import kotlinx.coroutines.flow.asSharedFlow
+import kotlinx.coroutines.flow.map
+import kotlinx.coroutines.flow.stateIn
 import kotlinx.coroutines.launch
 
 class FavoriteBooksViewModel(val dao: BookDao) : ViewModel() {
-    private val _navigateToBook = MutableLiveData<Long?>()
-    val navigateToBook: LiveData<Long?>
-        get() = _navigateToBook
+    private val _navigateToBook = MutableSharedFlow<Long>()
+    val navigateToBook = _navigateToBook.asSharedFlow()
+
+    val favoriteBooks: StateFlow<List<Book>> = dao.getAll()
+        .map { books -> books.filter { it.isFavorite } }
+        .stateIn(
+            viewModelScope,
+            SharingStarted.Lazily,
+            emptyList()
+        )
 
     fun onBookClicked(bookId: Long) {
-        _navigateToBook.value = bookId
+        viewModelScope.launch {
+            _navigateToBook.emit(bookId)
+        }
     }
-
-    fun onBookNavigated() {
-        _navigateToBook.value = null
-    }
-
-    private val _books = dao.getAll()
-    private val books: LiveData<List<Book>> = _books
-
-    private var _favoriteProducts = MutableLiveData<List<Book>>(emptyList())
-    var favoriteProducts: LiveData<List<Book>> = _favoriteProducts
 
     fun toggleBookIsFavorite(bookId: Long) {
         viewModelScope.launch {
@@ -36,12 +39,6 @@ class FavoriteBooksViewModel(val dao: BookDao) : ViewModel() {
             } else {
                 Log.e("BooksViewModel", "Книга с bookId=$bookId не найдена.")
             }
-        }
-    }
-
-    fun filterByFavorite() {
-        books.observeForever { currentList ->
-            _favoriteProducts.value = currentList?.filter { it.isFavorite } ?: emptyList()
         }
     }
 }

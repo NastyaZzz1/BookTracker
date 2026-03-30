@@ -1,6 +1,5 @@
 package com.nastya.booktracker.data.local.dao
 
-import androidx.lifecycle.LiveData
 import androidx.room.Dao
 import androidx.room.Delete
 import androidx.room.Insert
@@ -24,13 +23,10 @@ interface BookDao {
     suspend fun getNotLive(bookId: Long): Book?
 
     @Query("SELECT * FROM book_table WHERE book_id = :bookId")
-    fun getOneFlow(bookId: Long): Flow<Book>
-
-    @Query("SELECT * FROM book_table ORDER BY book_id DESC")
-    fun getAll() : LiveData<List<Book>>
+    fun getBook(bookId: Long): Flow<Book>
 
     @Query("SELECT * FROM book_table")
-    fun getAllFlow(): Flow<List<Book>>
+    fun getAll(): Flow<List<Book>>
 
     @Query("SELECT * FROM book_table")
     suspend fun getAllOnce(): List<Book>

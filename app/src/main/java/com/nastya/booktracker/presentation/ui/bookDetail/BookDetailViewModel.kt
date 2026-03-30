@@ -28,7 +28,7 @@ class BookDetailViewModel(bookId: Long, private val bookDao: BookDao): ViewModel
 
     init {
         viewModelScope.launch {
-            bookDao.getOneFlow(bookId).collect { book ->
+            bookDao.getBook(bookId).collect { book ->
                 _bookState.value = book
             }
         }

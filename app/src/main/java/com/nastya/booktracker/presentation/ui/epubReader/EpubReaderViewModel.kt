@@ -44,7 +44,7 @@ class EpubReaderViewModel(
         }
     }
 
-    val book = bookDao.getOneFlow(bookId)
+    val book = bookDao.getBook(bookId)
 
     @OptIn(ExperimentalDecorator::class)
     val highlightDecorations: Flow<List<Decoration>> =
