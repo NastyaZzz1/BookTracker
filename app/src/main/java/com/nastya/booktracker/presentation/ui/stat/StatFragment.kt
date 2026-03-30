@@ -6,27 +6,27 @@ import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
 import androidx.annotation.RequiresApi
+import androidx.core.content.ContextCompat
 import androidx.fragment.app.Fragment
+import androidx.lifecycle.Lifecycle
 import androidx.lifecycle.ViewModelProvider
-import com.github.mikephil.charting.components.AxisBase
+import androidx.lifecycle.lifecycleScope
+import androidx.lifecycle.repeatOnLifecycle
 import com.github.mikephil.charting.components.XAxis
 import com.github.mikephil.charting.data.BarData
 import com.github.mikephil.charting.data.BarDataSet
+import com.github.mikephil.charting.data.BarEntry
 import com.github.mikephil.charting.formatter.ValueFormatter
 import com.nastya.booktracker.R
 import com.nastya.booktracker.data.local.database.BookDatabase
 import com.nastya.booktracker.databinding.FragmentStatBinding
-import java.text.SimpleDateFormat
-import java.util.Date
-import java.util.Locale
+import kotlinx.coroutines.launch
+import java.time.LocalDate
 
-@Suppress("DEPRECATION")
 @RequiresApi(Build.VERSION_CODES.O)
 class StatFragment : Fragment() {
     private var _binding: FragmentStatBinding? = null
     private val binding get() = _binding!!
-    private lateinit var barData: BarData
-    private lateinit var barDataSet: BarDataSet
     private lateinit var viewModel: StatViewModel
 
     override fun onCreateView(
@@ -41,37 +41,15 @@ class StatFragment : Fragment() {
     override fun onViewCreated(view: View, savedInstanceState: Bundle?) {
         super.onViewCreated(view, savedInstanceState)
         initViewModel()
+        setupChart()
 
-        viewModel.getBarChartData()
+        viewModel.loadYearStat(LocalDate.now().year)
 
-        viewModel.barChartData.observe(viewLifecycleOwner) { entries ->
-            barDataSet = BarDataSet(entries, "Bar Chart Data")
-            barData = BarData(barDataSet)
-            binding.idBarChart.data = barData
-            binding.idBarChart.description.isEnabled = false
-            binding.idBarChart.legend.isEnabled = false
-            binding.idBarChart.axisRight.isEnabled = false
-            barDataSet.setColor(resources.getColor(R.color.light_brown))
-            binding.idBarChart.xAxis.position = XAxis.XAxisPosition.BOTTOM
-
-            val months = arrayOf("Я", "Ф", "М", "А", "М", "И", "И", "А", "С", "О", "Н", "Д")
-
-            binding.idBarChart.xAxis.valueFormatter = object : ValueFormatter() {
-
-                override fun getFormattedValue(value: Float): String {
-                    return if (value < months.size) months[value.toInt()] else ""
+        viewLifecycleOwner.lifecycleScope.launch {
+            repeatOnLifecycle(Lifecycle.State.STARTED) {
+                viewModel.monthStats.collect { entries ->
+                    updateChart(entries)
                 }
-                override fun getAxisLabel(value: Float, axis: AxisBase?): String {
-                    return getFormattedValue(value)
-                }
-            }
-            binding.idBarChart.xAxis.granularity = 1f
-            binding.idBarChart.xAxis.setLabelCount(months.size, true)
-            binding.yearStat.text = SimpleDateFormat("yyyy", Locale.getDefault()).format(Date())
-
-            with(binding.idBarChart) {
-                axisLeft.axisMinimum = 0f
-                invalidate()
             }
         }
     }
@@ -81,6 +59,57 @@ class StatFragment : Fragment() {
         val dailyReadingDao = BookDatabase.getInstance(application).dailyReadingDao
         val viewModelFactory = StatViewModelFactory(dailyReadingDao)
         viewModel = ViewModelProvider(this, viewModelFactory)[StatViewModel::class.java]
+    }
+
+    private fun setupChart() = with(binding.idBarChart) {
+        description.isEnabled = false
+        legend.isEnabled = false
+        axisRight.isEnabled = false
+
+        axisLeft.axisMinimum = 0f
+        xAxis.position = XAxis.XAxisPosition.BOTTOM
+        xAxis.granularity = 1f
+        xAxis.axisMinimum = 0f
+        xAxis.axisMaximum = 11f
+        xAxis.setLabelCount(12, true)
+
+        xAxis.valueFormatter = object : ValueFormatter() {
+            private val months =
+                arrayOf("Я", "Ф", "М", "А", "М", "И", "И", "А", "С", "О", "Н", "Д")
+
+            override fun getFormattedValue(value: Float): String {
+                return months.getOrNull(value.toInt()) ?: ""
+            }
+        }
+
+        data = BarData(
+            BarDataSet(emptyList(), "").apply {
+                color = ContextCompat.getColor(
+                    requireContext(),
+                    R.color.light_brown
+                )
+            }
+        ).apply {
+            barWidth = 0.9f
+        }
+
+        setFitBars(true)
+    }
+
+    private fun updateChart(stats: List<StatViewModel.MonthStat>) {
+        val entries = stats.map {
+            BarEntry((it.month - 1).toFloat(), it.pages.toFloat())
+        }
+
+        val chart = binding.idBarChart
+        val dataSet = binding.idBarChart.data.getDataSetByIndex(0) as BarDataSet
+        dataSet.values = entries
+
+        val maxValue = stats.maxOfOrNull { it.pages } ?: 0
+        chart.axisLeft.axisMaximum = (maxValue * 1.2f).coerceAtLeast(1f)
+
+        chart.notifyDataSetChanged()
+        chart.invalidate()
     }
 
     override fun onDestroyView() {
