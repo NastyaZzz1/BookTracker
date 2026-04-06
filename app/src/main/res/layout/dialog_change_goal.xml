@@ -19,10 +19,33 @@
             android:text="@string/for_day"
             android:textColor="@color/dark_brown"
             android:textSize="18sp"
-            app:layout_constraintBottom_toTopOf="@+id/timePicker"
             app:layout_constraintEnd_toEndOf="parent"
             app:layout_constraintStart_toStartOf="parent"
             app:layout_constraintTop_toTopOf="parent" />
+
+        <EditText
+            android:id="@+id/goal_hour"
+            android:layout_width="0dp"
+            android:layout_height="wrap_content"
+            android:autofillHints=""
+            android:inputType="number"
+            android:labelFor="@id/day_goal_label"
+            android:minWidth="48dp"
+            android:minHeight="48dp"
+            app:layout_constraintStart_toStartOf="parent"
+            app:layout_constraintTop_toBottomOf="@+id/goal_label" />
+
+        <EditText
+            android:id="@+id/goal_min"
+            android:layout_width="0dp"
+            android:layout_height="wrap_content"
+            android:autofillHints=""
+            android:inputType="number"
+            android:labelFor="@id/day_goal_label"
+            android:minWidth="48dp"
+            android:minHeight="48dp"
+            app:layout_constraintStart_toEndOf="@+id/goal_hour"
+            app:layout_constraintTop_toBottomOf="@+id/goal_label" />
 
         <TimePicker
             android:id="@+id/timePicker"
@@ -31,8 +54,8 @@
             android:layout_gravity="center"
             android:scaleX="0.7"
             android:scaleY="0.7"
+            android:visibility="gone"
             android:timePickerMode="spinner"
-            app:layout_constraintTop_toBottomOf="@+id/goal_label"
             app:layout_constraintEnd_toEndOf="parent"
             app:layout_constraintStart_toStartOf="parent"
             app:layout_constraintBottom_toBottomOf="parent" />

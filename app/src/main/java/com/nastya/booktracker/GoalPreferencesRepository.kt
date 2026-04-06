@@ -33,15 +33,21 @@ class GoalPreferencesRepository(
     fun setDailyGoal(value: Int) {
         prefs.edit { putInt(dayGoalKey, value) }
         _dailyGoal.value = value
+        _monthlyGoal.value = value * 30
+        _yearlyGoal.value = value * 30 * 12
     }
 
     fun setMonthlyGoal(value: Int) {
         prefs.edit { putInt(monthGoalKey, value) }
+        _dailyGoal.value = value / 30
         _monthlyGoal.value = value
+        _yearlyGoal.value = value * 12
     }
 
     fun setYearlyGoal(value: Int) {
         prefs.edit { putInt(yearGoalKey, value) }
+        _dailyGoal.value = value / 12 / 30
+        _monthlyGoal.value = value / 12
         _yearlyGoal.value = value
     }
 }

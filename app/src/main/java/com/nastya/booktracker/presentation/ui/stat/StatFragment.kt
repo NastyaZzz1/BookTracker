@@ -41,17 +41,11 @@ class StatFragment : Fragment() {
     override fun onViewCreated(view: View, savedInstanceState: Bundle?) {
         super.onViewCreated(view, savedInstanceState)
         initViewModel()
+
+        binding.yearStat.text = LocalDate.now().year.toString()
         setupChart()
-
         viewModel.loadYearStat(LocalDate.now().year)
-
-        viewLifecycleOwner.lifecycleScope.launch {
-            repeatOnLifecycle(Lifecycle.State.STARTED) {
-                viewModel.monthStats.collect { entries ->
-                    updateChart(entries)
-                }
-            }
-        }
+        observeMonthStat()
     }
 
     private fun initViewModel() {
@@ -59,6 +53,16 @@ class StatFragment : Fragment() {
         val dailyReadingDao = BookDatabase.getInstance(application).dailyReadingDao
         val viewModelFactory = StatViewModelFactory(dailyReadingDao)
         viewModel = ViewModelProvider(this, viewModelFactory)[StatViewModel::class.java]
+    }
+
+    private fun observeMonthStat() {
+        viewLifecycleOwner.lifecycleScope.launch {
+            repeatOnLifecycle(Lifecycle.State.STARTED) {
+                viewModel.monthStats.collect { entries ->
+                    updateChart(entries)
+                }
+            }
+        }
     }
 
     private fun setupChart() = with(binding.idBarChart) {

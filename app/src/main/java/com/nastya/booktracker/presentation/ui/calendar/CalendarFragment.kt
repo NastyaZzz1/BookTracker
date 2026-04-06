@@ -15,6 +15,7 @@ import android.graphics.Color
 import android.os.Build
 import android.view.LayoutInflater
 import android.view.ViewGroup
+import android.widget.EditText
 import android.widget.TimePicker
 import androidx.annotation.RequiresApi
 import androidx.fragment.app.Fragment
@@ -34,6 +35,7 @@ import java.time.DayOfWeek
 import java.time.Month
 import java.time.format.TextStyle
 import java.util.*
+import androidx.core.widget.addTextChangedListener
 
 @RequiresApi(Build.VERSION_CODES.O)
 class CalendarFragment : Fragment() {
@@ -220,26 +222,71 @@ class CalendarFragment : Fragment() {
 
         val label = dialogView.findViewById<TextView>(R.id.goal_label)
         val timePicker = dialogView.findViewById<TimePicker>(R.id.timePicker)
-        timePicker.setIs24HourView(true)
+        val editTextHour = dialogView.findViewById<EditText>(R.id.goal_hour)
+        val editTextMin = dialogView.findViewById<EditText>(R.id.goal_min)
 
-        val (currentFlow, onChange) = when (type) {
-            GoalType.DAY -> viewModel.dailyGoal to viewModel::onDayGoalChanged
-            GoalType.MONTH -> viewModel.monthlyGoal to viewModel::onMonthGoalChanged
-            GoalType.YEAR -> viewModel.yearlyGoal to viewModel::onYearGoalChanged
-        }
+        when(type) {
+            GoalType.DAY -> {
+                label.text = "На день"
+                editTextHour.visibility = View.GONE
+                editTextMin.visibility = View.GONE
+                timePicker.visibility = View.VISIBLE
 
-        label.text = when (type) {
-            GoalType.DAY -> "На день"
-            GoalType.MONTH -> "На месяц"
-            GoalType.YEAR -> "На год"
-        }
+                timePicker.setIs24HourView(true)
+                val value = viewModel.dailyGoal.value
+                timePicker.hour = value / 60
+                timePicker.minute = value % 60
 
-        val value = currentFlow.value
-        timePicker.hour = value / 60
-        timePicker.minute = value % 60
+                timePicker.setOnTimeChangedListener { _, h, m ->
+                    viewModel.onDayGoalChanged(h * 60 + m)
+                }
+            }
+            GoalType.MONTH -> {
+                label.text = "На месяц"
+                editTextHour.visibility = View.VISIBLE
+                editTextMin.visibility = View.VISIBLE
+                timePicker.visibility = View.GONE
 
-        timePicker.setOnTimeChangedListener { _, h, m ->
-            onChange(h * 60 + m)
+                editTextHour.setText((viewModel.monthlyGoal.value / 60).toString())
+                editTextHour.addTextChangedListener { text ->
+                    text.toString().toIntOrNull()?.let {
+                        val hour = text.toString().toIntOrNull() ?: 0
+                        val minute = editTextMin.text.toString().toIntOrNull() ?: 0
+                        viewModel.onMonthGoalChanged(hour * 60 + minute)
+                    }
+                }
+                editTextMin.setText((viewModel.monthlyGoal.value % 60).toString())
+                editTextMin.addTextChangedListener { text ->
+                    text.toString().toIntOrNull()?.let {
+                        val hour = editTextHour.text.toString().toIntOrNull() ?: 0
+                        val minute = text.toString().toIntOrNull() ?: 0
+                        viewModel.onMonthGoalChanged(hour * 60 + minute)
+                    }
+                }
+            }
+            GoalType.YEAR -> {
+                label.text = "На год"
+                editTextHour.visibility = View.VISIBLE
+                editTextMin.visibility = View.VISIBLE
+                timePicker.visibility = View.GONE
+
+                editTextHour.setText((viewModel.yearlyGoal.value / 60).toString())
+                editTextHour.addTextChangedListener { text ->
+                    text.toString().toIntOrNull()?.let {
+                        val hour = text.toString().toIntOrNull() ?: 0
+                        val minute = editTextMin.text.toString().toIntOrNull() ?: 0
+                        viewModel.onYearGoalChanged(hour * 60 + minute)
+                    }
+                }
+                editTextMin.setText((viewModel.yearlyGoal.value % 60).toString())
+                editTextMin.addTextChangedListener { text ->
+                    text.toString().toIntOrNull()?.let {
+                        val hour = text.toString().toIntOrNull() ?: 0
+                        val minute = editTextMin.text.toString().toIntOrNull() ?: 0
+                        viewModel.onYearGoalChanged(hour * 60 + minute)
+                    }
+                }
+            }
         }
 
         dialog.show()
@@ -267,9 +314,9 @@ class CalendarFragment : Fragment() {
         val minutes = totalMinutes % 60
 
         return when {
-            hours == 0 -> "$minutes мин"
-            minutes == 0 -> "$hours ч"
-            else -> "$hours ч $minutes мин"
+            hours == 0 -> "${minutes}м"
+            minutes == 0 -> "${hours}ч"
+            else -> "${hours}ч ${minutes}м"
         }
     }
 
