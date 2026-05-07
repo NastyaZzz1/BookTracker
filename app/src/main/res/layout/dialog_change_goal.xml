@@ -35,6 +35,18 @@
             app:layout_constraintStart_toStartOf="parent"
             app:layout_constraintTop_toBottomOf="@+id/goal_label" />
 
+        <TextView
+            android:id="@+id/goal_hour_label"
+            android:layout_width="0dp"
+            android:layout_height="wrap_content"
+            android:labelFor="@id/day_goal"
+            android:text="ч"
+            android:textColor="@color/dark_brown"
+            android:textSize="18sp"
+            app:layout_constraintBottom_toBottomOf="@+id/goal_hour"
+            app:layout_constraintStart_toEndOf="@+id/goal_hour"
+            app:layout_constraintTop_toTopOf="@+id/goal_hour" />
+
         <EditText
             android:id="@+id/goal_min"
             android:layout_width="0dp"
@@ -44,8 +56,20 @@
             android:labelFor="@id/day_goal_label"
             android:minWidth="48dp"
             android:minHeight="48dp"
-            app:layout_constraintStart_toEndOf="@+id/goal_hour"
+            app:layout_constraintStart_toEndOf="@+id/goal_hour_label"
             app:layout_constraintTop_toBottomOf="@+id/goal_label" />
+
+        <TextView
+            android:id="@+id/goal_min_label"
+            android:layout_width="0dp"
+            android:layout_height="wrap_content"
+            android:labelFor="@id/day_goal"
+            android:text="мин"
+            android:textColor="@color/dark_brown"
+            android:textSize="18sp"
+            app:layout_constraintBottom_toBottomOf="@+id/goal_min"
+            app:layout_constraintStart_toEndOf="@+id/goal_min"
+            app:layout_constraintTop_toTopOf="@+id/goal_min"  />
 
         <TimePicker
             android:id="@+id/timePicker"

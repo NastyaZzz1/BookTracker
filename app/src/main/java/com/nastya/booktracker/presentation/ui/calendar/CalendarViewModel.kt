@@ -34,10 +34,11 @@ class CalendarViewModel(
     fun onYearGoalChanged(value: Int) =
         goalRepo.setYearlyGoal(value)
 
-    suspend fun getDailyProgress (date: LocalDate) : Float {
-        val goal = dailyGoal.value
-        val time = dailyReadingDao.getAllTimeOfBook(date) ?: 0
-        return (time * 100f / goal)
+    suspend fun getDailyProgress(date: LocalDate): Float {
+        val goalMinutes = dailyGoal.value
+        val goalSeconds = goalMinutes * 60L
+        val timeSeconds = dailyReadingDao.getAllTimeOfBook(date) ?: 0L
+        return (timeSeconds * 100f / goalSeconds)
     }
 
     suspend fun getBooksForDate(date: LocalDate) =
@@ -46,7 +47,11 @@ class CalendarViewModel(
     suspend fun getReadingTimeForDate(date: LocalDate) =
         dailyReadingDao.getAllTimeOfBook(date) ?: 0
 
-    fun formatTimeMinutes(readingTime: Long) = String.format("%02d:%02d", readingTime / 60, readingTime % 60)
+    fun formatTimeMinutes(readingTime: Long) =
+        String.format("%02d:%02d:%02d",
+            readingTime / 3600,
+            (readingTime % 3600) / 60,
+            readingTime % 60)
 
     @RequiresApi(Build.VERSION_CODES.O)
     fun formatLocalDate(date: LocalDate): String {

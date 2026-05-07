@@ -133,7 +133,7 @@ class EpubReaderViewModel(
     fun saveReadingTime(readingTime: Long) {
         runBlocking(Dispatchers.IO) {
             val today = LocalDate.now()
-            dailyReadingDao.getPagesReadForBookOnDate(today, bookId)?.let {
+            dailyReadingDao.getDailyReading(today, bookId)?.let {
                 dailyReadingDao.update(
                     it.copy (readingTime = it.readingTime + readingTime)
                 )

@@ -24,9 +24,6 @@ data class DailyReading (
     @ColumnInfo(name = "book_id")
     var bookId: Long = 0L,
 
-    @ColumnInfo(name = "count_page")
-    var countPage: Int = 0,
-
     @ColumnInfo(name = "reading_time")
     var readingTime: Long = 0L,
 )

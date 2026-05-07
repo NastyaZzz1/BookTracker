@@ -16,40 +16,6 @@
         android:layout_marginHorizontal="20dp"
         android:paddingVertical="10dp" >
 
-        <com.google.android.material.button.MaterialButtonToggleGroup
-            android:id="@+id/toggleGroup"
-            android:layout_width="match_parent"
-            android:layout_height="wrap_content"
-            app:singleSelection="true"
-            app:selectionRequired="true"
-            app:layout_constraintStart_toStartOf="parent"
-            app:layout_constraintEnd_toEndOf="parent"
-            app:layout_constraintTop_toTopOf="parent"
-            app:checkedButton="@id/btnYear">
-
-            <com.google.android.material.button.MaterialButton
-                android:id="@+id/btnMonth"
-                style="@style/Widget.Material3.Button.OutlinedButton"
-                android:textColor="@color/white"
-                app:strokeColor="@color/selector_toggle_background"
-                android:backgroundTint="@color/selector_toggle_background"
-                android:layout_width="0dp"
-                android:layout_weight="1"
-                android:layout_height="38dp"
-                android:text="В месяц" />
-
-            <com.google.android.material.button.MaterialButton
-                android:id="@+id/btnYear"
-                style="@style/Widget.Material3.Button.OutlinedButton"
-                android:textColor="@color/white"
-                app:strokeColor="@color/selector_toggle_background"
-                android:backgroundTint="@color/selector_toggle_background"
-                android:layout_width="0dp"
-                android:layout_weight="1"
-                android:layout_height="38dp"
-                android:text="Год" />
-        </com.google.android.material.button.MaterialButtonToggleGroup>
-
         <TextView
             android:id="@+id/yearStat"
             android:layout_width="wrap_content"
@@ -58,7 +24,7 @@
             android:textSize="20sp"
             android:layout_marginTop="5dp"
             app:layout_constraintStart_toStartOf="parent"
-            app:layout_constraintTop_toBottomOf="@+id/toggleGroup" />
+            app:layout_constraintTop_toTopOf="parent" />
 
         <TextView
             android:id="@+id/textView"
