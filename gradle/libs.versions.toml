@@ -20,8 +20,10 @@ mpandroidchart_version = "v3.1.0"
 readium_version = "2.4.0"
 coroutines_version = "1.7.3"
 gson_version = "2.10.1"
+carouselrecyclerview_version = "1.2.6"
 
 [libraries]
+carouselrecyclerview = { module = "com.github.sparrow007:carouselrecyclerview", version.ref = "carouselrecyclerview_version" }
 gson = { module = "com.google.code.gson:gson", version.ref = "gson_version" }
 readium-shared = { module = "org.readium.kotlin-toolkit:readium-shared", version.ref = "readium_version" }
 readium-streamer = { module = "org.readium.kotlin-toolkit:readium-streamer", version.ref = "readium_version" }

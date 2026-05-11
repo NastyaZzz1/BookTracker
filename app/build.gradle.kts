@@ -43,6 +43,7 @@ android {
 
 dependencies {
     implementation(libs.gson)
+    implementation(libs.carouselrecyclerview)
     implementation(libs.readium.shared)
     implementation(libs.readium.streamer)
     implementation(libs.readium.navigator)

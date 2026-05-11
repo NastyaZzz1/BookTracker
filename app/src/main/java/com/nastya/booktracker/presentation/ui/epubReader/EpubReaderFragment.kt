@@ -3,7 +3,6 @@ package com.nastya.booktracker.presentation.ui.epubReader
 import android.graphics.PointF
 import android.os.Build
 import android.os.Bundle
-import android.util.Log
 import android.view.ActionMode
 import android.view.LayoutInflater
 import android.view.Menu

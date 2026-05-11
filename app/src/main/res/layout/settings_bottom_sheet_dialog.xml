@@ -2,7 +2,6 @@
 <androidx.cardview.widget.CardView
     xmlns:android="http://schemas.android.com/apk/res/android"
     xmlns:app="http://schemas.android.com/apk/res-auto"
-    xmlns:tools="http://schemas.android.com/tools"
     android:layout_width="match_parent"
     android:layout_height="wrap_content"
     app:cardElevation="0dp">
@@ -22,7 +21,6 @@
             android:checkable="true"
             android:textColor="@color/dark_gray"
             app:backgroundTint="@color/white"
-            app:layout_constraintBottom_toBottomOf="parent"
             app:layout_constraintStart_toStartOf="parent"
             app:layout_constraintTop_toTopOf="parent"
             app:layout_constraintEnd_toStartOf="@+id/sepia_style"
@@ -37,7 +35,6 @@
             android:textColor="@color/brown"
             app:backgroundTint="@color/sepia"
             android:checkable="true"
-            app:layout_constraintBottom_toBottomOf="parent"
             app:layout_constraintStart_toEndOf="@+id/white_style"
             app:layout_constraintTop_toTopOf="parent"
             app:layout_constraintEnd_toStartOf="@+id/black_style"
@@ -52,12 +49,60 @@
             android:checkable="true"
             android:textColor="@color/gray"
             app:backgroundTint="@color/black"
-            app:layout_constraintBottom_toBottomOf="parent"
             app:layout_constraintEnd_toEndOf="parent"
             app:layout_constraintStart_toEndOf="@+id/sepia_style"
             app:layout_constraintTop_toTopOf="parent"
             app:strokeColor="@color/selector_btn_stroke_black"
             app:strokeWidth="2dp" />
+
+        <TextView
+            android:id="@+id/fontSizeLable"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:text="Размер шрифта"
+            android:textSize="16sp"
+            android:layout_marginTop="10dp"
+            app:layout_constraintStart_toStartOf="@+id/white_style"
+            app:layout_constraintTop_toBottomOf="@+id/white_style" />
+
+        <com.google.android.material.button.MaterialButtonToggleGroup
+            android:id="@+id/toggleGroup"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            app:layout_constraintBottom_toBottomOf="@+id/fontSizeLable"
+            app:layout_constraintEnd_toEndOf="parent"
+            app:layout_constraintStart_toEndOf="@+id/fontSizeLable"
+            app:layout_constraintTop_toTopOf="@+id/fontSizeLable"
+            app:selectionRequired="true">
+
+            <com.google.android.material.button.MaterialButton
+                android:id="@+id/btnMinus"
+                style="@style/Widget.Material3.Button.OutlinedButton"
+                android:layout_width="60dp"
+                android:layout_height="38dp"
+                android:backgroundTint="@color/transparent"
+                android:text="-"
+                android:textColor="@color/black"
+                app:strokeColor="@color/selector_toggle_background" />
+
+            <com.google.android.material.button.MaterialButton
+                android:id="@+id/btnPlus"
+                style="@style/Widget.Material3.Button.OutlinedButton"
+                android:layout_width="60dp"
+                android:layout_height="38dp"
+                android:backgroundTint="@color/transparent"
+                android:text="+"
+                android:textColor="@color/black"
+                app:strokeColor="@color/selector_toggle_background" />
+        </com.google.android.material.button.MaterialButtonToggleGroup>
+
+        <com.jackandphantom.carouselrecyclerview.CarouselRecyclerview
+            android:id="@+id/carouselRecyclerview"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            app:layout_constraintEnd_toEndOf="parent"
+            app:layout_constraintStart_toStartOf="parent"
+            app:layout_constraintTop_toBottomOf="@+id/toggleGroup" />
 
     </androidx.constraintlayout.widget.ConstraintLayout>
 </androidx.cardview.widget.CardView>

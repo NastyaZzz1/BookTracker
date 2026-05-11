@@ -78,19 +78,16 @@ class CalendarFragment : Fragment() {
     }
 
     private fun setupGoalListener() {
-        binding.itemDayGoal.setOnLongClickListener {
+        binding.itemDayGoal.setOnClickListener {
             viewModel.onChangeGoalClicked(GoalType.DAY)
-            true
         }
 
-        binding.itemMonthGoal.setOnLongClickListener {
+        binding.itemMonthGoal.setOnClickListener {
             viewModel.onChangeGoalClicked(GoalType.MONTH)
-            true
         }
 
-        binding.itemYearGoal.setOnLongClickListener {
+        binding.itemYearGoal.setOnClickListener {
             viewModel.onChangeGoalClicked(GoalType.YEAR)
-            true
         }
     }
 
