@@ -323,7 +323,7 @@ class EpubReaderFragment : Fragment() {
 
     @RequiresApi(Build.VERSION_CODES.M)
     fun setSettingsBottomDialog() {
-        bookSettingsManager.showThemeDialog(layoutInflater, requireContext())
+        bookSettingsManager.showSettingsDialog(layoutInflater)
     }
 
     private fun maybeSaveProgress() {

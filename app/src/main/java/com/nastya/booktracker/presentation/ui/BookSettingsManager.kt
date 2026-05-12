@@ -1,6 +1,5 @@
 package com.nastya.booktracker.presentation.ui
 
-import android.content.Context
 import android.graphics.Typeface
 import android.os.Build
 import android.view.Gravity
@@ -9,6 +8,7 @@ import android.view.View
 import android.view.ViewGroup
 import android.widget.TextView
 import androidx.annotation.RequiresApi
+import androidx.core.content.ContextCompat
 import androidx.core.graphics.toColorInt
 import androidx.lifecycle.LifecycleCoroutineScope
 import androidx.recyclerview.widget.RecyclerView
@@ -69,13 +69,17 @@ class BookSettingsManager(
     }
     
     @RequiresApi(Build.VERSION_CODES.M)
-    fun showThemeDialog(inflater: LayoutInflater, context: Context) {
+    fun showSettingsDialog(inflater: LayoutInflater) {
         val viewDialog = inflater.inflate(R.layout.settings_bottom_sheet_dialog, null)
-        BottomSheetDialog(context).apply {
-            setupThemeButtons(viewDialog, context)
-            setupFontSizeButtons(viewDialog)
-            setupFontFamily(viewDialog)
 
+        setupThemeButtons(viewDialog)
+        setupFontSizeButtons(viewDialog)
+        setupFontFamily(viewDialog)
+
+        syncThemeButtons()
+        syncDialogBackground(viewDialog)
+
+        BottomSheetDialog(viewDialog.context).apply {
             setCancelable(true)
             setCanceledOnTouchOutside(true)
             setContentView(viewDialog)
@@ -84,7 +88,7 @@ class BookSettingsManager(
     }
 
     @RequiresApi(Build.VERSION_CODES.M)
-    private fun setupThemeButtons(viewDialog: View, context: Context) {
+    private fun setupThemeButtons(viewDialog: View) {
         val whiteBtn = viewDialog.findViewById<MaterialButton>(R.id.white_style)
         val sepiaBtn = viewDialog.findViewById<MaterialButton>(R.id.sepia_style)
         val blackBtn = viewDialog.findViewById<MaterialButton>(R.id.black_style)
@@ -92,21 +96,24 @@ class BookSettingsManager(
         themeButtons = listOf(whiteBtn, sepiaBtn, blackBtn)
 
         whiteBtn.setOnClickListener {
-            viewDialog.setBackgroundColor(context.getColor(R.color.white))
+            val color = ContextCompat.getColor(viewDialog.context, R.color.white)
+            viewDialog.setBackgroundColor(color)
             selectButton(whiteBtn)
             currentTheme = Theme.LIGHT
             saveSettings()
             applySettings()
         }
         sepiaBtn.setOnClickListener {
-            viewDialog.setBackgroundColor(context.getColor(R.color.sepia))
+            val color = ContextCompat.getColor(viewDialog.context, R.color.sepia)
+            viewDialog.setBackgroundColor(color)
             selectButton(sepiaBtn)
             currentTheme = Theme.SEPIA
             saveSettings()
             applySettings()
         }
         blackBtn.setOnClickListener {
-            viewDialog.setBackgroundColor(context.getColor(R.color.black))
+            val color = ContextCompat.getColor(viewDialog.context, R.color.black)
+            viewDialog.setBackgroundColor(color)
             selectButton(blackBtn)
             currentTheme = Theme.DARK
             saveSettings()
@@ -208,5 +215,26 @@ class BookSettingsManager(
     private fun selectButton(selectedBtn: MaterialButton) {
         themeButtons.forEach { it.isChecked = false }
         selectedBtn.isChecked = true
+    }
+
+    private fun syncThemeButtons() {
+        if (!::themeButtons.isInitialized) return
+
+        val selectedButton = when (currentTheme) {
+            Theme.LIGHT -> themeButtons.find { it.id == R.id.white_style }
+            Theme.SEPIA -> themeButtons.find { it.id == R.id.sepia_style }
+            Theme.DARK -> themeButtons.find { it.id == R.id.black_style }
+        }
+
+        selectedButton?.let { selectButton(it) }
+    }
+
+    private fun syncDialogBackground(viewDialog: View) {
+        val bgColor = when (currentTheme) {
+            Theme.LIGHT -> R.color.white
+            Theme.SEPIA -> R.color.sepia
+            Theme.DARK -> R.color.black
+        }
+        viewDialog.setBackgroundColor(ContextCompat.getColor(viewDialog.context,bgColor))
     }
 }

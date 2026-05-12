@@ -82,7 +82,7 @@
                 android:layout_height="38dp"
                 android:backgroundTint="@color/transparent"
                 android:text="-"
-                android:textColor="@color/black"
+                android:textColor="@color/dark_brown"
                 app:strokeColor="@color/selector_toggle_background" />
 
             <com.google.android.material.button.MaterialButton
@@ -92,7 +92,7 @@
                 android:layout_height="38dp"
                 android:backgroundTint="@color/transparent"
                 android:text="+"
-                android:textColor="@color/black"
+                android:textColor="@color/dark_brown"
                 app:strokeColor="@color/selector_toggle_background" />
         </com.google.android.material.button.MaterialButtonToggleGroup>
 
