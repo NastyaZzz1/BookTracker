@@ -21,7 +21,9 @@ import com.nastya.booktracker.data.local.database.BookDatabase
 import com.nastya.booktracker.databinding.FragmentEpubReaderBinding
 import com.nastya.booktracker.domain.model.Highlight
 import com.nastya.booktracker.domain.model.LocatorDto
-import com.nastya.booktracker.presentation.ui.ThemeManager
+import com.nastya.booktracker.presentation.ui.BookSettingsManager
+import com.nastya.booktracker.presentation.ui.BookSettingsRepository
+import com.nastya.booktracker.presentation.ui.SettingsCache
 import com.nastya.booktracker.presentation.ui.main.MainActivity
 import kotlinx.coroutines.delay
 import kotlinx.coroutines.flow.firstOrNull
@@ -31,6 +33,7 @@ import org.readium.r2.navigator.Decoration
 import org.readium.r2.navigator.ExperimentalDecorator
 import org.readium.r2.navigator.SelectableNavigator
 import org.readium.r2.navigator.epub.EpubNavigatorFragment
+import org.readium.r2.navigator.epub.EpubPreferences
 import org.readium.r2.navigator.util.BaseActionModeCallback
 import org.readium.r2.shared.ExperimentalReadiumApi
 import org.readium.r2.shared.publication.Locator
@@ -46,7 +49,7 @@ class EpubReaderFragment : Fragment() {
 
     private lateinit var highlightsManager: HighlightsManager
     private lateinit var notesManager: NotesManager
-    private lateinit var themeManager: ThemeManager
+    private lateinit var bookSettingsManager: BookSettingsManager
 
     private val decorationListener by lazy { DecorationListener() }
 
@@ -148,7 +151,13 @@ class EpubReaderFragment : Fragment() {
             navigatorFragment = { navigatorFragment as? SelectableNavigator }
         )
 
-        themeManager = ThemeManager { navigatorFragment }
+        bookSettingsManager = BookSettingsManager(
+            navigatorFragment = { navigatorFragment },
+            settingsRepository = BookSettingsRepository(
+                BookDatabase.getInstance(requireContext()).bookSettingsDao
+            ),
+            lifecycleScope = viewLifecycleOwner.lifecycleScope
+        )
     }
 
     private fun setupObservers(savedInstanceState: Bundle?) {
@@ -202,6 +211,10 @@ class EpubReaderFragment : Fragment() {
     }
 
     private fun displayPublication(publication: Publication, initialLocator: Locator?) {
+        val initialTheme = SettingsCache.getReadiumTheme()
+        val initialFontSize = SettingsCache.fontSize
+        val initialFontFamily = SettingsCache.getReadiumFontFamily()
+
         childFragmentManager.fragmentFactory = EpubNavigatorFragment.createFactory(
             publication = publication,
             initialLocator = initialLocator,
@@ -219,7 +232,19 @@ class EpubReaderFragment : Fragment() {
         navigatorFragment =
             childFragmentManager.findFragmentByTag("EPUB_NAVIGATOR")
                     as EpubNavigatorFragment
-        navigatorFragment?.let { setPrecentRead(it) }
+        navigatorFragment?.let {
+            setPrecentRead(it)
+
+            it.submitPreferences(EpubPreferences(
+                theme = initialTheme,
+                fontSize = initialFontSize,
+                fontFamily = initialFontFamily
+            ))
+        }
+
+        viewLifecycleOwner.lifecycleScope.launch {
+            bookSettingsManager.loadSettings()
+        }
     }
 
     private fun setPrecentRead(navigatorFragment: EpubNavigatorFragment) {
@@ -298,7 +323,7 @@ class EpubReaderFragment : Fragment() {
 
     @RequiresApi(Build.VERSION_CODES.M)
     fun setSettingsBottomDialog() {
-        themeManager.showThemeDialog(layoutInflater, requireContext())
+        bookSettingsManager.showThemeDialog(layoutInflater, requireContext())
     }
 
     private fun maybeSaveProgress() {

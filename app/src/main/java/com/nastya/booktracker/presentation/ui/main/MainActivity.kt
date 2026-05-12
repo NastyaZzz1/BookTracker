@@ -17,6 +17,7 @@ import androidx.annotation.RequiresApi
 import androidx.appcompat.app.AppCompatActivity
 import androidx.core.view.doOnPreDraw
 import androidx.lifecycle.ViewModelProvider
+import androidx.lifecycle.lifecycleScope
 import androidx.navigation.NavController
 import androidx.navigation.fragment.NavHostFragment
 import androidx.navigation.ui.AppBarConfiguration
@@ -27,9 +28,12 @@ import com.nastya.booktracker.R
 import com.nastya.booktracker.data.local.database.BookDatabase
 import com.nastya.booktracker.databinding.ActivityMainBinding
 import com.nastya.booktracker.presentation.ui.EpubRepository
+import com.nastya.booktracker.presentation.ui.SettingsCache
 import com.nastya.booktracker.presentation.ui.addBookEpub.AddBookEpubViewModel
 import com.nastya.booktracker.presentation.ui.addBookEpub.AddBookEpubViewModelFactory
 import com.nastya.booktracker.presentation.ui.epubReader.EpubReaderFragment
+import kotlinx.coroutines.Dispatchers
+import kotlinx.coroutines.launch
 
 class MainActivity : AppCompatActivity() {
     lateinit var binding: ActivityMainBinding
@@ -81,6 +85,7 @@ class MainActivity : AppCompatActivity() {
         setContentView(binding.root)
         setSupportActionBar(binding.toolbar)
 
+        loadSettingsToCache()
         initViewModel()
         setupNavigation()
         setupToolbarMenu()
@@ -238,6 +243,30 @@ class MainActivity : AppCompatActivity() {
 
         if (currentFragment is EpubReaderFragment) {
             currentFragment.setSettingsBottomDialog()
+        }
+    }
+
+    private fun loadSettingsToCache() {
+        lifecycleScope.launch(Dispatchers.IO) {
+            try {
+                val dao = BookDatabase.getInstance(applicationContext).bookSettingsDao
+                val settings = dao.getSettings()
+
+                if (settings != null) {
+                    SettingsCache.update(
+                        theme = settings.theme,
+                        fontSize = settings.fontSize,
+                        fontFamily = settings.fontFamily,
+                        fontIndex = settings.fontIndex
+                    )
+                } else {
+                    SettingsCache.reset()
+                }
+                SettingsCache.isLoaded = true
+
+            } catch (e: Exception) {
+                SettingsCache.reset()
+            }
         }
     }
 

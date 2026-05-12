@@ -10,12 +10,14 @@ import android.view.ViewGroup
 import android.widget.TextView
 import androidx.annotation.RequiresApi
 import androidx.core.graphics.toColorInt
+import androidx.lifecycle.LifecycleCoroutineScope
 import androidx.recyclerview.widget.RecyclerView
 import com.google.android.material.bottomsheet.BottomSheetDialog
 import com.google.android.material.button.MaterialButton
 import com.jackandphantom.carouselrecyclerview.CarouselLayoutManager
 import com.jackandphantom.carouselrecyclerview.CarouselRecyclerview
 import com.nastya.booktracker.R
+import kotlinx.coroutines.launch
 import org.readium.r2.navigator.epub.EpubNavigatorFragment
 import org.readium.r2.navigator.epub.EpubPreferences
 import org.readium.r2.navigator.preferences.FontFamily
@@ -23,7 +25,11 @@ import org.readium.r2.navigator.preferences.Theme
 import org.readium.r2.shared.ExperimentalReadiumApi
 
 @OptIn(ExperimentalReadiumApi::class)
-class ThemeManager(private val navigatorFragment: () -> EpubNavigatorFragment?) {
+class BookSettingsManager(
+    private val navigatorFragment: () -> EpubNavigatorFragment?,
+    private val settingsRepository: BookSettingsRepository,
+    private val lifecycleScope: LifecycleCoroutineScope
+) {
     private lateinit var themeButtons: List<MaterialButton>
 
     private var currentTheme: Theme = Theme.LIGHT
@@ -41,6 +47,26 @@ class ThemeManager(private val navigatorFragment: () -> EpubNavigatorFragment?) 
         "Mono" to FontFamily.MONOSPACE,
         "Cursive" to FontFamily.CURSIVE
     )
+
+    suspend fun loadSettings() {
+        val settings = settingsRepository.getSettings()
+        if (settings != null) {
+            currentTheme = when (settings.theme) {
+                ThemeType.LIGHT -> Theme.LIGHT
+                ThemeType.SEPIA -> Theme.SEPIA
+                ThemeType.DARK -> Theme.DARK
+            }
+            currentFontSize = settings.fontSize
+            currentFontFamily = when (settings.fontFamily) {
+                FontFamilyType.SANS_SERIF -> FontFamily.SANS_SERIF
+                FontFamilyType.SERIF -> FontFamily.SERIF
+                FontFamilyType.MONOSPACE -> FontFamily.MONOSPACE
+                FontFamilyType.CURSIVE -> FontFamily.CURSIVE
+            }
+            currentFontIndex = settings.fontIndex
+            applySettings()
+        }
+    }
     
     @RequiresApi(Build.VERSION_CODES.M)
     fun showThemeDialog(inflater: LayoutInflater, context: Context) {
@@ -69,18 +95,21 @@ class ThemeManager(private val navigatorFragment: () -> EpubNavigatorFragment?) 
             viewDialog.setBackgroundColor(context.getColor(R.color.white))
             selectButton(whiteBtn)
             currentTheme = Theme.LIGHT
+            saveSettings()
             applySettings()
         }
         sepiaBtn.setOnClickListener {
             viewDialog.setBackgroundColor(context.getColor(R.color.sepia))
             selectButton(sepiaBtn)
             currentTheme = Theme.SEPIA
+            saveSettings()
             applySettings()
         }
         blackBtn.setOnClickListener {
             viewDialog.setBackgroundColor(context.getColor(R.color.black))
             selectButton(blackBtn)
             currentTheme = Theme.DARK
+            saveSettings()
             applySettings()
         }
     }
@@ -93,6 +122,7 @@ class ThemeManager(private val navigatorFragment: () -> EpubNavigatorFragment?) 
             val newSize = (currentFontSize - STEP).coerceAtLeast(MIN_FONT_SIZE)
             if (newSize != currentFontSize) {
                 currentFontSize = newSize
+                saveSettings()
                 applySettings()
             }
         }
@@ -100,6 +130,7 @@ class ThemeManager(private val navigatorFragment: () -> EpubNavigatorFragment?) 
             val newSize = (currentFontSize + STEP).coerceAtMost(MAX_FONT_SIZE)
             if (newSize != currentFontSize) {
                 currentFontSize = newSize
+                saveSettings()
                 applySettings()
             }
         }
@@ -147,6 +178,7 @@ class ThemeManager(private val navigatorFragment: () -> EpubNavigatorFragment?) 
                 if (currentFontIndex != position) {
                     currentFontIndex = position
                     currentFontFamily = fonts[position].second
+                    saveSettings()
                     applySettings()
                     adapter.notifyDataSetChanged()
                 }
@@ -160,6 +192,17 @@ class ThemeManager(private val navigatorFragment: () -> EpubNavigatorFragment?) 
             fontSize = currentFontSize,
             fontFamily = currentFontFamily
         ))
+    }
+
+    private fun saveSettings() {
+        lifecycleScope.launch {
+            settingsRepository.saveSettings(
+                theme = currentTheme,
+                fontSize = currentFontSize,
+                fontFamily = currentFontFamily,
+                fontIndex = currentFontIndex
+            )
+        }
     }
 
     private fun selectButton(selectedBtn: MaterialButton) {
