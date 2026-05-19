@@ -46,6 +46,7 @@ class StatFragment : Fragment() {
         setupChart()
         viewModel.loadYearStat(LocalDate.now().year)
         observeMonthStat()
+        setupFilterButtons()
     }
 
     private fun initViewModel() {
@@ -102,18 +103,32 @@ class StatFragment : Fragment() {
 
     private fun updateChart(stats: List<StatViewModel.MonthStat>) {
         val entries = stats.map {
-            BarEntry((it.month - 1).toFloat(), it.pages.toFloat())
+            BarEntry((it.month - 1).toFloat(), it.seconds.toFloat())
         }
 
         val chart = binding.idBarChart
         val dataSet = binding.idBarChart.data.getDataSetByIndex(0) as BarDataSet
         dataSet.values = entries
 
-        val maxValue = stats.maxOfOrNull { it.pages } ?: 0
+        val maxValue = stats.maxOfOrNull { it.seconds } ?: 0
         chart.axisLeft.axisMaximum = (maxValue * 1.2f).coerceAtLeast(1f)
 
         chart.notifyDataSetChanged()
         chart.invalidate()
+    }
+
+    private fun setupFilterButtons() {
+        binding.toggleGroup.addOnButtonCheckedListener { _, checkedId, isChecked ->
+            if (isChecked) {
+                val units = when (checkedId) {
+                    R.id.btnS -> StatViewModel.Units.SECONDS
+                    R.id.btnMin -> StatViewModel.Units.MINUTES
+                    R.id.btnHours -> StatViewModel.Units.HOURS
+                    else -> return@addOnButtonCheckedListener
+                }
+                viewModel.changeUnits(units)
+            }
+        }
     }
 
     override fun onDestroyView() {
