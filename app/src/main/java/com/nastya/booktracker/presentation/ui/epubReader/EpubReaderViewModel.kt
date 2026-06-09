@@ -19,6 +19,7 @@ import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.flow.Flow
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.StateFlow
+import kotlinx.coroutines.flow.first
 import kotlinx.coroutines.flow.map
 import kotlinx.coroutines.launch
 import kotlinx.coroutines.runBlocking
@@ -121,11 +122,12 @@ class EpubReaderViewModel(
     fun saveProgressToDb(locator: Locator?, presentRead: Int) {
         if(locator == null) return
         runBlocking(Dispatchers.IO) {
-            bookDao.getNotLive(bookId)?.apply {
-                locatorJson = Gson().toJson(LocatorDto.fromLocator(locator))
+            val book = bookDao.getBook(bookId).first()
+            val updatedBook = book.copy(
+                locatorJson = Gson().toJson(LocatorDto.fromLocator(locator)),
                 progress = presentRead
-                bookDao.update(this)
-            }
+            )
+            bookDao.update(updatedBook)
         }
     }
 

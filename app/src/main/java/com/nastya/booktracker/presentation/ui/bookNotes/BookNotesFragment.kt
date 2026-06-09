@@ -13,6 +13,7 @@ import com.nastya.booktracker.data.local.database.BookDatabase
 import com.nastya.booktracker.databinding.FragmentBookNotesBinding
 import com.nastya.booktracker.domain.model.Highlight
 import com.nastya.booktracker.presentation.ui.bookDetail.BookDetailFragmentArgs
+import kotlinx.coroutines.flow.first
 import kotlinx.coroutines.launch
 
 class BookNotesFragment : Fragment() {
@@ -74,7 +75,7 @@ class BookNotesFragment : Fragment() {
     private fun openReaderAtHighlight(highlight: Highlight) {
         lifecycleScope.launch {
             val bundle = Bundle().apply {
-                putString("bookPath", viewModel.getBookPath())
+                putString("bookPath", viewModel.getBookPath().first())
                 putLong("bookId", highlight.bookId)
                 putLong("highlightId", highlight.id)
             }

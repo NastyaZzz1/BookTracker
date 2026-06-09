@@ -9,6 +9,7 @@ import kotlinx.coroutines.flow.SharingStarted
 import kotlinx.coroutines.flow.StateFlow
 import kotlinx.coroutines.flow.asStateFlow
 import kotlinx.coroutines.flow.combine
+import kotlinx.coroutines.flow.first
 import kotlinx.coroutines.flow.stateIn
 import kotlinx.coroutines.launch
 
@@ -65,7 +66,7 @@ class BooksViewModel(val dao: BookDao) : ViewModel() {
 
     fun updateAllCategories() {
         viewModelScope.launch {
-            val booksList = dao.getAllOnce()
+            val booksList = filteredBooks.first()
 
             val updatedBooks = booksList.map { book ->
                 val progress = book.progress
@@ -100,8 +101,8 @@ class BooksViewModel(val dao: BookDao) : ViewModel() {
 
     fun toggleBookIsFavorite(bookId: Long) {
         viewModelScope.launch {
-            val book = dao.getNotLive(bookId)
-            book!!.isFavorite = !book.isFavorite
+            val book = dao.getBook(bookId).first()
+            book.isFavorite = !book.isFavorite
             dao.update(book)
         }
     }

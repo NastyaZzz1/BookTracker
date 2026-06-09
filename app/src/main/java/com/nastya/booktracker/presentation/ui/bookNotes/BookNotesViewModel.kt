@@ -5,10 +5,12 @@ import androidx.lifecycle.viewModelScope
 import com.nastya.booktracker.data.local.dao.BookDao
 import com.nastya.booktracker.data.local.dao.HighlightDao
 import com.nastya.booktracker.domain.model.Highlight
+import kotlinx.coroutines.flow.Flow
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.SharingStarted
 import kotlinx.coroutines.flow.StateFlow
 import kotlinx.coroutines.flow.combine
+import kotlinx.coroutines.flow.map
 import kotlinx.coroutines.flow.stateIn
 
 class BookNotesViewModel(
@@ -18,7 +20,8 @@ class BookNotesViewModel(
 ): ViewModel() {
     private val selectedCategory = MutableStateFlow<Highlight.Style?>(null)
 
-    suspend fun getBookPath() = bookDao.getNotLive(bookId)?.filePath
+    fun getBookPath(): Flow<String> = bookDao.getBook(bookId)
+        .map { it.filePath }
 
     val filteredHighlights: StateFlow<List<Highlight>> = combine(
             highlightDao.getHighlightsForBookFlow(bookId),

@@ -20,17 +20,8 @@ interface BookDao {
     suspend fun delete(book: Book)
 
     @Query("SELECT * FROM book_table WHERE book_id = :bookId")
-    suspend fun getNotLive(bookId: Long): Book?
-
-    @Query("SELECT * FROM book_table WHERE book_id = :bookId")
     fun getBook(bookId: Long): Flow<Book>
 
     @Query("SELECT * FROM book_table")
     fun getAll(): Flow<List<Book>>
-
-    @Query("SELECT * FROM book_table")
-    suspend fun getAllOnce(): List<Book>
-
-    @Query("SELECT COUNT(*) FROM book_table WHERE book_name = :title AND book_author = :author")
-    suspend fun countBooksByTitleAndAuthor(title: String, author: String): Int
 }

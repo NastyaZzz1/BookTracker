@@ -58,11 +58,11 @@ class BooksFragment : Fragment() {
         binding.allBooksBtn.isSelected = true
         setSortIcon()
         setupFilterButtons()
-        setupSortButton()
+        setupSortButtons()
         navigateToBookObserver()
     }
 
-    private fun setupSortButton() {
+    private fun setupSortButtons() {
         binding.sortBtn.setOnClickListener {
             viewModel.changeSortedState()
         }
