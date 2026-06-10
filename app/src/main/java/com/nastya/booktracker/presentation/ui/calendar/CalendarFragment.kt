@@ -229,6 +229,9 @@ class CalendarFragment : Fragment() {
                 editTextMin.visibility = View.GONE
                 timePicker.visibility = View.VISIBLE
 
+                dialogView.findViewById<TextView>(R.id.goal_hour_label).visibility = View.GONE
+                dialogView.findViewById<TextView>(R.id.goal_min_label).visibility = View.GONE
+
                 timePicker.setIs24HourView(true)
                 val value = viewModel.dailyGoal.value
                 timePicker.hour = value / 60
