@@ -64,29 +64,6 @@ class BooksViewModel(val dao: BookDao) : ViewModel() {
         }
     }
 
-    fun updateAllCategories() {
-        viewModelScope.launch {
-            val booksList = filteredBooks.first()
-
-            val updatedBooks = booksList.map { book ->
-                val progress = book.progress
-
-                val newCategory = when (progress) {
-                    0 -> "want"
-                    100 -> "past"
-                    else -> "reading"
-                }
-
-                if (book.category != newCategory) book.copy(category = newCategory)
-                else book
-            }
-
-            updatedBooks.forEach { updatedBook ->
-                dao.update(updatedBook)
-            }
-        }
-    }
-
     fun onBookClicked(bookId: Long) {
         viewModelScope.launch {
             _navigateToDetail.value = bookId

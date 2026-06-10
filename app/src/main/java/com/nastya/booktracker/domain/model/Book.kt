@@ -17,7 +17,7 @@ data class Book (
     var bookAuthor: String = "",
 
     @ColumnInfo(name = "book_category")
-    var category: String = "",
+    var category: String = "want",
 
     @ColumnInfo(name = "book_description")
     var description: String = "",

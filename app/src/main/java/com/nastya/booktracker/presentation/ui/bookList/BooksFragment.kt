@@ -45,15 +45,14 @@ class BooksFragment : Fragment() {
         )
         binding.booksList.adapter = adapter
 
-        lifecycleScope.launch {
-            viewModel.filteredBooks.collect { books ->
-                books.let {
+        viewLifecycleOwner.lifecycleScope.launch {
+            viewLifecycleOwner.repeatOnLifecycle(Lifecycle.State.STARTED) {
+                viewModel.filteredBooks.collect { books ->
                     adapter.submitList(books)
                 }
             }
         }
 
-        viewModel.updateAllCategories()
         viewModel.filterByCategory("all")
         binding.allBooksBtn.isSelected = true
         setSortIcon()
@@ -103,12 +102,14 @@ class BooksFragment : Fragment() {
     }
 
     private fun setSortIcon() {
-        lifecycleScope.launch {
-            viewModel.sortedBooksState.collect { state ->
-                when (state) {
-                    is BooksViewModel.SortedState.None -> binding.sortBtn.setImageResource(R.drawable.icon_sort_none)
-                    is BooksViewModel.SortedState.Desc -> binding.sortBtn.setImageResource(R.drawable.icon_sort_desc)
-                    is BooksViewModel.SortedState.Asc -> binding.sortBtn.setImageResource(R.drawable.icon_sort_asc)
+        viewLifecycleOwner.lifecycleScope.launch {
+            viewLifecycleOwner.repeatOnLifecycle(Lifecycle.State.STARTED) {
+                viewModel.sortedBooksState.collect { state ->
+                    when (state) {
+                        is BooksViewModel.SortedState.None -> binding.sortBtn.setImageResource(R.drawable.icon_sort_none)
+                        is BooksViewModel.SortedState.Desc -> binding.sortBtn.setImageResource(R.drawable.icon_sort_desc)
+                        is BooksViewModel.SortedState.Asc -> binding.sortBtn.setImageResource(R.drawable.icon_sort_asc)
+                    }
                 }
             }
         }

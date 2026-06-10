@@ -123,9 +123,15 @@ class EpubReaderViewModel(
         if(locator == null) return
         runBlocking(Dispatchers.IO) {
             val book = bookDao.getBook(bookId).first()
+            val newCategory = when (presentRead) {
+                0 -> "want"
+                100 -> "past"
+                else -> "reading"
+            }
             val updatedBook = book.copy(
                 locatorJson = Gson().toJson(LocatorDto.fromLocator(locator)),
-                progress = presentRead
+                progress = presentRead,
+                category = newCategory
             )
             bookDao.update(updatedBook)
         }

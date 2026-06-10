@@ -34,6 +34,7 @@ class BookItemAdapter(
                 return BookItemViewHolder(binding)
             }
         }
+        var boundBookId: Long? = null
 
         @SuppressLint("SetTextI18n")
         fun bind(item: Book?,
@@ -50,11 +51,6 @@ class BookItemAdapter(
                 binding.bookAuthor.text = book.bookAuthor
 
                 binding.favBtn.setOnClickListener{
-                    book.isFavorite = !book.isFavorite
-                    binding.favBtn.setImageResource(
-                        if (book.isFavorite) R.drawable.icon_heart
-                        else R.drawable.icon_heart_empty
-                    )
                     onFavoriteClick(book.bookId)
                 }
 
@@ -63,10 +59,14 @@ class BookItemAdapter(
                     else R.drawable.icon_heart_empty
                 )
 
-                binding.bookImage.load(book.imageData) {
-                    crossfade(true)
+                if (boundBookId != book.bookId) {
+                    boundBookId = book.bookId
+                    binding.bookImage.load(book.imageData) {
+                        crossfade(false)
+                    }
                 }
             } ?: run {
+                boundBookId = null
                 binding.bookName.text = "No data"
             }
         }
